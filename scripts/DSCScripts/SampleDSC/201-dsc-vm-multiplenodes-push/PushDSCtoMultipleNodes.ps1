@@ -1,4 +1,4 @@
-# This Script complies MOF files for each computer and pushes configuration to all computers and applies configuration
+# This Script complies MOF files for each computer and pushes configuration to all computers and start DSC configuration
 # computers are defined in .\DSCConfigData.psd1 file 
 # RDP to VM, copy these files into a folder, run PushDSCtoMultipleNodes.ps1 file 
 

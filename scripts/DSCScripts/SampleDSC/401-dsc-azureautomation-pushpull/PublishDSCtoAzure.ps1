@@ -8,8 +8,8 @@
 #Requires -Module @{ModuleName="AzureRm.Profile";ModuleVersion="3.0"}
 
 
-# Uncomment this line below, if you are not already opened Azure Session. This will let you login to desired Azure subscription
-# Connect-AzureRmAccount
+# Azure Account 
+Connect-AzureRmAccount
 
 $DSCconfigFile = "DSCConfig.ps1"
 $ConfigurationName = "DSCConfig"
@@ -27,24 +27,24 @@ $DSCconfigDataFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PS
 
 $ConfigData = Import-PowerShellDataFile $DSCconfigDataFile
 
-#$AutomationAccount = Get-AzureRmAutomationAccount -AutomationAccountName $AutomationAccountName
-#$AutomationAccount
-
+# Import Configuraiton into Azure DSC Automation
 Import-AzureRmAutomationDscConfiguration -SourcePath $DSCconfigFile -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -Published -Force
-#Start-AzureRmAutomationDscCompilationJob -ConfigurationName $ConfigurationName -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName
 
+# Complies MOF Files for each nodes defined in DSCconfigDataFile
 $DSCComp = Start-AzureRmAutomationDscCompilationJob -AutomationAccountName $AutomationAccountName -ConfigurationName $ConfigurationName -ConfigurationData $ConfigData -ResourceGroupName  $ResourceGroupName
 
 $ConfigData.AllNodes | where {$_.NodeName -ne "*"} | ForEach-Object{
     
     $NodeName = $_.NodeName
+    # check if node is already registered or not with Azure DSC Automation pull server
     $getDSCNode =   Get-AzureRmAutomationDscNode -ResourceGroupName  $ResourceGroupName -AutomationAccountName $AutomationAccountName -Name $NodeName
     
     if(!$getDSCNode )
     {
         Write-Host "$NodeName - Not Registered"
         $nodeConfigurationName = $ConfigurationName +'.' + $NodeName
-        #$nodeConfigurationName
+
+        # Register each VM to Azure DSC Pull Server for MOF pull
         Register-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AzureVMResourceGroup $ResourceGroupName  -AutomationAccountName $AutomationAccountName -ConfigurationMode $ConfigurationMode -NodeConfigurationName $nodeConfigurationName -AzureVMName $NodeName -AzureVMLocation "East US" -Verbose
     }
 }

@@ -1,5 +1,5 @@
 ﻿
-# This script willl create software share resources in Azure. pass only $location of the files, and folder to upload
+# This script willl create software share resources in Azure.
 
 #Requires -Version 3.0
 #Requires -Module AzureRM.Resources
@@ -9,11 +9,11 @@
 #Connect-AzureRmAccount
 
 # change
-$Location     =   Read-Host -Prompt "Input share location for softwares" 
-$sourceFolder = Read-Host -Prompt "Input folder to upload"  # Folder to upload based on services, this folder inclues all folders that DSC requires for installation
+$Location     =   Read-Host -Prompt "Input share location for softwares" # local location to upload files
+$sourceFolder =   Read-Host -Prompt "Input folder to upload"  # Folder to upload based on services
 
-Write-Host $Location
-Write-Host $sourceFolder
+Write-Host $Location -ForegroundColor Yellow
+Write-Host $sourceFolder -ForegroundColor Yellow
 
 # Do not change, these are constant for the project
 $ResourceGroupLocation = "eastus"
@@ -53,10 +53,6 @@ if ($StorageFileShare -eq $null) {
     #Set-AzureStorageShareQuota -ShareName $StorageContainerName -Quota  10240
 }
 
-## create vault for storing key
-#New-AzureRmKeyVault -Name 'ThunderChickenVault' -ResourceGroupName 'StorageResourceGroupName' -Location "$ResourceGroupLocation"
-#$secretvalue = ConvertTo-SecureString $StorageAccount. -AsPlainText -Force
-#$secret = Set-AzureKeyVaultSecret -VaultName 'ContosoKeyVault' -Name 'ExamplePassword' -SecretValue $secretvalue
 $softwareKeys = Get-AzureRmStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName `
                                                  -Name $StorageAccountName
 $Location  = $Location + '\' + $sourceFolder    
@@ -64,7 +60,7 @@ $Location  = $Location + '\' + $sourceFolder
 if ($UploadArtifacts -and (Test-Path $Location))
 {
     
-    Write-Host "Uploading softwares..."
+    Write-Host "Uploading softwares..." -ForegroundColor Yellow
     # get all the folders in the source directory
     # create top folder for service
     
