@@ -9,11 +9,11 @@ $DSCconfigFile = "DSCConfig.ps1"
 $ConfigurationName = "DSCConfig"
 $ResourceGroupName = "ThunderChicken"
 
-Write-Host "Registering Configuration"
+Write-Host "Uploading and Registering Configuration"
 
 $DSCconfigFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCconfigFile))
 
-$storageName = 'masterdjyr55yornmvo' # DSC will be storad here before pushed into Azure VM
+$storageName =  Read-Host -Prompt "Input Azure Storage Account"  # DSC will be stored here before pushed into Azure VM
 
 # Publish the configuration script to user storage defined above
 $ArchiveZipFile = Publish-AzureRmVMDscConfiguration -ConfigurationPath $DSCconfigFile -ResourceGroupName $ResourceGroupName -StorageAccountName $storageName -force
