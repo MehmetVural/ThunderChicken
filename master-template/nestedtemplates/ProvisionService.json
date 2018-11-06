@@ -157,28 +157,8 @@
           },
           {
             "size": "Small",
-            "subnet": "[variables('KSubnetName')]"
-          },
-          {
-            "size": "Small",
-            "subnet": "[variables('KSubnetName')]"
-          },
-          {
-            "size": "Small",
             "subnet": "[variables('CSubnetName')]"
-          },
-          {
-            "size": "Small",
-            "subnet": "[variables('CSubnetName')]"
-          },
-          {
-            "size": "Small",
-            "subnet": "[variables('CSubnetName')]"
-          },
-          {
-            "size": "Small",
-            "subnet": "[variables('CSubnetName')]"
-          }
+          }         
         ]
       },
       "AirWatch": {
