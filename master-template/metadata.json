@@ -1,0 +1,11 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Master Template",
+  "description": "This template deploys a VNET with three subnets and provisions a DC in each subnet",
+  "summary": "Install Virtual Network with multiple subnets and AD Domain",
+  "githubUsername": "wallacetech",
+  "dateUpdated": "2018-10-16"
+}
+
+

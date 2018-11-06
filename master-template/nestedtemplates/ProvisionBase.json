@@ -1,0 +1,202 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "templatePrefix": "master",
+    "location": "[resourceGroup().location]",
+    "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+    "virtualNetworkName": "[concat(variables('templatePrefix'), '-vn')]",
+    "addressPrefix": "10.0.0.0/16",
+    "VSubnetPrefix": "10.0.0.0/24",
+    "KSubnetPrefix": "10.0.1.0/24",
+    "CSubnetPrefix": "10.0.2.0/24",
+    "VNSGName": "[concat(variables('templatePrefix'), '-vnsg')]",
+    "KNSGName": "[concat(variables('templatePrefix'), '-knsg')]",
+    "CNSGName": "[concat(variables('templatePrefix'), '-cnsg')]",
+    "VSubnetName": "vs",
+    "KSubnetName": "ks",
+    "CSubnetName": "cs",
+    "dc1NicName": "[concat(variables('templatePrefix'), '-dc1Nic')]",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-dc2Nic')]",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3NicName": "[concat(variables('templatePrefix'), '-dc3Nic')]",
+    "dc3NicIPAddress": "10.0.2.5",
+    "subnets": [
+      {
+        "name": "[variables('VSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('VSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('KSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('KSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('KNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('CSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('CSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CNSGName'))]"
+          }
+        }
+      }
+    ]
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('VNSGName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "Tcp",
+              "destinationPortRange": "3389",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('KNSGName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('CNSGName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('VNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('KNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('CNSGName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": "[variables('subnets')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountNamePrefix')]",
+      "apiVersion": "2016-01-01",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "properties": {}
+    },
+    {
+      "name": "[variables('dc1NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "This will be your file server nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('VSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dc1NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dc2NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "Replica DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('KSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dc2NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dc3NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "Replica DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('CSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dc3NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {}
+}

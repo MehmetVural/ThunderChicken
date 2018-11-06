@@ -1,0 +1,389 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": "vmadmin"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      }
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    },
+    "forestMode": {
+      "type": "string",
+      "defaultValue": "Win2012R2",
+      "allowedValues": [
+        "Win2008",
+        "Win2008R2",
+        "Win2012",
+        "Win2012R2",
+        "WinThreshold"
+      ],
+      "metadata": {
+        "group": "Settings",
+        "description": "Domain Controller Functionning Level"
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "master",
+    "location": "[resourceGroup().location]",
+    "domainName": "Domain.com",
+    "domainNetbiosName": "LAB",
+    "forestMode": "[parameters('forestMode')]",
+    "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+    "dc1VMName": "[concat(variables('templatePrefix'), '-dc1vm')]",
+    "dc1NicName": "[concat(variables('templatePrefix'), '-dc1Nic')]",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2VMName": "[concat(variables('templatePrefix'), '-dc2vm')]",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-dc2Nic')]",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3VMName": "[concat(variables('templatePrefix'), '-dc3vm')]",
+    "dc3NicName": "[concat(variables('templatePrefix'), '-dc3Nic')]",
+    "dc3NicIPAddress": "10.0.2.5",
+    "virtualMachineSize": "Standard_DS1_v2",
+    "dcPrimaryInstallModule": {
+      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
+      "script": "CreatePrimaryDC.ps1",
+      "function": "CreatePrimaryDC"
+    },
+    "dcSecondaryInstallModule": {
+      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','ProvisionReplicaDCs.ps1.zip')]",
+      "script": "ProvisionReplicaDCs.ps1",
+      "function": "ProvisionReplicaDCs"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('dc1VMName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('virtualMachineSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('dc1VMName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('dc1VMName'),'_OSDisk')]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('dc1NicName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('storageAccountNamePrefix'),'.blob.core.windows.net')]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
+          "type": "microsoft.devtestlab/schedules",
+          "name": "[concat('shutdown-computevm-',variables('dc1VMName'))]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('dc1VMName'))]"
+          ],
+          "properties": {
+            "status": "Enabled",
+            "taskType": "ComputeVmShutdownTask",
+            "dailyRecurrence": {
+              "time": "1900"
+            },
+            "timeZoneId": "Pacific Standard Time",
+            "notificationSettings": {
+              "status": "Disabled",
+              "timeInMinutes": 15
+            },
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('dc1VMName'))]"
+          }
+        },
+        {
+          "type": "extensions",
+          "name": "Microsoft.Powershell.DSC",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('dc1VMName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.20",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('dcPrimaryInstallModule').url]",
+                "script": "[variables('dcPrimaryInstallModule').script]",
+                "function": "[variables('dcPrimaryInstallModule').function]"
+              },
+              "configurationArguments": {
+                "domainName": "[variables('domainName')]",
+                "domainNetbiosName": "[variables('domainNetbiosName')]",
+                "dnsServer": "[variables('dc1NicIPAddress')]",
+                "forestMode": "[variables('forestMode')]"
+              }
+            },
+            "protectedSettings": {
+              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationArguments": {
+                "DomainAdminCredential": {
+                  "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('dc2VMName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('virtualMachineSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('dc2VMName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('dc2VMName'),'_OSDisk')]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('dc2NicName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('storageAccountNamePrefix'),'.blob.core.windows.net')]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
+          "type": "microsoft.devtestlab/schedules",
+          "name": "[concat('shutdown-computevm-',variables('dc2VMName'))]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('dc2VMName'))]"
+          ],
+          "properties": {
+            "status": "Enabled",
+            "taskType": "ComputeVmShutdownTask",
+            "dailyRecurrence": {
+              "time": "1900"
+            },
+            "timeZoneId": "Pacific Standard Time",
+            "notificationSettings": {
+              "status": "Disabled",
+              "timeInMinutes": 15
+            },
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('dc2VMName'))]"
+          }
+        },
+        {
+          "type": "extensions",
+          "name": "Microsoft.Powershell.DSC",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('dc2VMName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.20",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('dcSecondaryInstallModule').url]",
+                "script": "[variables('dcSecondaryInstallModule').script]",
+                "function": "[variables('dcSecondaryInstallModule').function]"
+              },
+              "configurationArguments": {
+                "domainName": "[variables('domainName')]",
+                "dnsServer": "[variables('dc1NicIPAddress')]"
+              }
+            },
+            "protectedSettings": {
+              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationArguments": {
+                "DomainAdminCredential": {
+                  "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('dc3VMName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('virtualMachineSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('dc3VMName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('dc3VMName'),'_OSDisk')]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('dc3NicName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('storageAccountNamePrefix'),'.blob.core.windows.net')]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
+          "type": "microsoft.devtestlab/schedules",
+          "name": "[concat('shutdown-computevm-',variables('dc3VMName'))]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('dc3VMName'))]"
+          ],
+          "properties": {
+            "status": "Enabled",
+            "taskType": "ComputeVmShutdownTask",
+            "dailyRecurrence": {
+              "time": "1900"
+            },
+            "timeZoneId": "Pacific Standard Time",
+            "notificationSettings": {
+              "status": "Disabled",
+              "timeInMinutes": 15
+            },
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('dc3VMName'))]"
+          }
+        },
+        {
+          "type": "extensions",
+          "name": "Microsoft.Powershell.DSC",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('dc3VMName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.20",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('dcSecondaryInstallModule').url]",
+                "script": "[variables('dcSecondaryInstallModule').script]",
+                "function": "[variables('dcSecondaryInstallModule').function]"
+              },
+              "configurationArguments": {
+                "domainName": "[variables('domainName')]",
+                "dnsServer": "[variables('dc1NicIPAddress')]"
+              }
+            },
+            "protectedSettings": {
+              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationArguments": {
+                "DomainAdminCredential": {
+                  "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {}
+}

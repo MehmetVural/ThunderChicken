@@ -1,0 +1,389 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": "vmadmin"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/wallacetech/ThunderChicken/servicemodular/service-template",
+      "metadata": {
+        "group": "Template settings",
+        "description": "Location of the artifacts"
+      }
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    },
+    "template": {
+      "type": "string",
+      "defaultValue": "Domain",
+      "allowedValues": [
+        "None",
+        "Domain",
+        "DNS",
+        "DHCP",
+        "FileServer",
+        "SCOM",
+        "SCCM",
+        "SharePoint",
+        "AirWatch",
+        "Exchange"
+      ],
+      "metadata": {
+        "group": "Lab Enviornment Template",
+        "description": "Indicates Which enviornment to build"
+      }
+    }
+  },
+  "variables": {
+    "template": "[parameters('template')]",
+    "location": "[resourceGroup().location]",
+    "templates": {
+      "None": {
+        "prefix": "blank",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "Domain": {
+        "prefix": "dc",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "DNS": {
+        "prefix": "dns",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('KSubnetName')]"
+          }
+        ]
+      },
+      "DHCP": {
+        "prefix": "dhcp",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "FileServer": {
+        "prefix": "fs",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "SCOM": {
+        "prefix": "scom",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "SCCM": {
+        "prefix": "sccm",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "SharePoint": {
+        "prefix": "sp",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('KSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('KSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('KSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('CSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('CSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('CSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('CSubnetName')]"
+          }
+        ]
+      },
+      "AirWatch": {
+        "prefix": "aw",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      },
+      "Exchange": {
+        "prefix": "ex",
+        "servers": [
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          },
+          {
+            "size": "Small",
+            "subnet": "[variables('VSubnetName')]"
+          }
+        ]
+      }
+    },
+    "templatePrefix": "[variables('templates')[variables('template')].prefix]",
+    "mastertemplatePrefix": "master",
+    "domainName": "Domain.com",
+    "domainNetbiosName": "LAB",
+    "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
+    "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
+    "VSubnetName": "vs",
+    "KSubnetName": "ks",
+    "CSubnetName": "cs",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3NicIPAddress": "10.0.2.5",
+    "virtualMachineSize": "Standard_DS1_v2",
+    "imageReference": {
+      "publisher": "MicrosoftWindowsServer",
+      "offer": "WindowsServer",
+      "sku": "2016-Datacenter",
+      "version": "latest"
+    },
+    "dscModulePrepare": {
+      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','PrepareVms.ps1.zip')]",
+      "script": "PrepareVms.ps1",
+      "function": "PrepareVms"
+    },
+    "virtualMachineSizeArray": {
+      "Small": "Standard_DS1_v2",
+      "Medium": "Standard_DS1_v2",
+      "Large": "Standard_DS1_v2"
+    }
+  },
+  "resources": [
+    {
+      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1))]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[variables('location')]",
+      "apiVersion": "2015-06-15",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[length(variables('templates')[variables('template')].servers)]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-', 'ipconfig', add(copyIndex(), 1))]",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('templates')[variables('template')].servers[copyIndex()].subnet)]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1))]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1)))]"
+      ],
+      "copy": {
+        "name": "vmLoop",
+        "count": "[length(variables('templates')[variables('template')].servers)]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('virtualMachineSizeArray')[variables('templates')[variables('template')].servers[copyIndex()].size]]"
+        },
+        "osProfile": {
+          "computerName": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imageReference').publisher]",
+            "offer": "[variables('imageReference').offer]",
+            "sku": "[variables('imageReference').sku]",
+            "version": "[variables('imageReference').version]"
+          },
+          "osDisk": {
+            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1), '_OSDisk')]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1), '_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-',variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1)))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('storageAccountNamePrefix'),'.blob.core.windows.net')]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
+          "type": "microsoft.devtestlab/schedules",
+          "name": "[concat('shutdown-computevm-', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+          ],
+          "properties": {
+            "status": "Enabled",
+            "taskType": "ComputeVmShutdownTask",
+            "dailyRecurrence": {
+              "time": "1900"
+            },
+            "timeZoneId": "Pacific Standard Time",
+            "notificationSettings": {
+              "status": "Disabled",
+              "timeInMinutes": 15
+            },
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+          }
+        },
+        {
+          "type": "extensions",
+          "name": "Microsoft.Powershell.DSC",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.20",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('dscModulePrepare').url]",
+                "script": "[variables('dscModulePrepare').script]",
+                "function": "[variables('dscModulePrepare').function]"
+              },
+              "configurationArguments": {
+                "domainName": "[variables('domainName')]",
+                "dnsServer": "[variables('dc1NicIPAddress')]"
+              }
+            },
+            "protectedSettings": {
+              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationArguments": {
+                "DomainAdminCredential": {
+                  "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "template": {
+      "type": "string",
+      "value": "[parameters('template')]"
+    }
+  }
+}

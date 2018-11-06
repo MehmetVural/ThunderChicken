@@ -1,0 +1,12 @@
+{
+    "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+    "type": "QuickStart",
+    "itemDisplayName": "devtestlab",
+    "description": "This template deploys devtest lab to Azure",
+    "summary": "Creates a devtestlab called thunderchicken",
+    "githubUsername": "wallacetech",
+    "dateUpdated": "2018-10-18"
+  }
+  
+  
+  

@@ -1,0 +1,210 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": "vmadmin"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/wallacetech/ThunderChicken/master/master-template"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    },
+    "deployJumpBoxTemplate": {
+      "type": "string",
+      "defaultValue": "Yes",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates wheter or not include JumpBox in this deployment"
+      }
+    },
+    "deployDomincontrollers": {
+      "type": "string",
+      "defaultValue": "Yes",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates wheter or not include Domain Controller template in this deployment"
+      }
+    },
+    "forestMode": {
+      "type": "string",
+      "defaultValue": "Win2012R2",
+      "allowedValues": [
+        "WinThreshold",
+        "Win2012R2",
+        "Win2012",
+        "Win2008R2",
+        "Win2008"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Domain Controller Functioning Level"
+      }
+    },
+    "template": {
+      "type": "string",
+      "defaultValue": "None",
+      "allowedValues": [
+        "None",
+        "Domain",
+        "DNS",
+        "DHCP",
+        "File Server",
+        "SCOM",
+        "SCCM",
+        "SharePoint",
+        "AirWatch",
+        "Exchange"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates Which Service Enviornment to Build"
+      }
+    }
+  },
+  "variables": {    
+    "location": "[resourceGroup().location]",
+    "forestMode": "[parameters('forestMode')]",    
+    "baseTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('_artifactsLocationSasToken'))]",    
+    "jumpboxTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('_artifactsLocationSasToken'))]",
+    "domainTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('_artifactsLocationSasToken'))]",
+    "serviceTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('_artifactsLocationSasToken'))]"    
+  },
+  "resources": [
+    {
+      "name": "ProvisioningBase",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('baseTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {}
+      }
+    },
+    {
+      "name": "ProvisioningJumbBox",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployJumpBoxTemplate'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('jumpboxTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningDomains",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployDomincontrollers'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('domainTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "forestMode": {
+            "value": "[parameters('forestMode')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningServiceVms",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[not(equals(parameters('template'), 'None'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('serviceTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "template": {
+            "value": "[parameters('template')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
