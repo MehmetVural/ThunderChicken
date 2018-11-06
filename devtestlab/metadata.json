@@ -4,7 +4,7 @@
     "itemDisplayName": "devtestlab",
     "description": "This template deploys devtest lab to Azure",
     "summary": "Creates a devtestlab called thunderchicken",
-    "githubUsername": "wallacetech",
+    "githubUsername": "",
     "dateUpdated": "2018-10-18"
   }
   
