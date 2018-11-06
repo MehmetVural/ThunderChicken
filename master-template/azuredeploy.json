@@ -35,7 +35,7 @@
     },
     "deployJumpBoxTemplate": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SharePoint",
       "allowedValues": [
         "None",
         "Domain",

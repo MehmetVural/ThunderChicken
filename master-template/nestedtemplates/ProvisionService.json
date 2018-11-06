@@ -152,13 +152,33 @@
         "prefix": "sp",
         "servers": [
           {
+            "hostname": "WGSAPP",
             "size": "Small",
-            "subnet": "[variables('KSubnetName')]"
+            "subnet": "[variables('KSubnetName')]",
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "10.0.1.10"
           },
           {
+            "hostname": "WGSWEB",
             "size": "Small",
-            "subnet": "[variables('CSubnetName')]"
-          }         
+            "subnet": "[variables('KSubnetName')]",
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "10.0.1.11"
+          },
+          {
+            "hostname": "WGTAPP",
+            "size": "Small",
+            "subnet": "[variables('CSubnetName')]",
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "10.0.2.10"
+          },
+          {
+            "hostname": "WGTWEB",
+            "size": "Small",
+            "subnet": "[variables('CSubnetName')]",
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "10.0.2.11"
+          }             
         ]
       },
       "AirWatch": {
@@ -220,10 +240,11 @@
   },
   "resources": [
     {
-      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1))]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[variables('location')]",
       "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic')]",      
+      "location": "[variables('location')]",
+      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",      
       "copy": {
         "name": "nicLoop",
         "count": "[length(variables('templates')[variables('template')].servers)]"
@@ -236,7 +257,9 @@
               "subnet": {
                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('templates')[variables('template')].servers[copyIndex()].subnet)]"
               },
-              "privateIPAllocationMethod": "Dynamic"
+              "privateIPAllocationMethod": "[variables('templates')[variables('template')].servers[copyIndex()].privateIPAllocationMethod]",
+              "privateIPAddress": "[if(equals('Static', 'Static'), variables('templates')[variables('template')].servers[copyIndex()].privateIPAddress, json('null'))]"
+              
             }
           }
         ]
@@ -245,10 +268,11 @@
     {
       "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1))]",
+      "name": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
       "location": "[variables('location')]",
+      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",      
       "dependsOn": [
-        "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1)))]"
+        "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic'))]"
       ],
       "copy": {
         "name": "vmLoop",
@@ -259,7 +283,7 @@
           "vmSize": "[variables('virtualMachineSizeArray')[variables('templates')[variables('template')].servers[copyIndex()].size]]"
         },
         "osProfile": {
-          "computerName": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1))]",
+          "computerName":  "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -271,13 +295,13 @@
             "version": "[variables('imageReference').version]"
           },
           "osDisk": {
-            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1), '_OSDisk')]",
+            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_OSDisk')]",
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
           "dataDisks": [
             {
-              "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1), '_DataDisk1')]",
+              "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk1')]",
               "caching": "None",
               "createOption": "Empty",
               "diskSizeGB": "128",
@@ -288,7 +312,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-',variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1)))]"
+              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic'))]"
             }
           ]
         },
@@ -303,10 +327,10 @@
         {
           "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
           "type": "microsoft.devtestlab/schedules",
-          "name": "[concat('shutdown-computevm-', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]",
+          "name": "[concat('shutdown-computevm-', variables('templates')[variables('template')].servers[copyIndex()].hostname)]",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+            "[concat('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
           ],
           "properties": {
             "status": "Enabled",
@@ -319,7 +343,7 @@
               "status": "Disabled",
               "timeInMinutes": 15
             },
-            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
           }
         },
         {
@@ -328,7 +352,7 @@
           "apiVersion": "2015-05-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+            "[resourceId('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"            
           ],
           "properties": {
             "publisher": "Microsoft.Powershell",
