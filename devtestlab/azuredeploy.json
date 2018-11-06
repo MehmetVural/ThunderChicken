@@ -2,25 +2,21 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "newLabName": {
+        "name": {
             "type": "string",
-            "metadata": {
-              "description": "The name of the new lab instance to be created"
-            }
-          },
-        "artifactRepoSecurityToken": {
-            "type": "securestring",
-            "metadata": {
-                "description": "The Personal Access Code for the repository"
-              }
-      }
+            "defaultValue": ""
+        },
+        "regionId": {
+            "type": "string",
+            "defaultValue": ""
+        }
     },
     "resources": [
         {
             "apiVersion": "2018-10-15-preview",
-            "name": "[parameters('newLabName')]",
+            "name": "[parameters('name')]",
             "type": "Microsoft.DevTestLab/labs",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('regionId')]",
             "tags": {},
             "properties": {
                 "labStorageType": "Premium"
@@ -29,16 +25,16 @@
                 {
                     "apiVersion": "2018-10-15-preview",
                     "name": "LabVmsShutdown",
-                    "location": "[resourceGroup().location]",
+                    "location": "[parameters('regionId')]",
                     "type": "schedules",
                     "dependsOn": [
-                        "[resourceId('Microsoft.DevTestLab/labs', parameters('newLabName'))]"
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
                     ],
                     "properties": {
                         "status": "Enabled",
                         "timeZoneId": "Pacific Standard Time",
                         "dailyRecurrence": {
-                            "time": "1800"
+                            "time": "1600"
                         },
                         "taskType": "LabVmsShutdownTask",
                         "notificationSettings": {
@@ -49,71 +45,25 @@
                 },
                 {
                     "apiVersion": "2018-10-15-preview",
-                    "name": "labvmautostart",
-                    "location": "[resourceGroup().location]",
-                    "type": "schedules",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.DevTestLab/labs', parameters('newLabName'))]"
-                    ],
-                     "properties": {
-                        "status": "Enabled",
-                        "taskType": "LabVmsStartupTask",
-                        "weeklyRecurrence": {
-                            "weekdays": [
-                                "Monday",
-                                "Tuesday",
-                                "Wednesday",
-                                "Thursday",
-                                "Friday"
-                            ],
-                            "time": "0630"
-                        },
-                        "timeZoneId": "Pacific Standard Time",
-                        "notificationSettings": {
-                            "status": "Disabled",
-                            "timeInMinutes": 0
-                        }
-                    }
-                },
-                {
-                    "apiVersion": "2018-10-15-preview",
-                    "name": "[concat('Dtl', parameters('newLabName'))]",
+                    "name": "[concat('Dtl', parameters('name'))]",
                     "type": "virtualNetworks",
-                    "location": "[resourceGroup().location]",
+                    "location": "[parameters('regionId')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.DevTestLab/labs', parameters('newLabName'))]"
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
                     ]
                 },
                 {
                     "apiVersion": "2018-10-15-preview",
                     "name": "Public Environment Repo",
                     "type": "artifactSources",
-                    "location": "[resourceGroup().location]",
+                    "location": "[parameters('regionId')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.DevTestLab/labs', parameters('newLabName'))]"
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
                     ],
                     "properties": {
                         "status": "Enabled"
                     }
                 }
-            ]
-        },
-        {
-            "name": "[concat(parameters('newLabName'), '/', 'Devlab')]",
-            "type": "Microsoft.DevTestLab/labs/artifactsources",
-            "apiVersion": "2016-05-15",
-            "properties": {
-              "displayName": "TC Git",
-              "uri": "https://github.com/wallacetech/ThunderChicken.git",
-              "sourceType": "GitHub",
-              "folderPath": "",
-              "armTemplateFolderPath": "/",
-              "branchRef": "master",
-              "securityToken": "[parameters('artifactRepoSecurityToken')]",
-              "status": "Enabled"
-            },
-            "dependsOn": [
-                "[resourceId('microsoft.devtestlab/labs', parameters('newLabName'))]"
             ]
         }
     ]

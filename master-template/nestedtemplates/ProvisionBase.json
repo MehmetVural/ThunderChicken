@@ -6,6 +6,7 @@
     "templatePrefix": "master",
     "location": "[resourceGroup().location]",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+    "DSCAutomationAccount": "DSCAutomationAccount",
     "virtualNetworkName": "[concat(variables('templatePrefix'), '-vn')]",
     "addressPrefix": "10.0.0.0/16",
     "VSubnetPrefix": "10.0.0.0/24",
@@ -124,6 +125,17 @@
       },
       "kind": "Storage",
       "properties": {}
+    },
+    {
+      "name": "[variables('DSCAutomationAccount')]",
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2015-10-31",
+      "location": "eastus2",
+      "properties": {
+        "sku": {
+          "name": "Basic"
+        }
+      }
     },
     {
       "name": "[variables('dc1NicName')]",

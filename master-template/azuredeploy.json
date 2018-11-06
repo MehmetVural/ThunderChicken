@@ -47,7 +47,7 @@
     },
     "deployDomincontrollers": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -80,7 +80,7 @@
         "Domain",
         "DNS",
         "DHCP",
-        "File Server",
+        "FileServer",
         "SCOM",
         "SCCM",
         "SharePoint",
