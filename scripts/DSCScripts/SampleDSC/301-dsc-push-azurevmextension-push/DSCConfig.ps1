@@ -1,5 +1,5 @@
 
-Configuration DSCConfig1 {  
+Configuration DSCConfig {  
     
     Node Localhost {
       
@@ -10,10 +10,10 @@ Configuration DSCConfig1 {
 
         Script AddContent {
             TestScript = { 
-                Test-Path 'C:\test-test.txt' 
+                Test-Path 'C:\301-test.txt' 
             }
             SetScript  = {
-                Add-Content 'C:\test-test.txt' 'Hello DSC World!.'
+                Add-Content 'C:\301-test.txt' 'Hello DSC World!.'
             }
             GetScript  = {$null}
         }  

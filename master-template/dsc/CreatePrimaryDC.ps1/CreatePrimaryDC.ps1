@@ -78,6 +78,8 @@
             LogPath = "C:\NTDS"
             SysvolPath = "C:\SYSVOL"
             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
-        }        
+        } 
+        
+        
    }
 }

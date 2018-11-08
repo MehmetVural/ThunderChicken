@@ -3,20 +3,27 @@
 # AzureRM.Profile, AzureRM.Compute  (Required Modules for this script)  
 
 # Azure Account 
-Connect-AzureRmAccount
+#Connect-AzureRmAccount
 
 $DSCconfigFile = "DSCConfig.ps1"
 $ConfigurationName = "DSCConfig"
-$ResourceGroupName = "ThunderChicken"
+$VMName = 'sp-ks-vm1'
 
-Write-Host "Uploading and Registering Configuration"
+Write-Host "Uploading and Registering Configuration" -ForegroundColor Yellow
 
 $DSCconfigFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCconfigFile))
 
-$storageName =  Read-Host -Prompt "Input Azure Storage Account"  # DSC will be stored here before pushed into Azure VM
+# Check Vm, storage Accounts
+$vm = Get-AzureRMVM | Where-Object Name -like "master-dc1vm" | Select-Object ResourceGroupName, Name, Location
+if ($vm) { $ResourceGroupName = $vm.ResourceGroupName }
+$vmforDSC = Get-AzureRMVM | Where-Object Name -like $VMName | Select-Object ResourceGroupName, Name, Location
+$storageAccount = Get-AzureRmStorageAccount | Where-Object ResourceGroupName -eq $ResourceGroupName | Select-Object StorageAccountName
+if($storageAccount){$storageName = $storageAccount.StorageAccountName}
 
-# Publish the configuration script to user storage defined above
-$ArchiveZipFile = Publish-AzureRmVMDscConfiguration -ConfigurationPath $DSCconfigFile -ResourceGroupName $ResourceGroupName -StorageAccountName $storageName -force
-
-Set-AzureRmVMDscExtension -Version '2.77' -ResourceGroupName $ResourceGroupName -VMName 'sp-ks-vm1'  -ArchiveBlobName "DSCConfig.ps1.zip" -ArchiveStorageAccountName $storageName -ConfigurationName $ConfigurationName -ArchiveContainerName "windows-powershell-dsc" -Location "East US"    
-
+# if vm and stroage account exist, then push zip configuration and push DSC extension to VM
+if($vmforDSC -and $storageAccount) {
+    # Publish the configuration script to user storage defined above
+    $ArchiveZipFile = Publish-AzureRmVMDscConfiguration -ConfigurationPath $DSCconfigFile -ResourceGroupName $ResourceGroupName -StorageAccountName $storageName -force
+    $filename = $ArchiveZipFile.Substring($ArchiveZipFile.LastIndexOf("/") + 1)    
+    Set-AzureRmVMDscExtension -Version '2.77' -ResourceGroupName $ResourceGroupName -VMName $VMName  -ArchiveBlobName $filename -ArchiveStorageAccountName $storageName -ConfigurationName $ConfigurationName -ArchiveContainerName "windows-powershell-dsc" -Location $vmforDSC.Location    
+}
