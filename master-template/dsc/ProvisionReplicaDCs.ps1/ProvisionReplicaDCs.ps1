@@ -97,7 +97,9 @@
             DatabasePath = "C:\NTDS"
             LogPath = "C:\NTDS"
             SysvolPath = "C:\SYSVOL"
+            SiteName   = 'CS'
             DependsOn  = "[Computer]JoinDomain"
+
         }        
    }
 }

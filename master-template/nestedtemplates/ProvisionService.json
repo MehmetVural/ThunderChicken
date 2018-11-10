@@ -38,7 +38,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "Domain",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "Domain",
@@ -153,32 +153,28 @@
         "servers": [
           {
             "hostname": "WGSAPP",
-            "size": "Small",
+            "size": "Large",
             "subnet": "[variables('KSubnetName')]",
-            "privateIPAllocationMethod": "Static",
             "privateIPAddress": "10.0.1.10"
           },
           {
             "hostname": "WGSWEB",
-            "size": "Small",
-            "subnet": "[variables('KSubnetName')]",
-            "privateIPAllocationMethod": "Static",
-            "privateIPAddress": "10.0.1.11"
-          },
-          {
-            "hostname": "WGTAPP",
-            "size": "Small",
+            "size": "Large",
             "subnet": "[variables('CSubnetName')]",
-            "privateIPAllocationMethod": "Static",
             "privateIPAddress": "10.0.2.10"
           },
           {
+            "hostname": "WGTAPP",
+            "size": "Medium",
+            "subnet": "[variables('KDMZSubnetName')]",
+            "privateIPAddress": "10.0.3.10"
+          },
+          {
             "hostname": "WGTWEB",
-            "size": "Small",
-            "subnet": "[variables('CSubnetName')]",
-            "privateIPAllocationMethod": "Static",
-            "privateIPAddress": "10.0.2.11"
-          }             
+            "size": "Medium",
+            "subnet": "[variables('CDMZSubnetName')]",
+            "privateIPAddress": "10.0.4.10"
+          }
         ]
       },
       "AirWatch": {
@@ -212,14 +208,47 @@
     "mastertemplatePrefix": "master",
     "domainName": "Domain.com",
     "domainNetbiosName": "LAB",
+    "domainNameDMZ": "DomainDmz.com",
+    "domainNetbiosNameDMZ": "LABDMZ",
     "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
     "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
     "VSubnetName": "vs",
     "KSubnetName": "ks",
     "CSubnetName": "cs",
+    "KDMZSubnetName": "kdmz",
+    "CDMZSubnetName": "cdmz",
     "dc1NicIPAddress": "10.0.0.5",
     "dc2NicIPAddress": "10.0.1.5",
     "dc3NicIPAddress": "10.0.2.5",
+    "dmzdc1NicIPAddress": "10.0.3.5",
+    "dmzdc2NicIPAddress": "10.0.4.5",
+    "subnets": {
+      "[variables('VSubnetName')]": {
+        "name": "[variables('VSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "dns": "[variables('dc1NicIPAddress')]"
+      },
+      "[variables('KSubnetName')]": {
+        "name": "[variables('KSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "dns": "[variables('dc2NicIPAddress')]"
+      },
+      "[variables('CSubnetName')]": {
+        "name": "[variables('CSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "dns": "[variables('dc3NicIPAddress')]"
+      },
+      "[variables('KDMZSubnetName')]": {
+        "name": "[variables('KDMZSubnetName')]",
+        "domain": "[variables('domainNameDMZ')]",
+        "dns": "[variables('dmzdc1NicIPAddress')]"
+      },
+      "[variables('CDMZSubnetName')]": {
+        "name": "[variables('CDMZSubnetName')]",
+        "domain": "[variables('domainNameDMZ')]",
+        "dns": "[variables('dmzdc2NicIPAddress')]"
+      }
+    },
     "virtualMachineSize": "Standard_DS1_v2",
     "imageReference": {
       "publisher": "MicrosoftWindowsServer",
@@ -234,17 +263,17 @@
     },
     "virtualMachineSizeArray": {
       "Small": "Standard_DS1_v2",
-      "Medium": "Standard_DS1_v2",
-      "Large": "Standard_DS1_v2"
+      "Medium": "Standard_D4s_v3",
+      "Large": "Standard_E4s_v3"  
     }
   },
   "resources": [
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic')]",      
+      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic')]",
       "location": "[variables('location')]",
-      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",      
+      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",
       "copy": {
         "name": "nicLoop",
         "count": "[length(variables('templates')[variables('template')].servers)]"
@@ -257,9 +286,8 @@
               "subnet": {
                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('templates')[variables('template')].servers[copyIndex()].subnet)]"
               },
-              "privateIPAllocationMethod": "[variables('templates')[variables('template')].servers[copyIndex()].privateIPAllocationMethod]",
+              "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[if(equals('Static', 'Static'), variables('templates')[variables('template')].servers[copyIndex()].privateIPAddress, json('null'))]"
-              
             }
           }
         ]
@@ -270,7 +298,7 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
       "location": "[variables('location')]",
-      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",      
+      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",
       "dependsOn": [
         "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic'))]"
       ],
@@ -283,7 +311,7 @@
           "vmSize": "[variables('virtualMachineSizeArray')[variables('templates')[variables('template')].servers[copyIndex()].size]]"
         },
         "osProfile": {
-          "computerName":  "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
+          "computerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -352,7 +380,7 @@
           "apiVersion": "2015-05-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"            
+            "[resourceId('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
           ],
           "properties": {
             "publisher": "Microsoft.Powershell",
@@ -366,8 +394,8 @@
                 "function": "[variables('dscModulePrepare').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('domainName')]",
-                "dnsServer": "[variables('dc1NicIPAddress')]"
+                "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
+                "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]"
               }
             },
             "protectedSettings": {
@@ -388,6 +416,6 @@
     "template": {
       "type": "string",
       "value": "[parameters('template')]"
-    }
+    }   
   }
 }

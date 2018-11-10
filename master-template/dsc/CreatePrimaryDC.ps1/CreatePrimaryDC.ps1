@@ -12,6 +12,10 @@
         [String]$DNSServer, 
 
         [Parameter(Mandatory)]
+        [hashtable[]]
+        $sites,
+
+        [Parameter(Mandatory)]
         [String]$ForestMode,       
 
         [Parameter(Mandatory=$true)]
@@ -66,7 +70,7 @@
             AddressFamily  = 'IPv4'           
             
         }
-
+        
         xADDomain FirstDS
         {
             DomainName = $DomainName
@@ -78,8 +82,26 @@
             LogPath = "C:\NTDS"
             SysvolPath = "C:\SYSVOL"
             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
-        } 
+        }
+                
+        foreach ($site in $sites.sites)         
+        {
+            xADReplicationSite $site.name 
+            {
+                Ensure = "Present"
+                Name = $site.name
+                RenameDefaultFirstSiteName = $true       
+            }
+            xADReplicationSubnet $site.name
+            {
+                Ensure = "Present"
+                Name   = $site.prefix
+                Site  = $site.name
+                DependsOn = "[xADReplicationSite]"+$site.name
+
+            }
         
+        }
         
    }
 }
