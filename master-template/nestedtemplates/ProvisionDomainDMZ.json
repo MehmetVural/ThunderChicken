@@ -68,10 +68,22 @@
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
     "forestMode": "[parameters('forestMode')]",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
-    "KDMZSubnetPrefix": "10.0.3.0/24",
-    "CDMZSubnetPrefix": "10.0.4.0/24",  
-    "CDMZSubnetName": "cdmz",
     "KDMZSubnetName": "kdmz",  
+    "CDMZSubnetName": "cdmz",
+    "KDMZSubnetPrefix": "10.0.3.0/24",
+    "CDMZSubnetPrefix": "10.0.4.0/24",        
+    "sites": [
+      {
+        "name": "[toUpper(variables('KDMZSubnetName'))]",
+        "prefix": "[variables('KDMZSubnetPrefix')]"
+      },
+      {
+        "name": "[toUpper(variables('CDMZSubnetName'))]",
+        "prefix": "[variables('CDMZSubnetPrefix')]"
+      }
+    ],
+
+
     "dc1VMName": "[concat(variables('templatePrefix'), '-dmzdc1vm')]",
     "dc1NicName": "[concat(variables('templatePrefix'), '-dmzdc1Nic')]",
     "dc1NicIPAddress": "10.0.3.5",
@@ -179,6 +191,7 @@
                 "domainName": "[variables('domainName')]",
                 "domainNetbiosName": "[variables('domainNetbiosName')]",
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "sites": "[string(variables('sites'))]",
                 "forestMode": "[variables('forestMode')]"
               }
             },

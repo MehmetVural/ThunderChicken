@@ -12,7 +12,7 @@
         [String]$DNSServer, 
 
         [Parameter(Mandatory)]
-        [hashtable[]]
+        [string]
         $sites,
 
         [Parameter(Mandatory)]
@@ -67,8 +67,7 @@
         {
             Address        = $DNSServer
             InterfaceAlias = $InterfaceAlias
-            AddressFamily  = 'IPv4'           
-            
+            AddressFamily  = 'IPv4'            
         }
         
         xADDomain FirstDS
@@ -83,8 +82,10 @@
             SysvolPath = "C:\SYSVOL"
             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
         }
-                
-        foreach ($site in $sites.sites)         
+
+        $sites = $sites | ConvertFrom-Json 
+
+        foreach ($site in $sites)         
         {
             xADReplicationSite $site.name 
             {
@@ -98,9 +99,7 @@
                 Name   = $site.prefix
                 Site  = $site.name
                 DependsOn = "[xADReplicationSite]"+$site.name
-
-            }
-        
+            }        
         }
         
    }

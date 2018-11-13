@@ -199,7 +199,7 @@
                 "domainName": "[variables('domainName')]",
                 "domainNetbiosName": "[variables('domainNetbiosName')]",
                 "dnsServer": "[variables('dc1NicIPAddress')]",
-                "sites": "[variables('sites')],",
+                "sites": "[string(variables('sites'))]",
                 "forestMode": "[variables('forestMode')]"
               }
             },
@@ -405,6 +405,7 @@
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",
                 "dnsServer": "[variables('dc1NicIPAddress')]"
+                
               }
             },
             "protectedSettings": {
