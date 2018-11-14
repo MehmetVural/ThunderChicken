@@ -153,25 +153,25 @@
         "servers": [
           {
             "hostname": "WGSAPP",
-            "size": "Large",
+            "size": "Small",
             "subnet": "[variables('KSubnetName')]",
             "privateIPAddress": "10.0.1.10"
           },
           {
             "hostname": "WGSWEB",
-            "size": "Large",
+            "size": "Small",
             "subnet": "[variables('CSubnetName')]",
             "privateIPAddress": "10.0.2.10"
           },
           {
             "hostname": "WGTAPP",
-            "size": "Medium",
+            "size": "Small",
             "subnet": "[variables('KDMZSubnetName')]",
             "privateIPAddress": "10.0.3.10"
           },
           {
             "hostname": "WGTWEB",
-            "size": "Medium",
+            "size": "Small",
             "subnet": "[variables('CDMZSubnetName')]",
             "privateIPAddress": "10.0.4.10"
           }

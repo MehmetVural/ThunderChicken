@@ -8,6 +8,9 @@
         [Parameter(Mandatory)]
         [String]$DNSServer,
 
+        [Parameter(Mandatory)]
+        [String]$site,
+
         [Parameter(Mandatory=$true)]
 		[ValidateNotNullorEmpty()]
 		[PSCredential]$DomainAdminCredential,
@@ -97,7 +100,7 @@
             DatabasePath = "C:\NTDS"
             LogPath = "C:\NTDS"
             SysvolPath = "C:\SYSVOL"
-            SiteName   = 'CS'
+            SiteName   = $site
             DependsOn  = "[Computer]JoinDomain"
 
         }        

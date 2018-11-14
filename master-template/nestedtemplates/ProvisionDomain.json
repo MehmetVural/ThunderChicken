@@ -67,6 +67,8 @@
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
     "forestMode": "[parameters('forestMode')]",
+    "RetryCount": "50",
+    "RetryIntervalSec": "30",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
     "VSubnetName": "vs",
     "KSubnetName": "ks",
@@ -302,7 +304,10 @@
               },
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",
-                "dnsServer": "[variables('dc1NicIPAddress')]"
+                "dnsServer": "[variables('dc1NicIPAddress')]",
+                "site": "[toUpper(variables('KSubnetName'))]",
+                "RetryCount": "[variables('RetryCount')]",
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"
               }
             },
             "protectedSettings": {
@@ -404,8 +409,10 @@
               },
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",
-                "dnsServer": "[variables('dc1NicIPAddress')]"
-                
+                "dnsServer": "[variables('dc1NicIPAddress')]",
+                "site": "[toUpper(variables('CSubnetName'))]",
+                "RetryCount": "[variables('RetryCount')]",
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"                
               }
             },
             "protectedSettings": {
