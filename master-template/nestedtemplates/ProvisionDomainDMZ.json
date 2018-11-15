@@ -92,7 +92,7 @@
     "dc2VMName": "[concat(variables('templatePrefix'), '-dmzdc2vm')]",
     "dc2NicName": "[concat(variables('templatePrefix'), '-dmzdc2Nic')]",
     "dc2NicIPAddress": "10.0.4.5",
-    "virtualMachineSize": "Standard_DS1_v2",
+    "virtualMachineSize": "Standard_D1_v2",
     "dcPrimaryInstallModule": {
       "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
       "script": "CreatePrimaryDC.ps1",

@@ -35,7 +35,7 @@
     },
     "deployJumpBoxTemplate": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -47,7 +47,7 @@
     },
     "deployDomincontrollers": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -77,15 +77,15 @@
       "defaultValue": "SharePoint",
       "allowedValues": [
         "None",
-        "Domain",
-        "DNS",
-        "DHCP",
-        "FileServer",
+        "AD-DS-DNS",
         "SCOM",
-        "SCCM",
+        "SQL",
+        "FileServer",
+        "DHCP",       
         "SharePoint",
-        "AirWatch",
-        "Exchange"
+        "Exchange",
+        "AirWatch",        
+        "Skype"
       ],
       "metadata": {
         "group": "Template Settings",
