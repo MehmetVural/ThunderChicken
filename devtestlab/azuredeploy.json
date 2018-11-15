@@ -104,7 +104,7 @@
             "apiVersion": "2016-05-15",
             "properties": {
               "displayName": "TC Git",
-              "uri": "https://github.com/wallacetech/ThunderChicken.git",
+              "uri": "https://github.com/CIThunderChicken/ThunderChicken.git",
               "sourceType": "GitHub",
               "folderPath": "",
               "armTemplateFolderPath": "/",
