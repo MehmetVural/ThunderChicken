@@ -1,6 +1,5 @@
-
 # Azure Account
-#Connect-AzureRmAccount
+Connect-AzureRmAccount
 
 # region variables
 $QuickSartDirectory = "C:\github\ThunderChicken" # set samples directory

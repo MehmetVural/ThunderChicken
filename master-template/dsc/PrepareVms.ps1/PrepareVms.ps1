@@ -46,12 +46,12 @@
             DriveLetter = "F"
 	        DependsOn="[xWaitForDisk]Disk2"
         }
-
+        
         xDnsServerAddress DnsServerAddress
         {
             Address        = $DNSServer
             InterfaceAlias = $InterfaceAlias
-            AddressFamily  = 'IPv4'         
+            AddressFamily  = 'IPv4'             
         }
 
         xWaitForADDomain DscForestWait
@@ -62,13 +62,13 @@
             RetryIntervalSec = $RetryIntervalSec
             DependsOn  = "[xDnsServerAddress]DnsServerAddress"
         }
-
         Computer JoinDomain
         {
             Name       = $env:COMPUTERNAME
             DomainName = $DomainName
-            Credential = $DomainAdminCredential # Credential to join to domain
+            Credential = $DomainAdminCredential 
             DependsOn  = "[xWaitForADDomain]DscForestWait"
-        }        
+        }  
+       
    }
 }

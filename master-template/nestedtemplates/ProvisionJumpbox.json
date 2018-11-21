@@ -26,10 +26,10 @@
     "VSubnetName": "vs",
     "KSubnetName": "ks",
     "CSubnetName": "cs",
-    "publicIPAddressName": "[concat(variables('templatePrefix'), '-publicip')]",
+    "jumpBoxVmName": "JumpBox",
+    "publicIPAddressName": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-publicip')]",
     "dnsPrefix": "[concat('dns',uniqueString(resourceGroup().id))]",
-    "jumpBoxNic": "[concat(variables('templatePrefix'), '-jbNic')]",
-    "jumpBoxVmName": "[concat(variables('templatePrefix'), '-jbvm')]",
+    "jumpBoxNic": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-nic')]",   
     "virtualMachineSize": "Standard_D1_v2"
   },
   "resources": [

@@ -54,7 +54,7 @@
 
         @(
             "AD-Domain-Services",            
-            "RSAT-ADDS-Tools"                                   
+            "RSAT-ADDS-Tools"                                         
         ) | ForEach-Object -Process {
             WindowsFeature "Feature-$_"
             {
@@ -99,7 +99,30 @@
                 Name   = $site.prefix
                 Site  = $site.name
                 DependsOn = "[xADReplicationSite]"+$site.name
-            }        
+            }
+        }
+
+        foreach ($site in $sites)         
+        {
+            if($site.sitelink -ne $null)
+            {
+                $linkname = $site.sitelink.Replace(',', ' to ')
+                $name = $site.name
+                $sitelink  = $site.sitelink.Split(',')
+
+                Script "ADReplicationSiteLink-$name"
+                {
+                    SetScript = {
+                        New-ADReplicationSiteLink -Name $using:linkname -SitesIncluded $using:sitelink -Cost 100 -ReplicationFrequencyInMinutes 15 -InterSiteTransportProtocol IP
+                        Get-ADReplicationSiteLink -filter {Name -eq "DEFAULTIPSITELINK"} | Remove-ADReplicationSiteLink
+
+                    }                                   
+                TestScript = { $false }
+                GetScript = { $null }
+                DependsOn = "[xADReplicationSite]" + $site.name
+                }
+            }
+
         }
         
    }

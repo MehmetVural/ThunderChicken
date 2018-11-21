@@ -77,20 +77,21 @@
     "sites": [
       {
         "name": "[toUpper(variables('KDMZSubnetName'))]",
-        "prefix": "[variables('KDMZSubnetPrefix')]"
+        "prefix": "[variables('KDMZSubnetPrefix')]",
+        "sitelink": "[concat(toUpper(variables('KDMZSubnetName')),',',toUpper(variables('CDMZSubnetName')))]"
       },
       {
         "name": "[toUpper(variables('CDMZSubnetName'))]",
-        "prefix": "[variables('CDMZSubnetPrefix')]"
+        "prefix": "[variables('CDMZSubnetPrefix')]",
+        "sitelink": null
       }
     ],
 
-
-    "dc1VMName": "[concat(variables('templatePrefix'), '-dmzdc1vm')]",
-    "dc1NicName": "[concat(variables('templatePrefix'), '-dmzdc1Nic')]",
+    "dc1VMName": "KDZ201",
+    "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.3.5",
-    "dc2VMName": "[concat(variables('templatePrefix'), '-dmzdc2vm')]",
-    "dc2NicName": "[concat(variables('templatePrefix'), '-dmzdc2Nic')]",
+    "dc2VMName": "CDZ201",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",
     "dc2NicIPAddress": "10.0.4.5",
     "virtualMachineSize": "Standard_D1_v2",
     "dcPrimaryInstallModule": {

@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "SharePoint",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS-DNS",

@@ -79,26 +79,29 @@
     "sites": [
       {
         "name": "[toUpper(variables('VSubnetName'))]",
-        "prefix": "[variables('VSubnetPrefix')]"
+        "prefix": "[variables('VSubnetPrefix')]",
+        "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('VSubnetName')))]"
       },
       {
         "name": "[toUpper(variables('KSubnetName'))]",
-        "prefix": "[variables('KSubnetPrefix')]"
+        "prefix": "[variables('KSubnetPrefix')]",
+        "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('CSubnetName')))]"        
       },
       {
         "name": "[toUpper(variables('CSubnetName'))]",
-        "prefix": "[variables('CSubnetPrefix')]"
+        "prefix": "[variables('CSubnetPrefix')]",        
+        "sitelink": "[concat(toUpper(variables('CSubnetName')),',',toUpper(variables('VSubnetName')))]"        
       }
     ],
 
-    "dc1VMName": "[concat(variables('templatePrefix'), '-dc1vm')]",
-    "dc1NicName": "[concat(variables('templatePrefix'), '-dc1Nic')]",
+    "dc1VMName": "VD201",    
+    "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
-    "dc2VMName": "[concat(variables('templatePrefix'), '-dc2vm')]",
-    "dc2NicName": "[concat(variables('templatePrefix'), '-dc2Nic')]",
+    "dc2VMName": "KD201",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",    
     "dc2NicIPAddress": "10.0.1.5",
-    "dc3VMName": "[concat(variables('templatePrefix'), '-dc3vm')]",
-    "dc3NicName": "[concat(variables('templatePrefix'), '-dc3Nic')]",
+    "dc3VMName": "CD201",
+    "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",    
     "dc3NicIPAddress": "10.0.2.5",
     "virtualMachineSize": "Standard_D1_v2",
     "dcPrimaryInstallModule": {
