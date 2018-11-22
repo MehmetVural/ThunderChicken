@@ -3,7 +3,7 @@
    param
    (
         [Parameter(Mandatory)]
-        [String]$DomainName,
+        [String]$DomainName,        
 
         [Parameter(Mandatory)]
         [String]$DNSServer,
@@ -20,8 +20,9 @@
     )
 
     Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName xNetworking
-    Import-DscResource -ModuleName ComputerManagementDsc    
+    Import-DscResource -ModuleName ComputerManagementDsc  
+    Import-DSCResource -ModuleName StorageDsc  
+    Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     
     $Interface=Get-NetAdapter|Where Name -Like "Ethernet*"|Select-Object -First 1
@@ -66,13 +67,27 @@
                 Name = $_
             }
         }
+        WaitForDisk Disk2
+        {
+             DiskId = 2
+             RetryIntervalSec = 60
+             RetryCount = 60
+             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
+        }
 
-        xDnsServerAddress DnsServerAddress
+        Disk FVolume
+        {
+             DiskId = 2
+             DriveLetter = 'F'           
+             DependsOn = '[WaitForDisk]Disk2'
+        }
+
+        DnsServerAddress DnsServerAddress
         {
             Address        = $DNSServer
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = 'IPv4'
-            DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
+            DependsOn="[Disk]FVolume"
         }
 
         xWaitForADDomain DscForestWait
@@ -81,7 +96,7 @@
             #DomainUserCredential= $DomainAdminCredential
             RetryCount = $RetryCount
             RetryIntervalSec = $RetryIntervalSec
-            DependsOn  = "[xDnsServerAddress]DnsServerAddress"
+            DependsOn  = "[DnsServerAddress]DnsServerAddress"
         }
 
         Computer JoinDomain
@@ -89,7 +104,7 @@
             Name       = $env:COMPUTERNAME
             DomainName = $DomainName
             Credential = $DomainAdminCredential # Credential to join to domain
-            DependsOn  = "[xDnsServerAddress]DnsServerAddress"
+            DependsOn  = "[xWaitForADDomain]DscForestWait"
         }
          
         xADDomainController  BDC
@@ -97,12 +112,11 @@
             DomainName = $DomainName            
             DomainAdministratorCredential = $DomainAdminCredential
             SafemodeAdministratorPassword = $DomainAdminCredential
-            DatabasePath = "C:\NTDS"
-            LogPath = "C:\NTDS"
-            SysvolPath = "C:\SYSVOL"
+            DatabasePath = "F:\NTDS"
+            LogPath = "F:\NTDS"
+            SysvolPath = "F:\SYSVOL"
             SiteName   = $site
             DependsOn  = "[Computer]JoinDomain"
-
         }        
    }
 }

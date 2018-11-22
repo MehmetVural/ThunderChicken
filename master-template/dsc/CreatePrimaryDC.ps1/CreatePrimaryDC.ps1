@@ -6,7 +6,7 @@
         [String]$DomainName,
 
         [Parameter(Mandatory)]
-        [String]$DomainNetbiosName,       
+        [String]$DomainNetbiosName, 
         
         [Parameter(Mandatory)]
         [String]$DNSServer, 
@@ -26,8 +26,9 @@
         [Int]$RetryIntervalSec=30
     )
 
-    Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName xNetworking
+    Import-DscResource -ModuleName xActiveDirectory    
+    Import-DSCResource -ModuleName StorageDsc
+    Import-DscResource -ModuleName NetworkingDsc 
     Import-DscResource -ModuleName PSDesiredStateConfiguration
 
     $Interface=Get-NetAdapter|Where Name -Like "Ethernet*"|Select-Object -First 1
@@ -63,7 +64,22 @@
             }
         }
         
-        xDnsServerAddress DnsServerAddress
+        WaitForDisk Disk2
+        {
+             DiskId = 2
+             RetryIntervalSec = 60
+             RetryCount = 60
+             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
+        }
+
+        Disk FVolume
+        {
+             DiskId = 2
+             DriveLetter = 'F'          
+             DependsOn = '[WaitForDisk]Disk2'
+        }
+       
+        DnsServerAddress DnsServerAddress
         {
             Address        = $DNSServer
             InterfaceAlias = $InterfaceAlias
@@ -77,10 +93,10 @@
             DomainAdministratorCredential = $DomainAdminCredential
             SafemodeAdministratorPassword = $DomainAdminCredential
             ForestMode                    = $ForestMode
-            DatabasePath = "C:\NTDS"
-            LogPath = "C:\NTDS"
-            SysvolPath = "C:\SYSVOL"
-            DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
+            DatabasePath = "F:\NTDS"
+            LogPath = "F:\NTDS"
+            SysvolPath = "F:\SYSVOL"
+            DependsOn="[Disk]FVolume"
         }
 
         $sites = $sites | ConvertFrom-Json 

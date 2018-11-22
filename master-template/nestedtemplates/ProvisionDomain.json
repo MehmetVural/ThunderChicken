@@ -142,7 +142,15 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": []
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dc1VMName'),'_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -202,7 +210,7 @@
               },
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",
-                "domainNetbiosName": "[variables('domainNetbiosName')]",
+                "domainNetbiosName": "[variables('domainNetbiosName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
                 "sites": "[string(variables('sites'))]",
                 "forestMode": "[variables('forestMode')]"
@@ -247,7 +255,15 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": []
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dc2VMName'),'_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -306,7 +322,7 @@
                 "function": "[variables('dcSecondaryInstallModule').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('domainName')]",
+                "domainName": "[variables('domainName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
                 "site": "[toUpper(variables('KSubnetName'))]",
                 "RetryCount": "[variables('RetryCount')]",
@@ -352,7 +368,15 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": []
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dc3VMName'),'_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -411,7 +435,7 @@
                 "function": "[variables('dcSecondaryInstallModule').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('domainName')]",
+                "domainName": "[variables('domainName')]",              
                 "dnsServer": "[variables('dc1NicIPAddress')]",
                 "site": "[toUpper(variables('CSubnetName'))]",
                 "RetryCount": "[variables('RetryCount')]",

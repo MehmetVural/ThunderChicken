@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "FileServer",
       "allowedValues": [
         "None",
         "AD-DS-DNS",

@@ -728,7 +728,7 @@
                 "function": "[variables('dscModulePrepare').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
+                "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",                
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
                 "RetryCount": "[variables('RetryCount')]",
                 "RetryIntervalSec": "[variables('RetryIntervalSec')]"
