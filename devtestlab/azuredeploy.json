@@ -9,7 +9,7 @@
             }
           },
         "artifactRepoSecurityToken": {
-            "type": "securestring",
+            "type": "string",
             "metadata": {
                 "description": "The Personal Access Code for the repository"
               }
