@@ -169,7 +169,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1900"
+             "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -284,7 +284,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1900"
+             "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {

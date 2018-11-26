@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SQL",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -148,7 +148,7 @@
       "name": "ProvisioningDomains",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomincontrollers'), 'No')]",
+      "condition": "[equals(parameters('deployDomincontrollers'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],

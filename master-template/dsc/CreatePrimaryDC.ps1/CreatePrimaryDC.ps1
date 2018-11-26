@@ -100,7 +100,7 @@
             DatabasePath = "F:\NTDS"
             LogPath = "F:\NTDS"
             SysvolPath = "F:\SYSVOL"
-            DependsOn="[Disk]FVolume"
+            DependsOn="[Disk]FVolume"           
         }
 
         $sites = $sites | ConvertFrom-Json 
@@ -135,11 +135,11 @@
                     SetScript = {
                         New-ADReplicationSiteLink -Name $using:linkname -SitesIncluded $using:sitelink -Cost 100 -ReplicationFrequencyInMinutes 15 -InterSiteTransportProtocol IP
                         Get-ADReplicationSiteLink -filter {Name -eq "DEFAULTIPSITELINK"} | Remove-ADReplicationSiteLink
-
-                    }                                   
-                TestScript = { $false }
-                GetScript = { $null }
-                DependsOn = "[xADReplicationSite]" + $site.name
+                    }   
+                                                    
+                    TestScript = { $false }
+                    GetScript = { $null }
+                    DependsOn = "[xADReplicationSite]" + $site.name
                 }
             }
 
