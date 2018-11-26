@@ -22,8 +22,12 @@
 		[ValidateNotNullorEmpty()]
 		[PSCredential]$DomainAdminCredential,        
 
-        [Int]$RetryCount=20,
-        [Int]$RetryIntervalSec=30
+        
+        [Parameter(Mandatory=$true)]
+        [Int]$RetryCount,
+        
+        [Parameter(Mandatory=$true)]
+        [Int]$RetryIntervalSec
     )
 
     Import-DscResource -ModuleName xActiveDirectory    
@@ -67,16 +71,16 @@
         WaitForDisk Disk2
         {
              DiskId = 2
-             RetryIntervalSec = 60
-             RetryCount = 60
-             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
+             RetryIntervalSec   = $RetryIntervalSec
+             RetryCount         = $RetryCount
+             DependsOn          ="[WindowsFeature]Feature-AD-Domain-Services"
         }
 
         Disk FVolume
         {
-             DiskId = 2
-             DriveLetter = 'F'          
-             DependsOn = '[WaitForDisk]Disk2'
+             DiskId         = 2
+             DriveLetter    = 'F'          
+             DependsOn      = '[WaitForDisk]Disk2'
         }
        
         DnsServerAddress DnsServerAddress
@@ -88,7 +92,7 @@
         
         xADDomain FirstDS
         {
-            DomainName = $DomainName
+            DomainName      = $DomainName
             DomainNetbiosName = $DomainNetbiosName
             DomainAdministratorCredential = $DomainAdminCredential
             SafemodeAdministratorPassword = $DomainAdminCredential

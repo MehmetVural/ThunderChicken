@@ -10,10 +10,13 @@
 
         [Parameter(Mandatory=$true)]
 		[ValidateNotNullorEmpty()]
-		[PSCredential]$DomainAdminCredential,
+        [PSCredential]$DomainAdminCredential,
         
-        [Int]$RetryCount=60,
-        [Int]$RetryIntervalSec=30
+        [Parameter(Mandatory=$true)]
+        [Int]$RetryCount,
+        
+        [Parameter(Mandatory=$true)]
+        [Int]$RetryIntervalSec
     )
 
     Import-DscResource -ModuleName xActiveDirectory

@@ -39,7 +39,7 @@
       "name": "[variables('publicIPAddressName')]",
       "location": "[variables('location')]",
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
+        "publicIPAllocationMethod": "Static",
         "dnsSettings": {
           "domainNameLabel": "[variables('dnsPrefix')]"
         }

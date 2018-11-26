@@ -15,8 +15,11 @@
 		[ValidateNotNullorEmpty()]
 		[PSCredential]$DomainAdminCredential,
         
-        [Int]$RetryCount=40,
-        [Int]$RetryIntervalSec=30
+        [Parameter(Mandatory=$true)]
+        [Int]$RetryCount,
+        
+        [Parameter(Mandatory=$true)]
+        [Int]$RetryIntervalSec
     )
 
     Import-DscResource -ModuleName xActiveDirectory
@@ -70,8 +73,8 @@
         WaitForDisk Disk2
         {
              DiskId = 2
-             RetryIntervalSec = 60
-             RetryCount = 60
+             RetryIntervalSec = $RetryIntervalSec
+             RetryCount = $RetryCount 
              DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
         }
 
