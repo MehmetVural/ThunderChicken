@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "SQL",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
