@@ -38,18 +38,18 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "Domain",
+      "defaultValue": "AD-DS-DNS",
       "allowedValues": [
         "None",
-        "Domain",
-        "DNS",
-        "DHCP",
-        "FileServer",
+        "AD-DS-DNS",
         "SCOM",
-        "SCCM",
+        "SQL",
+        "FileServer",
+        "DHCP",       
         "SharePoint",
-        "AirWatch",
-        "Exchange"
+        "Exchange",
+        "AirWatch",        
+        "Skype"
       ],
       "metadata": {
         "group": "Lab Enviornment Template",
@@ -63,62 +63,52 @@
     "templates": {
       "None": {
         "prefix": "blank",
-        "servers": [
-          {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
-          }
-        ]
+        "servers": []
       },
-      "Domain": {
-        "prefix": "dc",
+      "AD-DS-DNS": {
+        "prefix": "ds",
         "servers": [
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "VD202",
+            "size": "S",
+            "subnet": "V",
+            "ip": "10.0.0.6"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
-          }
-        ]
-      },
-      "DNS": {
-        "prefix": "dns",
-        "servers": [
-          {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "CD202",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.6"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('KSubnetName')]"
-          }
-        ]
-      },
-      "DHCP": {
-        "prefix": "dhcp",
-        "servers": [
-          {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "CS203",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.7"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
-          }
-        ]
-      },
-      "FileServer": {
-        "prefix": "fs",
-        "servers": [
-          {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "CH221",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.8"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "KD202",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.6"
+          },
+          {
+            "hostname": "KS203",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.7"
+          },
+          {
+            "hostname": "KH179",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.8"
           }
         ]
       },
@@ -126,25 +116,170 @@
         "prefix": "scom",
         "servers": [
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "VS201",
+            "size": "L",
+            "subnet": "V",
+            "ip": "10.0.0.10"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "VS202",
+            "size": "L",
+            "subnet": "V",
+            "ip": "10.0.0.11"
+          },
+          {
+            "hostname": "CS201",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.12"
+          },
+          {
+            "hostname": "CS202",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.13"
+          },
+          {
+            "hostname": "KS201",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.14"
+          },
+          {
+            "hostname": "KS202",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.15"
           }
         ]
+      },      
+      "SQL": {
+        "prefix": "sql",
+        "servers": [ 
+          {
+          "hostname": "VS222",
+          "size": "L",
+          "subnet": "V",
+          "ip": "10.0.0.16"
+        },
+        {
+          "hostname": "VS221",
+          "size": "L",
+          "subnet": "V",
+          "ip": "10.0.0.17"
+        },
+        {
+          "hostname": "CS222",
+          "size": "XL",
+          "subnet": "C",
+          "ip": "10.0.2.18"
+        },
+        {
+          "hostname": "CS221",
+          "size": "XL",
+          "subnet": "C",
+          "ip": "10.0.2.19"
+        },
+        {
+          "hostname": "KS222",
+          "size": "XL",
+          "subnet": "K",
+          "ip": "10.0.1.20"
+        },
+        {
+          "hostname": "KS221",
+          "size": "XL",
+          "subnet": "K",
+          "ip": "10.0.1.21"
+        }      
+      ]
       },
-      "SCCM": {
-        "prefix": "sccm",
+      "FileServer": {
+        "prefix": "fs",
         "servers": [
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "VF201",
+            "size": "M",
+            "subnet": "V",
+            "ip": "10.0.0.22"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "CF201",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.23"
+          },
+          {
+            "hostname": "KF201",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.24"
+          }
+
+        ]
+      },
+      "DHCP": {
+        "prefix": "dhcp",
+        "servers": [
+          {
+            "hostname": "VS203",
+            "size": "M",
+            "subnet": "V",
+            "ip": "10.0.0.25"
+          },
+          {
+            "hostname": "VS204",
+            "size": "M",
+            "subnet": "V",
+            "ip": "10.0.0.26"
+          },
+          {
+            "hostname": "VS205",
+            "size": "M",
+            "subnet": "V",
+            "ip": "10.0.0.27"
+          },
+          {
+            "hostname": "CS203",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.28"
+          },
+          {
+            "hostname": "CS204",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.29"
+          },
+          {
+            "hostname": "CS205",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.30"
+          },
+          {
+            "hostname": "CS206",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.31"
+          },
+          {
+            "hostname": "KS203",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.32"
+          },
+          {
+            "hostname": "KS204",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.33"
+          },
+          {
+            "hostname": "KS205",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.34"
           }
         ]
       },
@@ -152,38 +287,243 @@
         "prefix": "sp",
         "servers": [
           {
-            "size": "Small",
-            "subnet": "[variables('KSubnetName')]"
+            "hostname": "CP201",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.35"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('CSubnetName')]"
-          }         
-        ]
-      },
-      "AirWatch": {
-        "prefix": "aw",
-        "servers": [
-          {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "CP202",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.36"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
-          }
+            "hostname": "CP203",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.37"
+          },
+          {
+            "hostname": "CP204",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.38"
+          },
+          {
+            "hostname": "CP205",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.39"
+          },
+          {
+            "hostname": "CP206",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.40"
+          },
+          {
+            "hostname": "KP201",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.41"
+          },
+          {
+            "hostname": "KP202",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.42"
+          },
+          {
+            "hostname": "KP203",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.43"
+          },
+          {
+            "hostname": "KP204",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.44"
+          },
+          {
+            "hostname": "KP205",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.45"
+          },
+          {
+            "hostname": "KP206",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.46"
+          },
+          {
+            "hostname": "KP209",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.47"
+          }          
         ]
       },
       "Exchange": {
         "prefix": "ex",
         "servers": [
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "KM201",
+            "size": "M",
+            "subnet": "KD",
+            "ip": "10.0.3.48"
           },
           {
-            "size": "Small",
-            "subnet": "[variables('VSubnetName')]"
+            "hostname": "KM202",
+            "size": "M",
+            "subnet": "KD",
+            "ip": "10.0.3.49"
+          },
+          {
+            "hostname": "KM204",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.50"
+          },
+          {
+            "hostname": "KM205",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.51"
+          },
+          {
+            "hostname": "CM201",
+            "size": "M",
+            "subnet": "CD",
+            "ip": "10.0.4.52"
+          },
+          {
+            "hostname": "CM202",
+            "size": "M",
+            "subnet": "CD",
+            "ip": "10.0.4.53"
+          },
+          {
+            "hostname": "CM203",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.54"
+          },
+          {
+            "hostname": "CM204",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.55"
+          },
+          {
+            "hostname": "CM205",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.56"
+          },
+          {
+            "hostname": "KM203",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.57"
+          }
+
+
+        ]
+      },
+      "AirWatch": {
+        "prefix": "aw",
+        "servers": [
+          {
+            "hostname": "KM206",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.58"
+          },
+          {
+            "hostname": "KM207",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.59"
+          },
+          {
+            "hostname": "KM208",
+            "size": "L",
+            "subnet": "K",
+            "ip": "10.0.1.60"
+          },
+          {
+            "hostname": "CM206",
+            "size": "L",
+            "subnet": "C",
+            "ip": "10.0.2.61"
+          },
+          {
+            "hostname": "CM207",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.62"
+          },
+          {
+            "hostname": "CM208",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.63"
+          }
+        ]
+      },
+      "Skype": {
+        "prefix": "sk",
+        "servers": [
+          {
+            "hostname": "KM209",
+            "size": "L",
+            "subnet": "KD",
+            "ip": "10.0.3.64"
+          },
+          {
+            "hostname": "KM210",
+            "size": "L",
+            "subnet": "KD",
+            "ip": "10.0.3.65"
+          },
+          {
+            "hostname": "KM211",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.66"
+          },
+          {
+            "hostname": "KM212",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.67"
+          },
+          {
+            "hostname": "CM209",
+            "size": "L",
+            "subnet": "CD",
+            "ip": "10.0.4.68"
+          },
+          {
+            "hostname": "CM210",
+            "size": "L",
+            "subnet": "CD",
+            "ip": "10.0.4.69"
+          },
+          {
+            "hostname": "CM211",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.70"
+          },
+          {
+            "hostname": "CM212",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.71"
           }
         ]
       }
@@ -192,15 +532,49 @@
     "mastertemplatePrefix": "master",
     "domainName": "Domain.com",
     "domainNetbiosName": "LAB",
+    "domainNameDMZ": "DomainDmz.com",
+    "domainNetbiosNameDMZ": "LABDMZ",
+    "RetryCount": 150,
+    "RetryIntervalSec": 60,
     "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
     "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
     "VSubnetName": "vs",
     "KSubnetName": "ks",
     "CSubnetName": "cs",
+    "KDMZSubnetName": "kdmz",
+    "CDMZSubnetName": "cdmz",
     "dc1NicIPAddress": "10.0.0.5",
     "dc2NicIPAddress": "10.0.1.5",
     "dc3NicIPAddress": "10.0.2.5",
-    "virtualMachineSize": "Standard_DS1_v2",
+    "dmzdc1NicIPAddress": "10.0.3.5",
+    "dmzdc2NicIPAddress": "10.0.4.5",
+    "subnets": {
+      "V": {
+        "name": "[variables('VSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "dns": "[variables('dc1NicIPAddress')]"
+      },
+      "K": {
+        "name": "[variables('CSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "dns": "[variables('dc2NicIPAddress')]"
+      },
+      "C": {
+        "name": "[variables('KSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "dns": "[variables('dc3NicIPAddress')]"
+      },
+      "KD": {
+        "name": "[variables('KDMZSubnetName')]",
+        "domain": "[variables('domainNameDMZ')]",
+        "dns": "[variables('dmzdc1NicIPAddress')]"
+      },
+      "CD": {
+        "name": "[variables('CDMZSubnetName')]",
+        "domain": "[variables('domainNameDMZ')]",
+        "dns": "[variables('dmzdc2NicIPAddress')]"
+      }
+    },    
     "imageReference": {
       "publisher": "MicrosoftWindowsServer",
       "offer": "WindowsServer",
@@ -213,17 +587,26 @@
       "function": "PrepareVms"
     },
     "virtualMachineSizeArray": {
-      "Small": "Standard_DS1_v2",
-      "Medium": "Standard_DS1_v2",
-      "Large": "Standard_DS1_v2"
+      "S": "Standard_D1_v2",
+      "M": "Standard_D2_v2",
+      "L": "Standard_D3_v2",  
+      "XL": "Standard_D4_v2"  
+    },
+    "subnetMap": {
+      "V": "[variables('VSubnetName')]",
+      "K": "[variables('KSubnetName')]",
+      "C": "[variables('CSubnetName')]",  
+      "KD": "[variables('KDMZSubnetName')]", 
+      "CD": "[variables('CDMZSubnetName')]"  
     }
   },
   "resources": [
     {
-      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1))]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[variables('location')]",
       "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic')]",
+      "location": "[variables('location')]",
+      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",
       "copy": {
         "name": "nicLoop",
         "count": "[length(variables('templates')[variables('template')].servers)]"
@@ -231,12 +614,14 @@
       "properties": {
         "ipConfigurations": [
           {
-            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-', 'ipconfig', add(copyIndex(), 1))]",
+            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-', 'ipconfig', add(copyIndex(), 1))]",
             "properties": {
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('templates')[variables('template')].servers[copyIndex()].subnet)]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('subnetMap')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]"
+                  
               },
-              "privateIPAllocationMethod": "Dynamic"
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[if(equals('Static', 'Static'), variables('templates')[variables('template')].servers[copyIndex()].ip, json('null'))]"
             }
           }
         ]
@@ -245,10 +630,11 @@
     {
       "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1))]",
+      "name": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
       "location": "[variables('location')]",
+      "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",
       "dependsOn": [
-        "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1)))]"
+        "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic'))]"
       ],
       "copy": {
         "name": "vmLoop",
@@ -259,7 +645,7 @@
           "vmSize": "[variables('virtualMachineSizeArray')[variables('templates')[variables('template')].servers[copyIndex()].size]]"
         },
         "osProfile": {
-          "computerName": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1))]",
+          "computerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -271,13 +657,13 @@
             "version": "[variables('imageReference').version]"
           },
           "osDisk": {
-            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1), '_OSDisk')]",
+            "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_OSDisk')]",
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
           "dataDisks": [
             {
-              "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1), '_DataDisk1')]",
+              "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk1')]",
               "caching": "None",
               "createOption": "Empty",
               "diskSizeGB": "128",
@@ -288,7 +674,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-',variables('templates')[variables('template')].servers[copyIndex()].subnet, '-nic', add(copyIndex(), 1)))]"
+              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic'))]"
             }
           ]
         },
@@ -303,23 +689,23 @@
         {
           "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
           "type": "microsoft.devtestlab/schedules",
-          "name": "[concat('shutdown-computevm-', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]",
+          "name": "[concat('shutdown-computevm-', variables('templates')[variables('template')].servers[copyIndex()].hostname)]",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+            "[concat('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
           ],
           "properties": {
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1900"
+             "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
               "status": "Disabled",
               "timeInMinutes": 15
             },
-            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
           }
         },
         {
@@ -328,7 +714,7 @@
           "apiVersion": "2015-05-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].subnet, '-vm', add(copyIndex(), 1)))]"
+            "[resourceId('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
           ],
           "properties": {
             "publisher": "Microsoft.Powershell",
@@ -342,8 +728,10 @@
                 "function": "[variables('dscModulePrepare').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('domainName')]",
-                "dnsServer": "[variables('dc1NicIPAddress')]"
+                "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",                
+                "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
+                "RetryCount": "[variables('RetryCount')]",
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"
               }
             },
             "protectedSettings": {
@@ -364,6 +752,6 @@
     "template": {
       "type": "string",
       "value": "[parameters('template')]"
-    }
+    }   
   }
 }

@@ -7,23 +7,21 @@ Configuration DSCConfig {
     Node $AllNodes.NodeName  {
 
         # This section contains settings for the LCM        
-        LocalConfigurationManager
-        {
+        LocalConfigurationManager {
             RebootNodeIfNeeded = $true
         }
 
-        Script AddContent 
-        {
+        Script AddContent {
             TestScript = { 
-                Test-Path 'C:\test.txt' 
+                Test-Path 'C:\201-test.txt' 
             }
-            SetScript = {
-                    Add-Content 'C:\test.txt' 'Hello DSC World!.'
+            SetScript  = {
+                Add-Content 'C:\201-test.txt' 'Hello DSC World!.'
             }
-            GetScript = {$null}
+            GetScript  = {$null}
         }          
     }
-
+    
     Node ($AllNodes.Where{$_.Role -eq "WebServer"}).NodeName
     {            
         # Windows Feature - Web Server       
@@ -31,7 +29,6 @@ Configuration DSCConfig {
             Ensure               = 'Present'
             Name                 = 'Web-Server'
             IncludeAllSubFeature = $true
-        }   
+        }
     }
 }
- 

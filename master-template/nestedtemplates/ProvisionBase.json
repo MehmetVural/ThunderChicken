@@ -11,18 +11,34 @@
     "VSubnetPrefix": "10.0.0.0/24",
     "KSubnetPrefix": "10.0.1.0/24",
     "CSubnetPrefix": "10.0.2.0/24",
+    "KDMZSubnetPrefix": "10.0.3.0/24",
+    "CDMZSubnetPrefix": "10.0.4.0/24",    
     "VNSGName": "[concat(variables('templatePrefix'), '-vnsg')]",
     "KNSGName": "[concat(variables('templatePrefix'), '-knsg')]",
     "CNSGName": "[concat(variables('templatePrefix'), '-cnsg')]",
+    "CDMZNSGName": "[concat(variables('templatePrefix'), '-cdmznsg')]",
+    "KDMZNSGName": "[concat(variables('templatePrefix'), '-kdmznsg')]",
     "VSubnetName": "vs",
     "KSubnetName": "ks",
     "CSubnetName": "cs",
-    "dc1NicName": "[concat(variables('templatePrefix'), '-dc1Nic')]",
+    "CDMZSubnetName": "cdmz",
+    "KDMZSubnetName": "kdmz",
+    "dc1VMName": "VD201",    
+    "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
-    "dc2NicName": "[concat(variables('templatePrefix'), '-dc2Nic')]",
+    "dc2VMName": "KD201",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",    
     "dc2NicIPAddress": "10.0.1.5",
-    "dc3NicName": "[concat(variables('templatePrefix'), '-dc3Nic')]",
+    "dc3VMName": "CD201",
+    "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",    
     "dc3NicIPAddress": "10.0.2.5",
+    "dmzdc1VMName": "KDZ201",
+    "dmzdc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc1VMName'), '-nic')]",
+    "dmzdc1NicIPAddress": "10.0.3.5",
+    "dmzdc2VMName": "CDZ201",
+    "dmzdc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc2VMName'), '-nic')]",
+    "dmzdc2NicIPAddress": "10.0.4.5",
+
     "subnets": [
       {
         "name": "[variables('VSubnetName')]",
@@ -48,6 +64,24 @@
           "addressPrefix": "[variables('CSubnetPrefix')]",
           "networkSecurityGroup": {
             "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CNSGName'))]"
+          }
+        }
+      },      
+      {
+        "name": "[variables('KDMZSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('KDMZSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('KDMZNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('CDMZSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('CDMZSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CDMZNSGName'))]"
           }
         }
       }
@@ -97,13 +131,33 @@
     },
     {
       "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('KDMZNSGName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('CDMZNSGName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[variables('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('VNSGName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('KNSGName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('CNSGName'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('CNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('CDMZNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('KDMZNSGName'))]"
       ],
       "properties": {
         "addressSpace": {
@@ -192,6 +246,54 @@
               },
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[variables('dc3NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dmzdc1NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "Primary DMZ DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('KDMZSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dmzdc1NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dmzdc2NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "Replica DMZ DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('CDMZSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dmzdc2NicIPAddress')]"
             }
           }
         ]

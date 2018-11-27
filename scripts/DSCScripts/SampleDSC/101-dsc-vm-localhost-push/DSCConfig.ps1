@@ -14,10 +14,10 @@ Configuration DSCConfig {
         Script AddContent 
         {
             TestScript = { 
-                Test-Path 'C:\test.txt' 
+                Test-Path 'C:\101-test.txt' 
             }
             SetScript = {
-                    Add-Content 'C:\test.txt' 'Hello DSC World!.'
+                    Add-Content 'C:\101-test.txt' 'Hello DSC World!.'
             }
             GetScript = {$null}
         }    

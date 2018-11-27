@@ -23,7 +23,7 @@
         "group": "Base Settings",
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       },
-      "defaultValue": "https://raw.githubusercontent.com/wallacetech/ThunderChicken/master/master-template"
+      "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/master/master-template"
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
@@ -35,19 +35,19 @@
     },
     "deployJumpBoxTemplate": {
       "type": "string",
-      "defaultValue": "Yes",
-      "allowedValues": [
-        "Yes",
-        "No"
-      ],
+      "defaultValue": "Yes",      
       "metadata": {
         "group": "Template Settings",
         "description": "Indicates wheter or not include JumpBox in this deployment"
-      }
+      },
+      "allowedValues": [
+        "Yes",
+        "No"
+      ]
     },
     "deployDomincontrollers": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -77,15 +77,15 @@
       "defaultValue": "None",
       "allowedValues": [
         "None",
-        "Domain",
-        "DNS",
-        "DHCP",
-        "FileServer",
+        "AD-DS-DNS",
         "SCOM",
-        "SCCM",
+        "SQL",
+        "FileServer",
+        "DHCP",       
         "SharePoint",
-        "AirWatch",
-        "Exchange"
+        "Exchange",
+        "AirWatch",        
+        "Skype"
       ],
       "metadata": {
         "group": "Template Settings",
@@ -95,10 +95,15 @@
   },
   "variables": {    
     "location": "[resourceGroup().location]",
+    "domainName": "Domain.com",
+    "domainNetbiosName": "LAB",
+    "domainNameDMZ": "DomainDmz.com",
+    "domainNetbiosNameDMZ": "LABDMZ",
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('_artifactsLocationSasToken'))]",    
     "jumpboxTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('_artifactsLocationSasToken'))]",
     "domainTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('_artifactsLocationSasToken'))]",
+    "domainDMZTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('_artifactsLocationSasToken'))]",
     "serviceTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('_artifactsLocationSasToken'))]"    
   },
   "resources": [
@@ -165,6 +170,51 @@
           },
           "_artifactsLocationSasToken": {
             "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "forestMode": {
+            "value": "[parameters('forestMode')]"
+          }
+        }
+      }
+    },    
+    {
+      "name": "ProvisioningDomainsDMZ",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployDomincontrollers'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('domainDMZTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "domainname": {
+            "value": "[variables('domainnameDMZ')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
           },
           "forestMode": {
             "value": "[parameters('forestMode')]"

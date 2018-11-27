@@ -26,11 +26,11 @@
     "VSubnetName": "vs",
     "KSubnetName": "ks",
     "CSubnetName": "cs",
-    "publicIPAddressName": "[concat(variables('templatePrefix'), '-publicip')]",
+    "jumpBoxVmName": "JumpBox",
+    "publicIPAddressName": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-publicip')]",
     "dnsPrefix": "[concat('dns',uniqueString(resourceGroup().id))]",
-    "jumpBoxNic": "[concat(variables('templatePrefix'), '-jbNic')]",
-    "jumpBoxVmName": "[concat(variables('templatePrefix'), '-jbvm')]",
-    "virtualMachineSize": "Standard_DS1_v2"
+    "jumpBoxNic": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-nic')]",   
+    "virtualMachineSize": "Standard_D1_v2"
   },
   "resources": [
     {
@@ -39,7 +39,7 @@
       "name": "[variables('publicIPAddressName')]",
       "location": "[variables('location')]",
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
+        "publicIPAllocationMethod": "Static",
         "dnsSettings": {
           "domainNameLabel": "[variables('dnsPrefix')]"
         }
@@ -133,7 +133,7 @@
         "status": "Enabled",
         "taskType": "ComputeVmShutdownTask",
         "dailyRecurrence": {
-          "time": "1900"
+         "time": "1800"
         },
         "timeZoneId": "Pacific Standard Time",
         "notificationSettings": {

@@ -31,6 +31,20 @@
       },
       "defaultValue": ""
     },
+    "domainname": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }
+    },
+    "domainNetbiosName": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }
+    },
     "forestMode": {
       "type": "string",
       "defaultValue": "Win2012R2",
@@ -50,20 +64,46 @@
   "variables": {
     "templatePrefix": "master",
     "location": "[resourceGroup().location]",
-    "domainName": "Domain.com",
-    "domainNetbiosName": "LAB",
+    "domainName": "[parameters('domainName')]",
+    "domainNetbiosName": "[parameters('domainNetbiosName')]",
     "forestMode": "[parameters('forestMode')]",
+    "RetryCount": 60,
+    "RetryIntervalSec": 30,
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
-    "dc1VMName": "[concat(variables('templatePrefix'), '-dc1vm')]",
-    "dc1NicName": "[concat(variables('templatePrefix'), '-dc1Nic')]",
+    "VSubnetName": "vs",
+    "KSubnetName": "ks",
+    "CSubnetName": "cs",
+    "VSubnetPrefix": "10.0.0.0/24",
+    "KSubnetPrefix": "10.0.1.0/24",
+    "CSubnetPrefix": "10.0.2.0/24",
+    "sites": [
+      {
+        "name": "[toUpper(variables('VSubnetName'))]",
+        "prefix": "[variables('VSubnetPrefix')]",
+        "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('VSubnetName')))]"
+      },
+      {
+        "name": "[toUpper(variables('KSubnetName'))]",
+        "prefix": "[variables('KSubnetPrefix')]",
+        "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('CSubnetName')))]"        
+      },
+      {
+        "name": "[toUpper(variables('CSubnetName'))]",
+        "prefix": "[variables('CSubnetPrefix')]",        
+        "sitelink": "[concat(toUpper(variables('CSubnetName')),',',toUpper(variables('VSubnetName')))]"        
+      }
+    ],
+
+    "dc1VMName": "VD201",    
+    "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
-    "dc2VMName": "[concat(variables('templatePrefix'), '-dc2vm')]",
-    "dc2NicName": "[concat(variables('templatePrefix'), '-dc2Nic')]",
+    "dc2VMName": "KD201",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",    
     "dc2NicIPAddress": "10.0.1.5",
-    "dc3VMName": "[concat(variables('templatePrefix'), '-dc3vm')]",
-    "dc3NicName": "[concat(variables('templatePrefix'), '-dc3Nic')]",
+    "dc3VMName": "CD201",
+    "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",    
     "dc3NicIPAddress": "10.0.2.5",
-    "virtualMachineSize": "Standard_DS1_v2",
+    "virtualMachineSize": "Standard_D1_v2",
     "dcPrimaryInstallModule": {
       "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
       "script": "CreatePrimaryDC.ps1",
@@ -102,7 +142,15 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": []
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dc1VMName'),'_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -131,7 +179,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1900"
+             "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -162,9 +210,12 @@
               },
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",
-                "domainNetbiosName": "[variables('domainNetbiosName')]",
+                "domainNetbiosName": "[variables('domainNetbiosName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
-                "forestMode": "[variables('forestMode')]"
+                "sites": "[string(variables('sites'))]",
+                "forestMode": "[variables('forestMode')]",
+                "RetryCount": "[variables('RetryCount')]",
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"
               }
             },
             "protectedSettings": {
@@ -206,7 +257,15 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": []
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dc2VMName'),'_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -235,7 +294,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1900"
+             "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -265,8 +324,11 @@
                 "function": "[variables('dcSecondaryInstallModule').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('domainName')]",
-                "dnsServer": "[variables('dc1NicIPAddress')]"
+                "domainName": "[variables('domainName')]",                
+                "dnsServer": "[variables('dc1NicIPAddress')]",
+                "site": "[toUpper(variables('KSubnetName'))]",
+                "RetryCount": "[variables('RetryCount')]",
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"
               }
             },
             "protectedSettings": {
@@ -308,7 +370,15 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": []
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dc3VMName'),'_DataDisk1')]",
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "128",
+              "lun": 0
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -337,7 +407,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1900"
+             "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -367,8 +437,11 @@
                 "function": "[variables('dcSecondaryInstallModule').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('domainName')]",
-                "dnsServer": "[variables('dc1NicIPAddress')]"
+                "domainName": "[variables('domainName')]",              
+                "dnsServer": "[variables('dc1NicIPAddress')]",
+                "site": "[toUpper(variables('CSubnetName'))]",
+                "RetryCount": "[variables('RetryCount')]",
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"           
               }
             },
             "protectedSettings": {
