@@ -34,12 +34,16 @@
       "defaultValue": ""
     },
     "deployJumpBoxTemplate": {
-      "type": "bool",
+      "type": "string",
       "defaultValue": "Yes",      
       "metadata": {
         "group": "Template Settings",
         "description": "Indicates wheter or not include JumpBox in this deployment"
-      }
+      },
+      "allowedValues": [
+        "Yes",
+        "No"
+      ]
     },
     "deployDomincontrollers": {
       "type": "string",
@@ -120,7 +124,7 @@
       "name": "ProvisioningJumbBox",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[parameters('deployJumpBoxTemplate)]",
+      "condition": "[equals(parameters('deployJumpBoxTemplate'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
