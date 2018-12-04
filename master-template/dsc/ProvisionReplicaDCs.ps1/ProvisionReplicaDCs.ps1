@@ -8,6 +8,8 @@
         [Parameter(Mandatory)]
         [String]$DNSServer,
 
+        [string]$DataDisks,
+
         [Parameter(Mandatory)]
         [String]$site,
 
@@ -19,7 +21,14 @@
         [Int]$RetryCount,
         
         [Parameter(Mandatory=$true)]
-        [Int]$RetryIntervalSec
+        [Int]$RetryIntervalSec,
+
+        [Boolean]$RebootNodeIfNeeded = $true,
+        [String]$ActionAfterReboot = "ContinueConfiguration",
+        [String]$ConfigurationModeFrequencyMins = 15,
+        [String]$ConfigurationMode = "ApplyAndMonitor",
+        [String]$RefreshMode = "Push",
+        [String]$RefreshFrequencyMins  = 30
     )
 
     Import-DscResource -ModuleName xActiveDirectory
@@ -35,8 +44,74 @@
     {
         LocalConfigurationManager
         {
-            ConfigurationMode = 'ApplyOnly'
-            RebootNodeIfNeeded = $true
+            RebootNodeIfNeeded = $RebootNodeIfNeeded
+            ActionAfterReboot = $ActionAfterReboot            
+            ConfigurationModeFrequencyMins = $ConfigurationModeFrequencyMins
+            ConfigurationMode = $ConfigurationMode
+            RefreshMode = $RefreshMode
+            RefreshFrequencyMins = $RefreshFrequencyMins            
+        }
+
+        
+        # remove D drive as system managed drive. and place paging files to C drive. 
+        $computer = Get-WmiObject Win32_computersystem -EnableAllPrivileges
+        $computer.AutomaticManagedPagefile = $false
+        $computer.Put()
+        $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='d:\\pagefile.sys'"       
+        if($CurrentPageFile -ne $null) { $CurrentPageFile.delete() }
+        Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name="c:\pagefile.sys";InitialSize = 0; MaximumSize = 0} -ErrorAction SilentlyContinue
+         
+        # remove dummy txt file that azure places. 
+        File RemoveReadMe
+        {
+             DestinationPath = "D:\DATALOSS_WARNING_README.txt"
+             Ensure = "Absent"
+             Type = "File"
+             Force = $true
+        }
+
+        # move DVD optical drive to Z letter, empty "E"
+       OpticalDiskDriveLetter RemoveDiscDrive
+       {
+           DiskId      = 1
+           DriveLetter = 'Z' # This value is ignored
+           Ensure      = 'Present'
+       }  
+
+        # change C drive label "System" from "Windows"
+        $drive = gwmi win32_volume -Filter "DriveLetter = 'C:'"
+        $drive.Label = "System"
+        $drive.put()
+        # change D drive label to "Local Data" from "Temporary Data"
+        $drive = gwmi win32_volume -Filter "DriveLetter = 'D:'"
+        $drive.Label = "Local Data"
+        $drive.put()
+        # convert DataDisks Json string to array of objects
+        $DataDisks = $DataDisks | ConvertFrom-Json        
+
+        # loop each Datadisk information and mount to a letter in object
+        $count = 2 # start with "2" ad "0" and "1" is for  C  and D that comes from WindowsServer Azure image 
+        
+        foreach ($datadisk in $DataDisks)         
+        {
+            # wait for disk is mounted to vm and available   
+            WaitForDisk $datadisk.name
+            {
+                DiskId = $count 
+                RetryIntervalSec = $RetryIntervalSec
+                RetryCount = $RetryCount
+                DependsOn  ="[OpticalDiskDriveLetter]RemoveDiscDrive" 
+            }
+            # once disk number availabe, assign and format drive with all available sizes and assign a leter and label that comes from parameters.
+            Disk $datadisk.letter
+            {
+                FSLabel = $datadisk.name
+                DiskId = $count 
+                DriveLetter = $datadisk.letter
+                DependsOn = "[WaitForDisk]"+$datadisk.name
+            }
+
+            $count ++
         }
 
         #Registry DisableIPv6
@@ -70,27 +145,12 @@
                 Name = $_
             }
         }
-        WaitForDisk Disk2
-        {
-             DiskId = 2
-             RetryIntervalSec = $RetryIntervalSec
-             RetryCount = $RetryCount 
-             DependsOn="[WindowsFeature]Feature-AD-Domain-Services"
-        }
-
-        Disk FVolume
-        {
-             DiskId = 2
-             DriveLetter = 'F'           
-             DependsOn = '[WaitForDisk]Disk2'
-        }
 
         DnsServerAddress DnsServerAddress
         {
             Address        = $DNSServer
             InterfaceAlias = $InterfaceAlias
-            AddressFamily  = 'IPv4'
-            DependsOn="[Disk]FVolume"
+            AddressFamily  = 'IPv4'           
         }
 
         xWaitForADDomain DscForestWait
@@ -98,8 +158,7 @@
             DomainName = $DomainName
             #DomainUserCredential= $DomainAdminCredential
             RetryCount = $RetryCount
-            RetryIntervalSec = $RetryIntervalSec
-            DependsOn  = "[DnsServerAddress]DnsServerAddress"
+            RetryIntervalSec = $RetryIntervalSec          
         }
 
         Computer JoinDomain
@@ -115,9 +174,9 @@
             DomainName = $DomainName            
             DomainAdministratorCredential = $DomainAdminCredential
             SafemodeAdministratorPassword = $DomainAdminCredential
-            DatabasePath = "F:\NTDS"
-            LogPath = "F:\NTDS"
-            SysvolPath = "F:\SYSVOL"
+            DatabasePath = "E:\NTDS"
+            LogPath = "E:\NTDS"
+            SysvolPath = "E:\SYSVOL"              
             SiteName   = $site
             DependsOn  = "[Computer]JoinDomain"
         }        

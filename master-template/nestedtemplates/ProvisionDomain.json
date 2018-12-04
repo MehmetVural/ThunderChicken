@@ -67,6 +67,9 @@
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
     "forestMode": "[parameters('forestMode')]",
+    "fileShareSAAccount": "[concat('share', substring(replace(subscription().subscriptionId,'-', ''), 0, 19))]",
+    "shareResourceGroupName": "TCShare",
+    "fileShare": "share",    
     "RetryCount": 60,
     "RetryIntervalSec": 30,
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
@@ -93,7 +96,18 @@
         "sitelink": "[concat(toUpper(variables('CSubnetName')),',',toUpper(variables('VSubnetName')))]"        
       }
     ],
-
+    "datadisks": [
+      {              
+        "name": "DirectoryLogs",
+        "diskSizeGB": 50,
+        "letter": "E"              
+      },
+      {              
+        "name": "FileShare",
+        "diskSizeGB": 100,
+        "letter": "F"              
+      }
+    ],
     "dc1VMName": "VD201",    
     "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
@@ -142,15 +156,18 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": [
+          "copy": [
             {
-              "name": "[concat(variables('dc1VMName'),'_DataDisk1')]",
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "128",
-              "lun": 0
+              "name": "dataDisks",
+              "count": "[length(variables('datadisks'))]",              
+              "input": {
+                "name": "[concat(variables('dc1VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].name)]",
+                "diskSizeGB": "[int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB)]",
+                "lun": "[copyIndex('dataDisks')]",
+                "createOption": "Empty"
+              }
             }
-          ]
+          ] 
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -212,10 +229,14 @@
                 "domainName": "[variables('domainName')]",
                 "domainNetbiosName": "[variables('domainNetbiosName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "dataDisks": "[string(variables('datadisks'))]",
                 "sites": "[string(variables('sites'))]",
                 "forestMode": "[variables('forestMode')]",
+                "SourcePath" : "[concat('\\\\', variables('fileShareSAAccount'), '.file.core.windows.net', '\\', 'share')]",
                 "RetryCount": "[variables('RetryCount')]",
-                "RetryIntervalSec": "[variables('RetryIntervalSec')]"
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]",                
+                "ConfigurationMode" : "ApplyAndAutoCorrect",
+                "ConfigurationModeFrequencyMins" : 15
               }
             },
             "protectedSettings": {
@@ -224,6 +245,10 @@
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
                   "Password": "[parameters('adminPassword')]"
+                },
+                "AzureShareCredential": {
+                  "UserName": "[concat('Azure', '\\', variables('fileShareSAAccount'))]",
+                  "Password": "[listKeys(resourceId(variables('shareResourceGroupName'), 'Microsoft.Storage/storageAccounts', variables('fileShareSAAccount')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
                 }
               }
             }
@@ -257,15 +282,18 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": [
+          "copy": [
             {
-              "name": "[concat(variables('dc2VMName'),'_DataDisk1')]",
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "128",
-              "lun": 0
+              "name": "dataDisks",
+              "count": "[length(variables('datadisks'))]",              
+              "input": {
+                "name": "[concat(variables('dc2VMName'),'_DataDisk', variables('datadisks')[copyIndex('dataDisks')].name)]",
+                "diskSizeGB": "[int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB)]",
+                "lun": "[copyIndex('dataDisks')]",
+                "createOption": "Empty"
+              }
             }
-          ]
+          ] 
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -326,6 +354,7 @@
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "dataDisks": "[string(variables('datadisks'))]",
                 "site": "[toUpper(variables('KSubnetName'))]",
                 "RetryCount": "[variables('RetryCount')]",
                 "RetryIntervalSec": "[variables('RetryIntervalSec')]"
@@ -370,15 +399,18 @@
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
-          "dataDisks": [
+          "copy": [
             {
-              "name": "[concat(variables('dc3VMName'),'_DataDisk1')]",
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "128",
-              "lun": 0
+              "name": "dataDisks",
+              "count": "[length(variables('datadisks'))]",              
+              "input": {
+                "name": "[concat(variables('dc3VMName'),'_DataDisk', variables('datadisks')[copyIndex('dataDisks')].name)]",
+                "diskSizeGB": "[int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB)]",
+                "lun": "[copyIndex('dataDisks')]",
+                "createOption": "Empty"
+              }
             }
-          ]
+          ] 
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -439,9 +471,10 @@
               "configurationArguments": {
                 "domainName": "[variables('domainName')]",              
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "dataDisks": "[string(variables('datadisks'))]",
                 "site": "[toUpper(variables('CSubnetName'))]",
                 "RetryCount": "[variables('RetryCount')]",
-                "RetryIntervalSec": "[variables('RetryIntervalSec')]"           
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"                         
               }
             },
             "protectedSettings": {
@@ -459,4 +492,6 @@
     }
   ],
   "outputs": {}
+
+
 }

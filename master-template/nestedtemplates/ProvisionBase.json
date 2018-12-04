@@ -6,13 +6,14 @@
     "templatePrefix": "master",
     "location": "[resourceGroup().location]",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+    
     "virtualNetworkName": "[concat(variables('templatePrefix'), '-vn')]",
     "addressPrefix": "10.0.0.0/16",
     "VSubnetPrefix": "10.0.0.0/24",
     "KSubnetPrefix": "10.0.1.0/24",
     "CSubnetPrefix": "10.0.2.0/24",
     "KDMZSubnetPrefix": "10.0.3.0/24",
-    "CDMZSubnetPrefix": "10.0.4.0/24",    
+    "CDMZSubnetPrefix": "10.0.4.0/24",
     "VNSGName": "[concat(variables('templatePrefix'), '-vnsg')]",
     "KNSGName": "[concat(variables('templatePrefix'), '-knsg')]",
     "CNSGName": "[concat(variables('templatePrefix'), '-cnsg')]",
@@ -23,14 +24,14 @@
     "CSubnetName": "cs",
     "CDMZSubnetName": "cdmz",
     "KDMZSubnetName": "kdmz",
-    "dc1VMName": "VD201",    
+    "dc1VMName": "VD201",
     "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
     "dc2VMName": "KD201",
-    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",    
+    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",
     "dc2NicIPAddress": "10.0.1.5",
     "dc3VMName": "CD201",
-    "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",    
+    "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",
     "dc3NicIPAddress": "10.0.2.5",
     "dmzdc1VMName": "KDZ201",
     "dmzdc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc1VMName'), '-nic')]",
@@ -38,7 +39,6 @@
     "dmzdc2VMName": "CDZ201",
     "dmzdc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc2VMName'), '-nic')]",
     "dmzdc2NicIPAddress": "10.0.4.5",
-
     "subnets": [
       {
         "name": "[variables('VSubnetName')]",
@@ -66,7 +66,7 @@
             "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CNSGName'))]"
           }
         }
-      },      
+      },
       {
         "name": "[variables('KDMZSubnetName')]",
         "properties": {
@@ -299,6 +299,7 @@
         ]
       }
     }
+   
   ],
   "outputs": {}
 }

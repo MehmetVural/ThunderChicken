@@ -74,12 +74,12 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SharedSQL",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
         "SCOM",
-        "SQL",
+        "SharedSQL",
         "FileServer",
         "DHCP",       
         "SharePoint",
@@ -94,11 +94,11 @@
     }
   },
   "variables": {    
-    "location": "[resourceGroup().location]",
+    "location": "[resourceGroup().location]",    
     "domainName": "Domain.com",
     "domainNetbiosName": "LAB",
     "domainNameDMZ": "DomainDmz.com",
-    "domainNetbiosNameDMZ": "LABDMZ",
+    "domainNetbiosNameDMZ": "LABDMZ",    
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('_artifactsLocationSasToken'))]",    
     "jumpboxTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('_artifactsLocationSasToken'))]",
