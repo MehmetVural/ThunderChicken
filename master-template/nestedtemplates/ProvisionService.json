@@ -45,10 +45,10 @@
         "SCOM",
         "SharedSQL",
         "FileServer",
-        "DHCP",       
+        "DHCP",
         "SharePoint",
         "Exchange",
-        "AirWatch",        
+        "AirWatch",
         "Skype"
       ],
       "metadata": {
@@ -74,10 +74,15 @@
             "subnet": "V",
             "ip": "10.0.0.6",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "Directory Logs",
                 "diskSizeGB": 50,
-                "letter": "E"                 
+                "letter": "E"
               }
             ]
           },
@@ -87,10 +92,15 @@
             "subnet": "C",
             "ip": "10.0.2.6",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "Directory Logs",
                 "diskSizeGB": 50,
-                "letter": "E"                 
+                "letter": "E"
               }
             ]
           },
@@ -99,14 +109,26 @@
             "size": "S",
             "subnet": "C",
             "ip": "10.0.2.7",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CH221",
             "size": "S",
             "subnet": "C",
             "ip": "10.0.2.8",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KD202",
@@ -114,10 +136,15 @@
             "subnet": "K",
             "ip": "10.0.1.6",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "Directory Logs",
                 "diskSizeGB": 50,
-                "letter": "E"                 
+                "letter": "E"
               }
             ]
           },
@@ -126,14 +153,26 @@
             "size": "S",
             "subnet": "K",
             "ip": "10.0.1.7",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KH179",
             "size": "S",
             "subnet": "K",
             "ip": "10.0.1.8",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           }
         ]
       },
@@ -142,250 +181,287 @@
         "servers": [
           {
             "hostname": "VS201",
-            "size": "L",
+            "size": "S",
             "subnet": "V",
             "ip": "10.0.0.10",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "VS202",
-            "size": "L",
+            "size": "S",
             "subnet": "V",
             "ip": "10.0.0.11",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CS201",
-            "size": "L",
+            "size": "S",
             "subnet": "C",
             "ip": "10.0.2.12",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CS202",
-            "size": "L",
+            "size": "S",
             "subnet": "C",
             "ip": "10.0.2.13",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KS201",
-            "size": "L",
+            "size": "S",
             "subnet": "K",
             "ip": "10.0.1.14",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KS202",
-            "size": "L",
+            "size": "S",
             "subnet": "K",
             "ip": "10.0.1.15",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           }
         ]
-      },      
+      },
       "SharedSQL": {
         "prefix": "sql",
-        "servers": [ 
+        "servers": [
           {
-          "hostname": "VS222",
-          "size": "S",
-          "subnet": "V",
-          "ip": "10.0.0.16",
-          "datadisks": [
-            {              
-              "name": "Local Data",
-              "diskSizeGB": 50,
-              "letter": "D"
-            },
-            {              
-              "name": "SQLData",
-              "diskSizeGB": 500,
-              "letter": "E"              
-            },
-            {
-              "name": "SQLLog",
-              "diskSizeGB": 100,
-              "letter": "F"
-            },
-            {
-              "name": "SQLTempDB",
-              "diskSizeGB": 50,
-              "letter": "G"
-            },
-            {
-              "name": "SQLBackup",
-              "diskSizeGB": 500,
-              "letter": "H"
-            }
-          ]
-        },
-        {
-          "hostname": "VS221",
-          "size": "S",
-          "subnet": "V",
-          "ip": "10.0.0.17",
-          "datadisks": [
-            {              
-              "name": "Local Data",
-              "diskSizeGB": 50,
-              "letter": "D"
-            },
-            {              
-              "name": "SQLData",
-              "diskSizeGB": 500,
-              "letter": "E"              
-            },
-            {
-              "name": "SQLLog",
-              "diskSizeGB": 100,
-              "letter": "F"
-            },
-            {
-              "name": "SQLTempDB",
-              "diskSizeGB": 50,
-              "letter": "G"
-            },
-            {
-              "name": "SQLBackup",
-              "diskSizeGB": 500,
-              "letter": "H"
-            }
-          ]
-        },
-        {
-          "hostname": "CS222",
-          "size": "S",
-          "subnet": "C",
-          "ip": "10.0.2.18",
-          "datadisks": [
-            {              
-              "name": "Local Data",
-              "diskSizeGB": 50,
-              "letter": "D"
-            },
-            {              
-              "name": "SQLData",
-              "diskSizeGB": 1023,
-              "letter": "E"              
-            },
-            {
-              "name": "SQLLog",
-              "diskSizeGB": 200,
-              "letter": "F"
-            },
-            {
-              "name": "SQLTempDB",
-              "diskSizeGB": 50,
-              "letter": "G"
-            },
-            {
-              "name": "SQLBackup",
-              "diskSizeGB": 1023,
-              "letter": "H"
-            }
-          ]
-        },
-        {
-          "hostname": "CS221",
-          "size": "S",
-          "subnet": "C",
-          "ip": "10.0.2.19",
-          "datadisks": [
-            {              
-              "name": "Local Data",
-              "diskSizeGB": 50,
-              "letter": "D"
-            },
-            {              
-              "name": "SQLData",
-              "diskSizeGB": 1023,
-              "letter": "E"              
-            },
-            {
-              "name": "SQLLog",
-              "diskSizeGB": 200,
-              "letter": "F"
-            },
-            {
-              "name": "SQLTempDB",
-              "diskSizeGB": 50,
-              "letter": "G"
-            },
-            {
-              "name": "SQLBackup",
-              "diskSizeGB": 1023,
-              "letter": "H"
-            }
-          ]
-        },
-        {
-          "hostname": "KS222",
-          "size": "S",
-          "subnet": "K",
-          "ip": "10.0.1.20",
-          "datadisks": [
-            {              
-              "name": "Local Data",
-              "diskSizeGB": 50,
-              "letter": "D"
-            },
-            {              
-              "name": "SQLData",
-              "diskSizeGB": 1023,
-              "letter": "E"              
-            },
-            {
-              "name": "SQLLog",
-              "diskSizeGB": 200,
-              "letter": "F"
-            },
-            {
-              "name": "SQLTempDB",
-              "diskSizeGB": 50,
-              "letter": "G"
-            },
-            {
-              "name": "SQLBackup",
-              "diskSizeGB": 1023,
-              "letter": "H"
-            }
-          ]
-        },
-        {
-          "hostname": "KS221",
-          "size": "S",
-          "subnet": "K",
-          "ip": "10.0.1.21",
-          "datadisks": [
-            {              
-              "name": "Local Data",
-              "diskSizeGB": 50,
-              "letter": "D"
-            },
-            {              
-              "name": "SQLData",
-              "diskSizeGB": 1023,
-              "letter": "E"              
-            },
-            {
-              "name": "SQLLog",
-              "diskSizeGB": 200,
-              "letter": "F"
-            },
-            {
-              "name": "SQLTempDB",
-              "diskSizeGB": 50,
-              "letter": "G"
-            },
-            {
-              "name": "SQLBackup",
-              "diskSizeGB": 1023,
-              "letter": "H"
-            }
-          ]
-        }      
-      ]
+            "hostname": "VS222",
+            "size": "M",
+            "subnet": "V",
+            "ip": "10.0.0.16",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ]
+          },
+          {
+            "hostname": "VS221",
+            "size": "M",
+            "subnet": "V",
+            "ip": "10.0.0.17",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ]
+          },
+          {
+            "hostname": "CS222",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.18",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ]
+          },
+          {
+            "hostname": "CS221",
+            "size": "M",
+            "subnet": "C",
+            "ip": "10.0.2.19",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ]
+          },
+          {
+            "hostname": "KS222",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.20",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ]
+          },
+          {
+            "hostname": "KS221",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.21",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ]
+          } 
+          
+        ]
       },
       "FileServer": {
         "prefix": "fs",
@@ -396,15 +472,15 @@
             "subnet": "V",
             "ip": "10.0.0.22",
             "datadisks": [
-              {              
+              {
                 "name": "Local Data",
                 "diskSizeGB": 50,
                 "letter": "D"
               },
-              {              
+              {
                 "name": "Users",
                 "diskSizeGB": 1023,
-                "letter": "E"              
+                "letter": "E"
               },
               {
                 "name": "Public",
@@ -439,15 +515,15 @@
             "subnet": "C",
             "ip": "10.0.2.23",
             "datadisks": [
-              {              
+              {
                 "name": "Local Data",
                 "diskSizeGB": 50,
                 "letter": "D"
               },
-              {              
+              {
                 "name": "Users",
                 "diskSizeGB": 1023,
-                "letter": "E"              
+                "letter": "E"
               },
               {
                 "name": "Public",
@@ -482,15 +558,15 @@
             "subnet": "K",
             "ip": "10.0.1.24",
             "datadisks": [
-              {              
+              {
                 "name": "Local Data",
                 "diskSizeGB": 50,
                 "letter": "D"
               },
-              {              
+              {
                 "name": "Users",
                 "diskSizeGB": 1023,
-                "letter": "E"              
+                "letter": "E"
               },
               {
                 "name": "Public",
@@ -519,7 +595,6 @@
               }
             ]
           }
-
         ]
       },
       "DHCP": {
@@ -531,10 +606,15 @@
             "subnet": "V",
             "ip": "10.0.0.25",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },              
+              {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
-                "letter": "E"              
+                "letter": "E"
               }
             ]
           },
@@ -544,7 +624,12 @@
             "subnet": "V",
             "ip": "10.0.0.26",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
                 "letter": "E"
@@ -556,7 +641,13 @@
             "size": "M",
             "subnet": "V",
             "ip": "10.0.0.27",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CS203",
@@ -564,7 +655,12 @@
             "subnet": "C",
             "ip": "10.0.2.28",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
                 "letter": "E"
@@ -577,7 +673,12 @@
             "subnet": "C",
             "ip": "10.0.2.29",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
                 "letter": "E"
@@ -589,14 +690,26 @@
             "size": "M",
             "subnet": "C",
             "ip": "10.0.2.30",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CS206",
             "size": "M",
             "subnet": "C",
             "ip": "10.0.2.31",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KS203",
@@ -604,7 +717,7 @@
             "subnet": "K",
             "ip": "10.0.1.32",
             "datadisks": [
-              {              
+              {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
                 "letter": "E"
@@ -617,7 +730,12 @@
             "subnet": "K",
             "ip": "10.0.1.33",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
                 "letter": "E"
@@ -629,7 +747,13 @@
             "size": "M",
             "subnet": "K",
             "ip": "10.0.1.34",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           }
         ]
       },
@@ -638,45 +762,62 @@
         "servers": [
           {
             "hostname": "CP201",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.35",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CP202",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.36",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CP203",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.37",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SQLData",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "SQLLog",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "SQLTempDB",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "SQLBackup",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "SP_Indexes",
                 "diskSizeGB": 50,
                 "letter": "I"
@@ -685,66 +826,101 @@
           },
           {
             "hostname": "CP204",
-            "size": "XL",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.38",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CP205",
-            "size": "XL",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.39",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CP206",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.40",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KP201",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.41",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KP202",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.42",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KP203",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.43",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SQLData",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "SQLLog",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "SQLTempDB",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "SQLBackup",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "SP_Indexes",
                 "diskSizeGB": 50,
                 "letter": "I"
@@ -753,58 +929,81 @@
           },
           {
             "hostname": "KP204",
-            "size": "XL",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.44",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KP205",
-            "size": "XL",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.45",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KP206",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.46",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KP209",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.47",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SQLData",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "SQLLog",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "SQLTempDB",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "SQLBackup",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "SP_Indexes",
                 "diskSizeGB": 50,
                 "letter": "I"
               }
             ]
-          }          
+          }
         ]
       },
       "Exchange": {
@@ -815,42 +1014,59 @@
             "size": "M",
             "subnet": "KD",
             "ip": "10.0.3.48",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KM202",
             "size": "M",
             "subnet": "KD",
             "ip": "10.0.3.49",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "KM204",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.50",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DAG AND LOGS1",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "DAG AND LOGS2",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "DAG AND LOGS3",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "DAG AND LOGS4",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "RECOVERY",
                 "diskSizeGB": 50,
                 "letter": "I"
@@ -859,31 +1075,36 @@
           },
           {
             "hostname": "KM205",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.51",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DAG AND LOGS1",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "DAG AND LOGS2",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "DAG AND LOGS3",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "DAG AND LOGS4",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "RECOVERY",
                 "diskSizeGB": 50,
                 "letter": "I"
@@ -895,49 +1116,72 @@
             "size": "M",
             "subnet": "CD",
             "ip": "10.0.4.52",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CM202",
             "size": "M",
             "subnet": "CD",
             "ip": "10.0.4.53",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CM203",
             "size": "M",
             "subnet": "C",
             "ip": "10.0.2.54",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
             "hostname": "CM204",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.55",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DAG AND LOGS1",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "DAG AND LOGS2",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "DAG AND LOGS3",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "DAG AND LOGS4",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "RECOVERY",
                 "diskSizeGB": 50,
                 "letter": "I"
@@ -946,31 +1190,36 @@
           },
           {
             "hostname": "CM205",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.56",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "DAG AND LOGS1",
                 "diskSizeGB": 1023,
                 "letter": "E"
               },
-              {              
+              {
                 "name": "DAG AND LOGS2",
                 "diskSizeGB": 400,
                 "letter": "F"
               },
-              {              
+              {
                 "name": "DAG AND LOGS3",
                 "diskSizeGB": 50,
                 "letter": "G"
               },
-              {              
+              {
                 "name": "DAG AND LOGS4",
                 "diskSizeGB": 1023,
                 "letter": "H"
               },
-              {              
+              {
                 "name": "RECOVERY",
                 "diskSizeGB": 50,
                 "letter": "I"
@@ -982,10 +1231,14 @@
             "size": "M",
             "subnet": "K",
             "ip": "10.0.1.57",
-            "datadisks": []
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           }
-
-
         ]
       },
       "AirWatch": {
@@ -997,7 +1250,12 @@
             "subnet": "K",
             "ip": "10.0.1.58",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "AWData",
                 "diskSizeGB": 50,
                 "letter": "E"
@@ -1010,7 +1268,12 @@
             "subnet": "K",
             "ip": "10.0.1.59",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "AWData",
                 "diskSizeGB": 100,
                 "letter": "E"
@@ -1019,11 +1282,16 @@
           },
           {
             "hostname": "KM208",
-            "size": "L",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.60",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "AWData",
                 "diskSizeGB": 100,
                 "letter": "E"
@@ -1032,11 +1300,16 @@
           },
           {
             "hostname": "CM206",
-            "size": "L",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.61",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "AWData",
                 "diskSizeGB": 50,
                 "letter": "E"
@@ -1049,7 +1322,12 @@
             "subnet": "C",
             "ip": "10.0.2.62",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "AWData",
                 "diskSizeGB": 100,
                 "letter": "E"
@@ -1062,7 +1340,12 @@
             "subnet": "C",
             "ip": "10.0.2.63",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "AWData",
                 "diskSizeGB": 100,
                 "letter": "E"
@@ -1076,11 +1359,16 @@
         "servers": [
           {
             "hostname": "KM209",
-            "size": "L",
+            "size": "M",
             "subnet": "KD",
             "ip": "10.0.3.64",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 400,
                 "letter": "E"
@@ -1089,11 +1377,16 @@
           },
           {
             "hostname": "KM210",
-            "size": "L",
+            "size": "M",
             "subnet": "KD",
             "ip": "10.0.3.65",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 400,
                 "letter": "E"
@@ -1102,11 +1395,16 @@
           },
           {
             "hostname": "KM211",
-            "size": "XL",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.66",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 800,
                 "letter": "E"
@@ -1115,11 +1413,16 @@
           },
           {
             "hostname": "KM212",
-            "size": "XL",
+            "size": "M",
             "subnet": "K",
             "ip": "10.0.1.67",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 800,
                 "letter": "E"
@@ -1128,11 +1431,16 @@
           },
           {
             "hostname": "CM209",
-            "size": "L",
+            "size": "M",
             "subnet": "CD",
             "ip": "10.0.4.68",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 400,
                 "letter": "E"
@@ -1141,11 +1449,16 @@
           },
           {
             "hostname": "CM210",
-            "size": "L",
+            "size": "M",
             "subnet": "CD",
             "ip": "10.0.4.69",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 400,
                 "letter": "E"
@@ -1154,11 +1467,16 @@
           },
           {
             "hostname": "CM211",
-            "size": "XL",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.70",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 800,
                 "letter": "E"
@@ -1167,11 +1485,16 @@
           },
           {
             "hostname": "CM212",
-            "size": "XL",
+            "size": "M",
             "subnet": "C",
             "ip": "10.0.2.71",
             "datadisks": [
-              {              
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
                 "name": "SkypeData",
                 "diskSizeGB": 800,
                 "letter": "E"
@@ -1227,7 +1550,7 @@
         "domain": "[variables('domainNameDMZ')]",
         "dns": "[variables('dmzdc2NicIPAddress')]"
       }
-    },    
+    },
     "imageReference": {
       "publisher": "MicrosoftWindowsServer",
       "offer": "WindowsServer",
@@ -1242,15 +1565,15 @@
     "virtualMachineSizeArray": {
       "S": "Standard_D1_v2",
       "M": "Standard_D2_v2",
-      "L": "Standard_D3_v2",  
-      "XL": "Standard_D4_v2"  
+      "L": "Standard_D3_v2",
+      "XL": "Standard_D4_v2"
     },
     "subnetMap": {
       "V": "[variables('VSubnetName')]",
       "K": "[variables('KSubnetName')]",
-      "C": "[variables('CSubnetName')]",  
-      "KD": "[variables('KDMZSubnetName')]", 
-      "CD": "[variables('CDMZSubnetName')]"  
+      "C": "[variables('CSubnetName')]",
+      "KD": "[variables('KDMZSubnetName')]",
+      "CD": "[variables('CDMZSubnetName')]"
     }
   },
   "resources": [
@@ -1271,7 +1594,6 @@
             "properties": {
               "subnet": {
                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('subnetMap')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]"
-                  
               },
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[if(equals('Static', 'Static'), variables('templates')[variables('template')].servers[copyIndex()].ip, json('null'))]"
@@ -1319,13 +1641,13 @@
               "name": "dataDisks",
               "count": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),1, length(variables('templates')[variables('template')].servers[copyIndex()].datadisks))]",
               "input": {
-                "name": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', 'dummy'), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', replace(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].name,' ','_'))    )]",
+                "name": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', 'dummy'), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].letter, '_' , replace(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].name,' ','_'))    )]",
                 "diskSizeGB": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0), 1, int(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].diskSizeGB)    )]",
                 "lun": "[copyIndex('dataDisks')]",
                 "createOption": "Empty"
               }
             }
-          ]         
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -1354,7 +1676,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-             "time": "1800"
+              "time": "1800"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -1384,8 +1706,8 @@
                 "function": "[variables('dscModulePrepare').function]"
               },
               "configurationArguments": {
-                "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",                
-                "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",                
+                "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
+                "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
                 "retryCount": "[variables('RetryCount')]",
                 "retryIntervalSec": "[variables('RetryIntervalSec')]"
@@ -1409,6 +1731,6 @@
     "template": {
       "type": "string",
       "value": "[parameters('template')]"
-    }   
+    }
   }
 }

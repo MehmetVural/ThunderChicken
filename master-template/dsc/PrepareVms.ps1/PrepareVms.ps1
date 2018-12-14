@@ -32,6 +32,7 @@
     Import-DscResource -ModuleName xActiveDirectory
     Import-DscResource -ModuleName ComputerManagementDsc  
     Import-DSCResource -ModuleName StorageDsc
+    Import-DscResource -ModuleName xPendingReboot
     Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName PSDesiredStateConfiguration
 
@@ -51,69 +52,66 @@
             RefreshFrequencyMins = $RefreshFrequencyMins            
         }
 
+        # change C drive label to "System" from "Windows"
+        $drive = Get-WmiObject win32_volume -Filter "DriveLetter = 'C:'"
+        $drive.Label = "System"
+        $drive.put()
+        
         # remove DVD optical drive
         OpticalDiskDriveLetter RemoveDiscDrive
         {
            DiskId      = 1
-           #DriveLetter = 'Z' # This value is ignored
+           DriveLetter = 'E' # This value is ignored
            Ensure      = 'Absent'
         }  
-
-
-        # remove D drive as system managed drive. and place paging files to C drive. 
-        Script DDrive
+        
+        # removes pagefile on Drive and move D drive to T and sets back page file on that drive
+        Script DeletePageFile
         {
             SetScript = {
-
-                # change C drive label "System" from "Windows"
-                $drive = gwmi win32_volume -Filter "DriveLetter = 'C:'"
-                $drive.Label = "System"
-                $drive.put()
-
-                # remove D drive as system managed drive. and place paging files to C drive. 
-                $computer = Get-WmiObject Win32_computersystem -EnableAllPrivileges
-                $computer.AutomaticManagedPagefile = $false
-                $computer.Put()
-                $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='d:\\pagefile.sys'"       
-                if($CurrentPageFile -ne $null) { $CurrentPageFile.delete() }
-                Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name="c:\pagefile.sys";InitialSize = 0; MaximumSize = 0} -ErrorAction SilentlyContinue
+                
+                #Get-WmiObject win32_pagefilesetting
+                $pf = Get-WmiObject win32_pagefilesetting
+                if($pf -ne $null) {$pf.Delete()}   
+                
+                
             }
 
-            TestScript = { $false}
+            TestScript = {                                 
+                $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='T:\\pagefile.sys'"       
+                if($CurrentPageFile -eq $null) { return $false } else {return $true }
+            }
             GetScript = { $null } 
             DependsOn = "[OpticalDiskDriveLetter]RemoveDiscDrive"           
         }
 
-        Disk DtoTVolume
+        xPendingReboot Reboot1
         {
-             DiskId = 1
-             DriveLetter = 'T'             
-             DependsOn = '[Script]DDrive'
-        }  
-         
-         # move paging back to T drive.
-         Script TPaging
-         {
+            name = "After deleting PageFile"
+        }
+
+         # removes pagefile on Drive and move D drive to T and sets back page file on that drive
+        Script DDrive
+        {
              SetScript = {
-                 # remove D drive as system managed drive. and place paging files to C drive. 
-                 $computer = Get-WmiObject Win32_computersystem -EnableAllPrivileges
-                 $computer.AutomaticManagedPagefile = $false
-                 $computer.Put()
-                 $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='c:\\pagefile.sys'"       
-                 if($CurrentPageFile -ne $null) { $CurrentPageFile.delete() }
-                 Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name="T:\pagefile.sys";InitialSize = 0; MaximumSize = 0} -ErrorAction SilentlyContinue
-             } 
-             TestScript = { $false}
+                 $TempDriveLetter = "T"
+
+                 # move D Temporary Data drive  drive to T
+                 $drive = Get-Partition -DriveLetter "D" | Set-Partition -NewDriveLetter $TempDriveLetter
+ 
+                 #set pagefile to T drive 
+                 $TempDriveLetter = $TempDriveLetter + ":"
+                 Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{ Name = "$TempDriveLetter\pagefile.sys"; MaximumSize = 0; }
+             }
+ 
+             TestScript = {                                 
+                 $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='T:\\pagefile.sys'"       
+                 if($CurrentPageFile -eq $null) { return $false } else {return $true }
+             }
              GetScript = { $null } 
-             DependsOn = "[Disk]DtoTVolume"                    
-        }        
-        
-        # change D drive label to "Local Data" from "Temporary Data"
-        #$drive = gwmi win32_volume -Filter "DriveLetter = 'D:'"
-        #$drive.Label = "Local Data"
-        #$drive.put()
-        
-    
+             DependsOn = "[xPendingReboot]Reboot1"           
+         }
+
         # convert DataDisks Json string to array of objects
         $DataDisks = $DataDisks | ConvertFrom-Json        
 
@@ -127,7 +125,7 @@
                 DiskId = $count 
                 RetryIntervalSec = $RetryIntervalSec
                 RetryCount = $RetryCount
-                DependsOn  ="[OpticalDiskDriveLetter]RemoveDiscDrive" 
+                DependsOn  ="[Script]DDrive" 
             }
             # once disk number availabe, assign and format drive with all available sizes and assign a leter and label that comes from parameters.
             Disk $datadisk.letter

@@ -47,7 +47,7 @@
     },
     "deployDomincontrollers": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -92,6 +92,7 @@
         "description": "Indicates Which Service Enviornment to Build"
       }
     }
+   
   },
   "variables": {    
     "location": "[resourceGroup().location]",    

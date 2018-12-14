@@ -88,6 +88,11 @@
       }
     ],
     "datadisks": [
+      {
+        "name": "Local Data",
+        "diskSizeGB": 50,
+        "letter": "D"
+      },
       {              
         "name": "DirectoryLogs",
         "diskSizeGB": 50,
@@ -148,8 +153,8 @@
             {
               "name": "dataDisks",
               "count": "[length(variables('datadisks'))]",              
-              "input": {
-                "name": "[concat(variables('dc1VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].name)]",
+              "input": {                
+                "name": "[concat(variables('dc1VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].letter, '_', replace(variables('datadisks')[copyIndex('dataDisks')].name,' ','_'))]",
                 "diskSizeGB": "[int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB)]",
                 "lun": "[copyIndex('dataDisks')]",
                 "createOption": "Empty"
@@ -269,8 +274,8 @@
             {
               "name": "dataDisks",
               "count": "[length(variables('datadisks'))]",
-              "input": {
-                "name": "[concat(variables('dc2VMName'),'_DataDisk', variables('datadisks')[copyIndex('dataDisks')].name)]",
+              "input": {                
+                "name": "[concat(variables('dc2VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].letter, '_', replace(variables('datadisks')[copyIndex('dataDisks')].name,' ','_'))]",
                 "diskSizeGB": "[int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB)]",
                 "lun": "[copyIndex('dataDisks')]",
                 "createOption": "Empty"

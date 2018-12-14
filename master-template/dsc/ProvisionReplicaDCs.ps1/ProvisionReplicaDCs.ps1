@@ -34,6 +34,7 @@
     Import-DscResource -ModuleName xActiveDirectory
     Import-DscResource -ModuleName ComputerManagementDsc  
     Import-DSCResource -ModuleName StorageDsc  
+    Import-DscResource -ModuleName xPendingReboot
     Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     
@@ -51,41 +52,64 @@
             RefreshMode = $RefreshMode
             RefreshFrequencyMins = $RefreshFrequencyMins            
         }
-
-        
-        # remove D drive as system managed drive. and place paging files to C drive. 
-        $computer = Get-WmiObject Win32_computersystem -EnableAllPrivileges
-        $computer.AutomaticManagedPagefile = $false
-        $computer.Put()
-        $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='d:\\pagefile.sys'"       
-        if($CurrentPageFile -ne $null) { $CurrentPageFile.delete() }
-        Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name="c:\pagefile.sys";InitialSize = 0; MaximumSize = 0} -ErrorAction SilentlyContinue
-         
-        # remove dummy txt file that azure places. 
-        File RemoveReadMe
-        {
-             DestinationPath = "D:\DATALOSS_WARNING_README.txt"
-             Ensure = "Absent"
-             Type = "File"
-             Force = $true
-        }
-
-        # move DVD optical drive to Z letter, empty "E"
-       OpticalDiskDriveLetter RemoveDiscDrive
-       {
-           DiskId      = 1
-           DriveLetter = 'Z' # This value is ignored
-           Ensure      = 'Present'
-       }  
-
-        # change C drive label "System" from "Windows"
-        $drive = gwmi win32_volume -Filter "DriveLetter = 'C:'"
+        # change C drive label to "System" from "Windows"
+        $drive = Get-WmiObject win32_volume -Filter "DriveLetter = 'C:'"
         $drive.Label = "System"
         $drive.put()
-        # change D drive label to "Local Data" from "Temporary Data"
-        $drive = gwmi win32_volume -Filter "DriveLetter = 'D:'"
-        $drive.Label = "Local Data"
-        $drive.put()
+        
+        # remove DVD optical drive
+        OpticalDiskDriveLetter RemoveDiscDrive
+        {
+           DiskId      = 1
+           DriveLetter = 'E' # This value is ignored
+           Ensure      = 'Absent'
+        }  
+        
+        # removes pagefile on Drive and move D drive to T and sets back page file on that drive
+        Script DeletePageFile
+        {
+            SetScript = {
+                
+                #Get-WmiObject win32_pagefilesetting
+                $pf = Get-WmiObject win32_pagefilesetting
+                if($pf -ne $null) {$pf.Delete()}               
+            }
+
+            TestScript = {                                 
+                $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='T:\\pagefile.sys'"       
+                if($CurrentPageFile -eq $null) { return $false } else {return $true }
+            }
+            GetScript = { $null } 
+            DependsOn = "[OpticalDiskDriveLetter]RemoveDiscDrive"           
+        }
+
+        xPendingReboot Reboot1
+        {
+            name = "After deleting PageFile"
+        }
+
+         # removes pagefile on Drive and move D drive to T and sets back page file on that drive
+        Script DDrive
+        {
+            SetScript = {
+                 $TempDriveLetter = "T"
+
+                 # move D Temporary Data drive  drive to T
+                 $drive = Get-Partition -DriveLetter "D" | Set-Partition -NewDriveLetter $TempDriveLetter
+ 
+                 #set pagefile to T drive 
+                 $TempDriveLetter = $TempDriveLetter + ":"
+                 Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{ Name = "$TempDriveLetter\pagefile.sys"; MaximumSize = 0; }
+            }
+ 
+            TestScript = {                                 
+                 $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='T:\\pagefile.sys'"       
+                 if($CurrentPageFile -eq $null) { return $false } else {return $true }
+            }
+            GetScript = { $null } 
+            DependsOn = "[xPendingReboot]Reboot1"           
+        }
+
         # convert DataDisks Json string to array of objects
         $DataDisks = $DataDisks | ConvertFrom-Json        
 
@@ -100,7 +124,7 @@
                 DiskId = $count 
                 RetryIntervalSec = $RetryIntervalSec
                 RetryCount = $RetryCount
-                DependsOn  ="[OpticalDiskDriveLetter]RemoveDiscDrive" 
+                DependsOn  ="[Script]DDrive" 
             }
             # once disk number availabe, assign and format drive with all available sizes and assign a leter and label that comes from parameters.
             Disk $datadisk.letter
