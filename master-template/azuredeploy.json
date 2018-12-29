@@ -32,19 +32,7 @@
         "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       },
       "defaultValue": ""
-    },
-    "deployJumpBoxTemplate": {
-      "type": "string",
-      "defaultValue": "Yes",      
-      "metadata": {
-        "group": "Template Settings",
-        "description": "Indicates wheter or not include JumpBox in this deployment"
-      },
-      "allowedValues": [
-        "Yes",
-        "No"
-      ]
-    },
+    },    
     "deployDomincontrollers": {
       "type": "string",
       "defaultValue": "No",
@@ -55,6 +43,18 @@
       "metadata": {
         "group": "Template Settings",
         "description": "Indicates wheter or not include Domain Controller template in this deployment"
+      }
+    },
+    "deployDomincontrollersDMZ": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates wheter or not include DMZ Domain template in this deployment"
       }
     },
     "forestMode": {
@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "SharedSQL",
+      "defaultValue": "SCOM",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -96,6 +96,7 @@
   },
   "variables": {    
     "location": "[resourceGroup().location]",    
+    "deployJumpBoxTemplate": "Yes",
     "domainName": "Domain.com",
     "domainNetbiosName": "LAB",
     "domainNameDMZ": "DomainDmz.com",
@@ -125,7 +126,7 @@
       "name": "ProvisioningJumbBox",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployJumpBoxTemplate'), 'Yes')]",
+      "condition": "[equals(variables('deployJumpBoxTemplate'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -188,7 +189,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomincontrollers'), 'Yes')]",
+      "condition": "[equals(parameters('deployDomincontrollersDMZ'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],

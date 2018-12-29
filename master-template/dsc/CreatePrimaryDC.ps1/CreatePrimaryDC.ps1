@@ -74,8 +74,8 @@
        OpticalDiskDriveLetter RemoveDiscDrive
        {
          DiskId      = 1
-         DriveLetter = 'E' # This value is ignored
-         Ensure      = 'Absent'
+         DriveLetter = 'Z' # This value is ignored
+         Ensure      = 'Present'
        }  
       
        # removes pagefile on Drive and move D drive to T and sets back page file on that drive
@@ -174,7 +174,7 @@
                 Name = $_
             }
         }
-
+        
         # modify dns 
         DnsServerAddress DnsServerAddress
         {
@@ -248,7 +248,6 @@
                     DependsOn = "[xADReplicationSite]" + $site.name
                 }
             }
-
         }
         # copy share files from Azure
         if($AzureShareCredential -ne $null -And $SourcePath -ne $null) {

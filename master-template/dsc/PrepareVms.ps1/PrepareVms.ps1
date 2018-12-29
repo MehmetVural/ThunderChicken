@@ -23,7 +23,7 @@
         [Boolean]$RebootNodeIfNeeded = $true,
         [String]$ActionAfterReboot = "ContinueConfiguration",
         [String]$ConfigurationModeFrequencyMins = 15,
-        [String]$ConfigurationMode = "ApplyAndMonitor",
+        [String]$ConfigurationMode = "ApplyAndAutoCorrect",
         [String]$RefreshMode = "Push",
         [String]$RefreshFrequencyMins  = 30
     )
@@ -52,6 +52,33 @@
             RefreshFrequencyMins = $RefreshFrequencyMins            
         }
 
+         # change DNS server address to subnet DNS address
+        DnsServerAddress  DnsServerAddress
+        {
+             Address        = $DNSServer
+             InterfaceAlias = $InterfaceAlias
+             AddressFamily  = 'IPv4'                  
+        }       
+ 
+        # wait domain is available before joinning this computer to domain
+        xWaitForADDomain DscForestWait
+        {
+             DomainName = $DomainName
+             DomainUserCredential= $DomainAdminCredential
+             RetryCount = $RetryCount
+             RetryIntervalSec = $RetryIntervalSec
+             DependsOn  = "[DnsServerAddress]DnsServerAddress"
+        }
+ 
+         # once domain is available join this computer to domain.
+        Computer JoinDomain
+        {
+             Name       = $env:COMPUTERNAME
+             DomainName = $DomainName
+             Credential = $DomainAdminCredential 
+             DependsOn  = "[xWaitForADDomain]DscForestWait"
+         } 
+
         # change C drive label to "System" from "Windows"
         $drive = Get-WmiObject win32_volume -Filter "DriveLetter = 'C:'"
         $drive.Label = "System"
@@ -61,20 +88,19 @@
         OpticalDiskDriveLetter RemoveDiscDrive
         {
            DiskId      = 1
-           DriveLetter = 'E' # This value is ignored
-           Ensure      = 'Absent'
+           DriveLetter = 'Z' # This value is ignored
+           Ensure      = 'Present'
+           DependsOn = "[Computer]JoinDomain"
         }  
         
         # removes pagefile on Drive and move D drive to T and sets back page file on that drive
         Script DeletePageFile
         {
             SetScript = {
-                
+
                 #Get-WmiObject win32_pagefilesetting
                 $pf = Get-WmiObject win32_pagefilesetting
-                if($pf -ne $null) {$pf.Delete()}   
-                
-                
+                if($pf -ne $null) {$pf.Delete()}  
             }
 
             TestScript = {                                 
@@ -135,35 +161,9 @@
                 DriveLetter = $datadisk.letter
                 DependsOn = "[WaitForDisk]"+$datadisk.name
             }
-
             $count ++
         }
 
-        # change DNS server address to subnet DNS address
-        DnsServerAddress  DnsServerAddress
-        {
-            Address        = $DNSServer
-            InterfaceAlias = $InterfaceAlias
-            AddressFamily  = 'IPv4'                  
-        }       
-
-        # wait domain is available before joinning this computer to domain
-        xWaitForADDomain DscForestWait
-        {
-            DomainName = $DomainName
-            DomainUserCredential= $DomainAdminCredential
-            RetryCount = $RetryCount
-            RetryIntervalSec = $RetryIntervalSec
-            DependsOn  = "[DnsServerAddress]DnsServerAddress"
-        }
-
-        # once domain is available join this computer to domain.
-        Computer JoinDomain
-        {
-            Name       = $env:COMPUTERNAME
-            DomainName = $DomainName
-            Credential = $DomainAdminCredential 
-            DependsOn  = "[xWaitForADDomain]DscForestWait"
-        }       
+             
    }
 }
