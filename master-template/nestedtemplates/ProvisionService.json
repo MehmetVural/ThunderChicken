@@ -261,7 +261,7 @@
       },
       "SharedSQL": {
         "prefix": "sql",
-        "servers": [
+        "servers": [  
           {
             "hostname": "VS222",
             "size": "M",
@@ -393,7 +393,7 @@
                 "letter": "H"
               }
             ]
-          },
+          },        
           {
             "hostname": "KS222",
             "size": "M",
@@ -459,8 +459,7 @@
                 "letter": "H"
               }
             ]
-          } 
-          
+          }
         ]
       },
       "FileServer": {
@@ -1710,7 +1709,9 @@
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
                 "retryCount": "[variables('RetryCount')]",
-                "retryIntervalSec": "[variables('RetryIntervalSec')]"
+                "retryIntervalSec": "[variables('RetryIntervalSec')]",                                
+                "ConfigurationMode" : "ApplyAndAutoCorrect",
+                "ConfigurationModeFrequencyMins" : 15
               }
             },
             "protectedSettings": {
