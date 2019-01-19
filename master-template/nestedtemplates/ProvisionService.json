@@ -36,6 +36,56 @@
       },
       "defaultValue": ""
     },
+    "VirtualMachineSizes": {
+      "type": "string",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, RegularTemplate: size defined in Service Templates"
+      }
+    },
+
+    "DiskSizes": {
+      "type": "string",     
+      "allowedValues": [
+        "Small-2GB",
+        "Medium-20GB",
+        "Large-50GB",        
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, Default: Attach individual disks for each drive letter and very costly"
+      }
+    },
+    "OSDiskSize": {
+      "type": "string",     
+      "allowedValues": [
+        "Small-30GB",
+        "Regular-127GB"        
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VMs OS disk size "
+      }
+    },
+    "VMSeries": {
+      "type": "string",      
+      "allowedValues": [
+        "Dsv3-Series",
+        "Dv2-Series",
+        "Bs-Series"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VM Series - CPU and memory allocation"
+      }
+    },
     "template": {
       "type": "string",
       "defaultValue": "None",
@@ -181,7 +231,7 @@
         "servers": [
           {
             "hostname": "VS201",
-            "size": "S",
+            "size": "L",
             "subnet": "V",
             "ip": "10.0.0.10",
             "datadisks": [
@@ -194,7 +244,7 @@
           },
           {
             "hostname": "VS202",
-            "size": "S",
+            "size": "L",
             "subnet": "V",
             "ip": "10.0.0.11",
             "datadisks": [
@@ -207,7 +257,7 @@
           },
           {
             "hostname": "CS201",
-            "size": "S",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.12",
             "datadisks": [
@@ -220,7 +270,7 @@
           },
           {
             "hostname": "CS202",
-            "size": "S",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.13",
             "datadisks": [
@@ -233,7 +283,7 @@
           },
           {
             "hostname": "KS201",
-            "size": "S",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.14",
             "datadisks": [
@@ -246,7 +296,7 @@
           },
           {
             "hostname": "KS202",
-            "size": "S",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.15",
             "datadisks": [
@@ -261,10 +311,10 @@
       },
       "SharedSQL": {
         "prefix": "sql",
-        "servers": [  
+        "servers": [
           {
             "hostname": "VS222",
-            "size": "M",
+            "size": "L",
             "subnet": "V",
             "ip": "10.0.0.16",
             "datadisks": [
@@ -297,7 +347,7 @@
           },
           {
             "hostname": "VS221",
-            "size": "M",
+            "size": "L",
             "subnet": "V",
             "ip": "10.0.0.17",
             "datadisks": [
@@ -330,7 +380,7 @@
           },
           {
             "hostname": "CS222",
-            "size": "M",
+            "size": "XL",
             "subnet": "C",
             "ip": "10.0.2.18",
             "datadisks": [
@@ -363,7 +413,7 @@
           },
           {
             "hostname": "CS221",
-            "size": "M",
+            "size": "XL",
             "subnet": "C",
             "ip": "10.0.2.19",
             "datadisks": [
@@ -393,10 +443,10 @@
                 "letter": "H"
               }
             ]
-          },        
+          },
           {
             "hostname": "KS222",
-            "size": "M",
+            "size": "XL",
             "subnet": "K",
             "ip": "10.0.1.20",
             "datadisks": [
@@ -429,7 +479,7 @@
           },
           {
             "hostname": "KS221",
-            "size": "M",
+            "size": "XL",
             "subnet": "K",
             "ip": "10.0.1.21",
             "datadisks": [
@@ -609,7 +659,7 @@
                 "name": "Local Data",
                 "diskSizeGB": 50,
                 "letter": "D"
-              },              
+              },
               {
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
@@ -761,7 +811,7 @@
         "servers": [
           {
             "hostname": "CP201",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.35",
             "datadisks": [
@@ -774,7 +824,7 @@
           },
           {
             "hostname": "CP202",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.36",
             "datadisks": [
@@ -787,7 +837,7 @@
           },
           {
             "hostname": "CP203",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.37",
             "datadisks": [
@@ -825,7 +875,7 @@
           },
           {
             "hostname": "CP204",
-            "size": "M",
+            "size": "XL",
             "subnet": "C",
             "ip": "10.0.2.38",
             "datadisks": [
@@ -838,7 +888,7 @@
           },
           {
             "hostname": "CP205",
-            "size": "M",
+            "size": "XL",
             "subnet": "C",
             "ip": "10.0.2.39",
             "datadisks": [
@@ -851,7 +901,7 @@
           },
           {
             "hostname": "CP206",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.40",
             "datadisks": [
@@ -864,7 +914,7 @@
           },
           {
             "hostname": "KP201",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.41",
             "datadisks": [
@@ -877,7 +927,7 @@
           },
           {
             "hostname": "KP202",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.42",
             "datadisks": [
@@ -890,7 +940,7 @@
           },
           {
             "hostname": "KP203",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.43",
             "datadisks": [
@@ -928,7 +978,7 @@
           },
           {
             "hostname": "KP204",
-            "size": "M",
+            "size": "XL",
             "subnet": "K",
             "ip": "10.0.1.44",
             "datadisks": [
@@ -941,7 +991,7 @@
           },
           {
             "hostname": "KP205",
-            "size": "M",
+            "size": "XL",
             "subnet": "K",
             "ip": "10.0.1.45",
             "datadisks": [
@@ -954,7 +1004,7 @@
           },
           {
             "hostname": "KP206",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.46",
             "datadisks": [
@@ -967,7 +1017,7 @@
           },
           {
             "hostname": "KP209",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.47",
             "datadisks": [
@@ -1036,7 +1086,7 @@
           },
           {
             "hostname": "KM204",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.50",
             "datadisks": [
@@ -1074,7 +1124,7 @@
           },
           {
             "hostname": "KM205",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.51",
             "datadisks": [
@@ -1151,7 +1201,7 @@
           },
           {
             "hostname": "CM204",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.55",
             "datadisks": [
@@ -1189,7 +1239,7 @@
           },
           {
             "hostname": "CM205",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.56",
             "datadisks": [
@@ -1281,7 +1331,7 @@
           },
           {
             "hostname": "KM208",
-            "size": "M",
+            "size": "L",
             "subnet": "K",
             "ip": "10.0.1.60",
             "datadisks": [
@@ -1299,7 +1349,7 @@
           },
           {
             "hostname": "CM206",
-            "size": "M",
+            "size": "L",
             "subnet": "C",
             "ip": "10.0.2.61",
             "datadisks": [
@@ -1358,7 +1408,7 @@
         "servers": [
           {
             "hostname": "KM209",
-            "size": "M",
+            "size": "L",
             "subnet": "KD",
             "ip": "10.0.3.64",
             "datadisks": [
@@ -1376,7 +1426,7 @@
           },
           {
             "hostname": "KM210",
-            "size": "M",
+            "size": "L",
             "subnet": "KD",
             "ip": "10.0.3.65",
             "datadisks": [
@@ -1394,7 +1444,7 @@
           },
           {
             "hostname": "KM211",
-            "size": "M",
+            "size": "XL",
             "subnet": "K",
             "ip": "10.0.1.66",
             "datadisks": [
@@ -1412,7 +1462,7 @@
           },
           {
             "hostname": "KM212",
-            "size": "M",
+            "size": "XL",
             "subnet": "K",
             "ip": "10.0.1.67",
             "datadisks": [
@@ -1430,7 +1480,7 @@
           },
           {
             "hostname": "CM209",
-            "size": "M",
+            "size": "L",
             "subnet": "CD",
             "ip": "10.0.4.68",
             "datadisks": [
@@ -1448,7 +1498,7 @@
           },
           {
             "hostname": "CM210",
-            "size": "M",
+            "size": "L",
             "subnet": "CD",
             "ip": "10.0.4.69",
             "datadisks": [
@@ -1466,7 +1516,7 @@
           },
           {
             "hostname": "CM211",
-            "size": "M",
+            "size": "XL",
             "subnet": "C",
             "ip": "10.0.2.70",
             "datadisks": [
@@ -1484,7 +1534,7 @@
           },
           {
             "hostname": "CM212",
-            "size": "M",
+            "size": "XL",
             "subnet": "C",
             "ip": "10.0.2.71",
             "datadisks": [
@@ -1553,7 +1603,7 @@
     "imageReference": {
       "publisher": "MicrosoftWindowsServer",
       "offer": "WindowsServer",
-      "sku": "2016-Datacenter",
+      "sku": "[concat('2016-Datacenter', if(equals(parameters('OSDiskSize'), 'Small-30GB'),'-smalldisk',''))]",
       "version": "latest"
     },
     "dscModulePrepare": {
@@ -1562,18 +1612,48 @@
       "function": "PrepareVms"
     },
     "virtualMachineSizeArray": {
-      "S": "Standard_D1_v2",
-      "M": "Standard_D2_v2",
-      "L": "Standard_D3_v2",
-      "XL": "Standard_D4_v2"
+        "S": "Standard_B2s",
+        "M": "Standard_B2ms",
+        "L": "Standard_B4ms",
+        "XL": "Standard_B8ms"
     },
+    "virtualMachineSizeArraySeries": {
+      "Bs-Series" : { 
+        "S": "Standard_B2s",
+        "M": "Standard_B2ms",
+        "L": "Standard_B4ms",
+        "XL": "Standard_B8ms"
+      },
+      "Dv2-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v2",
+        "L": "Standard_D3_v2",
+        "XL": "Standard_D4_v2"
+      },
+      "Dsv3-Series" : {
+        "S": "Standard_DS1_v2",
+        "M": "Standard_D2s_v3",
+        "L": "Standard_D4s_v3",
+        "XL": "Standard_D8s_v3"
+      }
+    },
+    "virtualMachineSizesMap": {
+      "Small": "S",
+      "Medium": "M",
+      "Large": "L"      
+    },   
+    "DisksizeGB": {
+      "Small-2GB": 2,
+      "Medium-20GB": 20,
+      "Large-50GB": 50
+    },   
     "subnetMap": {
       "V": "[variables('VSubnetName')]",
       "K": "[variables('KSubnetName')]",
       "C": "[variables('CSubnetName')]",
       "KD": "[variables('KDMZSubnetName')]",
       "CD": "[variables('CDMZSubnetName')]"
-    }
+    } 
   },
   "resources": [
     {
@@ -1616,7 +1696,7 @@
       },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSizeArray')[variables('templates')[variables('template')].servers[copyIndex()].size]]"
+          "vmSize": "[if(not(equals(parameters('VirtualMachineSizes'), 'Default')), variables('virtualMachineSizeArraySeries')[parameters('VMSeries')][variables('virtualMachineSizesMap')[parameters('VirtualMachineSizes')]], variables('virtualMachineSizeArraySeries')[parameters('VMSeries')][variables('templates')[variables('template')].servers[copyIndex()].size])]"
         },
         "osProfile": {
           "computerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
@@ -1633,17 +1713,23 @@
           "osDisk": {
             "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_OSDisk')]",
             "caching": "ReadWrite",
-            "createOption": "FromImage"
+            "createOption": "FromImage",
+            "managedDisk": {                 
+              "storageAccountType": "Standard_LRS"
+            }
           },
           "copy": [
             {
               "name": "dataDisks",
-              "count": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),1, length(variables('templates')[variables('template')].servers[copyIndex()].datadisks))]",
+              "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, if(equals( length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0 ), 1, length(variables('templates')[variables('template')].servers[copyIndex()].datadisks)) )]",
               "input": {
-                "name": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', 'dummy'), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].letter, '_' , replace(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].name,' ','_'))    )]",
-                "diskSizeGB": "[if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0), 1, int(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].diskSizeGB)    )]",
+                "name": "[if(not(equals(parameters('DiskSizes'), 'Default')), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk'), if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', 'dummy'), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].letter, '_' , replace(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].name,' ','_')))   )]",
+                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), add(mul( int( variables('DisksizeGB')[parameters('DiskSizes')]),  length(variables('templates')[variables('template')].servers[copyIndex()].datadisks)), 10), if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0), 1, int(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].diskSizeGB)    ))]",
                 "lun": "[copyIndex('dataDisks')]",
-                "createOption": "Empty"
+                "createOption": "Empty",
+                "managedDisk": {                 
+                  "storageAccountType": "Standard_LRS"
+                }
               }
             }
           ]
@@ -1705,13 +1791,15 @@
                 "function": "[variables('dscModulePrepare').function]"
               },
               "configurationArguments": {
+                "DiskSize": "[parameters('DiskSizes')]",
+                "DisksizeGB": "[int(variables('DisksizeGB')[parameters('DiskSizes')])]",
                 "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
                 "retryCount": "[variables('RetryCount')]",
-                "retryIntervalSec": "[variables('RetryIntervalSec')]",                                
-                "ConfigurationMode" : "ApplyAndAutoCorrect",
-                "ConfigurationModeFrequencyMins" : 15
+                "retryIntervalSec": "[variables('RetryIntervalSec')]",
+                "ConfigurationMode": "ApplyAndAutoCorrect",
+                "ConfigurationModeFrequencyMins": 15
               }
             },
             "protectedSettings": {

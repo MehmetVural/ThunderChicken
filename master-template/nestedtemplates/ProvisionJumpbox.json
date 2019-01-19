@@ -16,7 +16,31 @@
         "group": "Template settings",
         "description": "The password for the administrator account of the new VMs and Domain"
       }
+    },
+    "OSDiskSize": {
+      "type": "string",      
+      "allowedValues": [
+        "Small-30GB",
+        "Regular-127GB"        
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VMs OS disk size "
+      }
+    },
+    "VMSeries": {
+      "type": "string",      
+      "allowedValues": [
+        "Dsv3-Series",
+        "Dv2-Series",
+        "Bs-Series"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VM Series - CPU and memory allocation"
+      }
     }
+
   },
   "variables": {
     "templatePrefix": "master",
@@ -30,7 +54,27 @@
     "publicIPAddressName": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-publicip')]",
     "dnsPrefix": "[concat('dns',uniqueString(resourceGroup().id))]",
     "jumpBoxNic": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-nic')]",   
-    "virtualMachineSize": "Standard_D1_v2"
+    "virtualMachineSize": "Standard_B2s",    
+    "virtualMachineSizeArraySeries": {
+      "Bs-Series" : { 
+        "S": "Standard_B2s",
+        "M": "Standard_B2ms",
+        "L": "Standard_B4ms",
+        "XL": "Standard_B8ms"
+      },
+      "Dv2-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v2",
+        "L": "Standard_D3_v2",
+        "XL": "Standard_D4_v2"
+      },
+      "Dsv3-Series" : {
+        "S": "Standard_DS1_v2",
+        "M": "Standard_D2s_v3",
+        "L": "Standard_D4s_v3",
+        "XL": "Standard_D8s_v3"
+      }
+    }
   },
   "resources": [
     {
@@ -90,19 +134,23 @@
           }
         },
         "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
+          "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
+          
         },
         "storageProfile": {
           "imageReference": {
             "publisher": "MicrosoftWindowsServer",
             "offer": "WindowsServer",
-            "sku": "2016-Datacenter",
+            "sku": "2016-Datacenter-smalldisk",
             "version": "latest"
           },
           "osDisk": {
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
-            "createOption": "FromImage"
+            "createOption": "FromImage",
+            "managedDisk": {                 
+              "storageAccountType": "Standard_LRS"
+            }            
           },
           "dataDisks": []
         },

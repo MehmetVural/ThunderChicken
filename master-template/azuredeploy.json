@@ -35,7 +35,7 @@
     },    
     "deployDomincontrollers": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "SCOM",
+      "defaultValue": "SharedSQL",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -90,9 +90,60 @@
       "metadata": {
         "group": "Template Settings",
         "description": "Indicates Which Service Enviornment to Build"
+      }      
+    },   
+    "VirtualMachineSizes": {
+      "type": "string",
+      "defaultValue": "Medium",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, RegularTemplate: size defined in Service Templates"
+      }
+    },       
+    "DiskSizes": {
+      "type": "string",
+      "defaultValue": "Small-2GB",
+      "allowedValues": [
+        "Small-2GB",
+        "Medium-20GB",
+        "Large-50GB" 
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, RegularTemplate: size defined in Service Templates"
+      }
+    },       
+    "OSDiskSize": {
+      "type": "string",
+      "defaultValue": "Small-30GB",
+      "allowedValues": [
+        "Small-30GB",
+        "Regular-127GB"        
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VMs OS disk size "
+      }
+    },       
+    "VMSeries": {
+      "type": "string",
+      "defaultValue": "Dsv3-Series",
+      "allowedValues": [
+        "Dsv3-Series",
+        "Dv2-Series",
+        "Bs-Series"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VM Series - CPU and memory allocation"
       }
     }
-   
   },
   "variables": {    
     "location": "[resourceGroup().location]",    
@@ -142,6 +193,12 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
           }
         }
       }
@@ -173,6 +230,15 @@
           "_artifactsLocationSasToken": {
             "value": "[parameters('_artifactsLocationSasToken')]"
           },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
           "domainname": {
             "value": "[variables('domainname')]"
           },
@@ -182,6 +248,7 @@
           "forestMode": {
             "value": "[parameters('forestMode')]"
           }
+
         }
       }
     },    
@@ -212,6 +279,15 @@
           "_artifactsLocationSasToken": {
             "value": "[parameters('_artifactsLocationSasToken')]"
           },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          },         
           "domainname": {
             "value": "[variables('domainnameDMZ')]"
           },
@@ -251,6 +327,18 @@
           "_artifactsLocationSasToken": {
             "value": "[parameters('_artifactsLocationSasToken')]"
           },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
           "template": {
             "value": "[parameters('template')]"
           }
