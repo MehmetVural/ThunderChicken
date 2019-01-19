@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "SharedSQL",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -94,7 +94,7 @@
     },   
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Medium",
+      "defaultValue": "Small",
       "allowedValues": [
         "Small",
         "Medium",
