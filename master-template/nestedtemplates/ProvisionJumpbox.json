@@ -30,11 +30,6 @@
     },
     "VMSeries": {
       "type": "string",      
-      "allowedValues": [
-        "Dv3-Series",
-        "Dv2-Series",
-        "Bs-Series"
-      ],
       "metadata": {
         "group": "Template Settings",
         "description": "Defines VM Series - CPU and memory allocation"
