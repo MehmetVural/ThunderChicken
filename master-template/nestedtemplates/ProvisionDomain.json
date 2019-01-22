@@ -160,11 +160,11 @@
         "L": "Standard_D3_v2",
         "XL": "Standard_D4_v2"
       },
-      "Dsv3-Series" : {
-        "S": "Standard_DS1_v2",
-        "M": "Standard_D2s_v3",
-        "L": "Standard_D4s_v3",
-        "XL": "Standard_D8s_v3"
+      "Dv3-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v3",
+        "L": "Standard_D4_v3",
+        "XL": "Standard_D8_v3"
       }
     },
     "dc1VMName": "VD201",    

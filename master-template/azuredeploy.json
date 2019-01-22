@@ -94,7 +94,7 @@
     },   
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Small",
+      "defaultValue": "Large",
       "allowedValues": [
         "Small",
         "Medium",
@@ -133,9 +133,9 @@
     },       
     "VMSeries": {
       "type": "string",
-      "defaultValue": "Dsv3-Series",
+      "defaultValue": "Dv3-Series",
       "allowedValues": [
-        "Dsv3-Series",
+        "Dv3-Series",
         "Dv2-Series",
         "Bs-Series"
       ],
