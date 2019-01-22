@@ -61,7 +61,7 @@
     "VMSeries": {
       "type": "string",      
       "allowedValues": [
-        "Dsv3-Series",
+        "Dv3-Series",
         "Dv2-Series",
         "Bs-Series"
       ],
