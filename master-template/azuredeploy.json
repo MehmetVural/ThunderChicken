@@ -94,7 +94,7 @@
     },   
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Large",
+      "defaultValue": "Small",
       "allowedValues": [
         "Small",
         "Medium",
