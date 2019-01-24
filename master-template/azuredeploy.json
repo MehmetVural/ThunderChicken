@@ -32,7 +32,19 @@
         "group": "Base Settings",
         "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }      
-    },    
+    }, 
+    "deployJumpbox": {
+      "type": "string",
+      "defaultValue": "Yes",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates wheter or not include DMZ Domain template in this deployment"
+      }
+    },   
     "deployDomincontrollers": {
       "type": "string",
       "defaultValue": "Yes",
@@ -166,7 +178,7 @@
   },
   "variables": {    
     "location": "[resourceGroup().location]",    
-    "deployJumpBoxTemplate": "Yes",
+    "deployJumpBoxTemplate":"[parameters('deployJumpbox')]", 
     "domainName": "Domain.com",
     "domainNetbiosName": "LAB",
     "domainNameDMZ": "DomainDmz.com",
@@ -196,7 +208,7 @@
       "name": "ProvisioningJumbBox",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(variables('deployJumpBoxTemplate'), 'Yes')]",
+      "condition":  "[equals(variables('deployJumpBoxTemplate'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],

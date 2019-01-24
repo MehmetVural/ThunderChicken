@@ -60,7 +60,7 @@ $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combin
 $TemplateJSON = Get-Content $TemplateFile -Raw | ConvertFrom-Json
 
 #if the switch is set or the standard parameter is present in the template, upload all artifacts
-if ($UploadArtifacts -Or (Get-Member -InputObject $TemplateJSON.parameters -Name _artifactsLocation -MemberType Properties) -ne $null) {
+if ($UploadArtifacts -Or (Get-Member -InputObject $TemplateJSON.parameters -Name ArtifactsLocation -MemberType Properties) -ne $null) {
     # Convert relative paths to absolute paths if needed
     $ArtifactStagingDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $ArtifactStagingDirectory))
     $DSCSourceFolder = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCSourceFolder))
@@ -70,8 +70,8 @@ if ($UploadArtifacts -Or (Get-Member -InputObject $TemplateJSON.parameters -Name
     if (($JsonParameters | Get-Member -Type NoteProperty 'parameters') -ne $null) {
         $JsonParameters = $JsonParameters.parameters
     }
-    $ArtifactsLocationName = '_artifactsLocation'
-    $ArtifactsLocationSasTokenName = '_artifactsLocationSasToken'
+    $ArtifactsLocationName = 'ArtifactsLocation'
+    $ArtifactsLocationSasTokenName = 'ArtifactsLocationSasToken'
     $OptionalParameters[$ArtifactsLocationName] = $JsonParameters | Select-Object -Expand $ArtifactsLocationName -ErrorAction Ignore | Select-Object -Expand 'value' -ErrorAction Ignore
     $OptionalParameters[$ArtifactsLocationSasTokenName] = $JsonParameters | Select-Object -Expand $ArtifactsLocationSasTokenName -ErrorAction Ignore | Select-Object -Expand 'value' -ErrorAction Ignore
 

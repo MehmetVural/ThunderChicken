@@ -1309,8 +1309,8 @@
           {
             "hostname": "KM206",
             "size": "M",
-            "subnet": "K",
-            "ip": "10.0.1.58",
+            "subnet": "KD",
+            "ip": "10.0.3.58",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -1327,8 +1327,8 @@
           {
             "hostname": "KM207",
             "size": "M",
-            "subnet": "K",
-            "ip": "10.0.1.59",
+            "subnet": "KD",
+            "ip": "10.0.3.59",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -1363,8 +1363,8 @@
           {
             "hostname": "CM206",
             "size": "L",
-            "subnet": "C",
-            "ip": "10.0.2.61",
+            "subnet": "CD",
+            "ip": "10.0.4.61",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -1381,8 +1381,8 @@
           {
             "hostname": "CM207",
             "size": "M",
-            "subnet": "C",
-            "ip": "10.0.2.62",
+            "subnet": "CD",
+            "ip": "10.0.4.62",
             "datadisks": [
               {
                 "name": "Local Data",
