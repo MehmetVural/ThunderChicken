@@ -17,17 +17,17 @@
         "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
-    "_artifactsLocation": {
+    "ArtifactsLocation": {
       "type": "string",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       }
     },
-    "_artifactsLocationSasToken": {
+    "ArtifactsLocationSasToken": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       },
       "defaultValue": ""
     },
@@ -68,14 +68,14 @@
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
     },
     "domainNetbiosName": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
     },
     "forestMode": {
@@ -96,6 +96,9 @@
     "AutoShutdown": {
       "type": "string",     
       "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
         "1500",
         "1600",
         "1700",
@@ -175,12 +178,12 @@
     "dc2NicIPAddress": "10.0.4.5",
     "virtualMachineSize": "Standard_B2s", 
     "dcPrimaryInstallModule": {
-      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
       "script": "CreatePrimaryDC.ps1",
       "function": "CreatePrimaryDC"
     },
     "dcSecondaryInstallModule": {
-      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','ProvisionReplicaDCs.ps1.zip')]",
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','ProvisionReplicaDCs.ps1.zip')]",
       "script": "ProvisionReplicaDCs.ps1",
       "function": "ProvisionReplicaDCs"
     }
@@ -303,7 +306,7 @@
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
@@ -428,7 +431,7 @@
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",

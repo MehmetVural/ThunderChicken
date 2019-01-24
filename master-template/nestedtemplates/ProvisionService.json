@@ -17,7 +17,7 @@
         "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
-    "_artifactsLocation": {
+    "ArtifactsLocation": {
       "type": "string",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
@@ -28,11 +28,11 @@
         "description": "Location of the artifacts"
       }
     },
-    "_artifactsLocationSasToken": {
+    "ArtifactsLocationSasToken": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       },
       "defaultValue": ""
     },
@@ -104,6 +104,9 @@
     "AutoShutdown": {
       "type": "string",     
       "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
         "1500",
         "1600",
         "1700",
@@ -1617,7 +1620,7 @@
       "version": "latest"
     },
     "dscModulePrepare": {
-      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','PrepareVms.ps1.zip')]",
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','PrepareVms.ps1.zip')]",
       "script": "PrepareVms.ps1",
       "function": "PrepareVms"
     },
@@ -1813,7 +1816,7 @@
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",

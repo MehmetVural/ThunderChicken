@@ -38,6 +38,9 @@
     "AutoShutdown": {
       "type": "string",     
       "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
         "1500",
         "1600",
         "1700",

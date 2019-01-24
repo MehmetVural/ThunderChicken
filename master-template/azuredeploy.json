@@ -47,7 +47,7 @@
     },
     "deployDomincontrollersDMZ": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "SCOM",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -146,8 +146,11 @@
     },    
     "AutoShutdown": {
       "type": "string",
-      "defaultValue": "1500",
+      "defaultValue": "1700",
       "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
         "1500",
         "1600",
         "1700",
