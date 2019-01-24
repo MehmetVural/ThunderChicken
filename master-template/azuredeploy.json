@@ -19,11 +19,11 @@
     },
     "_artifactsLocation": {
       "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/master/master-template"
       "metadata": {
         "group": "Base Settings",
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      },
-      "defaultValue": ""
+      }      
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
@@ -47,7 +47,7 @@
     },
     "deployDomincontrollersDMZ": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -74,7 +74,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SCOM",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -146,7 +146,7 @@
     },    
     "AutoShutdown": {
       "type": "string",
-      "defaultValue": "1700",
+      "defaultValue": "1500",
       "allowedValues": [
         "1500",
         "1600",
@@ -157,7 +157,7 @@
       ],
       "metadata": {
         "group": "Template Settings",
-        "description": "Defines VM Series - CPU and memory allocation"
+        "description": "Daily Auto Shutdown schedule for each vms."
       }
     }
   },
