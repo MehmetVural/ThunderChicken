@@ -143,6 +143,22 @@
         "group": "Template Settings",
         "description": "Defines VM Series - CPU and memory allocation"
       }
+    },    
+    "AutoShutdown": {
+      "type": "string",
+      "defaultValue": "1700",
+      "allowedValues": [
+        "1500",
+        "1600",
+        "1700",
+        "1800",
+        "1900",
+        "2000"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VM Series - CPU and memory allocation"
+      }
     }
   },
   "variables": {    
@@ -199,6 +215,9 @@
           },
           "VMSeries": {
             "value": "[parameters('VMSeries')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
         }
       }
@@ -247,6 +266,9 @@
           },
           "forestMode": {
             "value": "[parameters('forestMode')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
 
         }
@@ -296,6 +318,9 @@
           },
           "forestMode": {
             "value": "[parameters('forestMode')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
         }
       }
@@ -341,6 +366,9 @@
           }, 
           "template": {
             "value": "[parameters('template')]"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
         }
       }

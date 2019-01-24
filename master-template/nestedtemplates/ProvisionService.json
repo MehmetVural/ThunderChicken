@@ -100,6 +100,21 @@
         "group": "Lab Enviornment Template",
         "description": "Indicates Which enviornment to build"
       }
+    },    
+    "AutoShutdown": {
+      "type": "string",     
+      "allowedValues": [
+        "1500",
+        "1600",
+        "1700",
+        "1800",
+        "1900",
+        "2000"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Daily Auto Shutdown time"
+      }
     }
   },
   "variables": {
@@ -1756,7 +1771,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-              "time": "1800"
+              "time": "[parameters('AutoShutdown')]"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
