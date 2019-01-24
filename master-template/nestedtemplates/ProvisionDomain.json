@@ -17,32 +17,66 @@
         "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
-    "_artifactsLocation": {
+    "ArtifactsLocation": {
       "type": "string",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       }
     },
-    "_artifactsLocationSasToken": {
+    "ArtifactsLocationSasToken": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       },
       "defaultValue": ""
+    },    
+    "VirtualMachineSizes": {
+      "type": "string",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, RegularTemplate: size defined in Service Templates"
+      }
+    },
+
+    "DiskSizes": {
+      "type": "string",     
+      "allowedValues": [
+        "Small-2GB",
+        "Medium-20GB",
+        "Large-50GB",        
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, Default: Attach individual disks for each drive letter and very costly"
+      }
+    },
+    "VMSeries": {
+      "type": "string",
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VM Series - CPU and memory allocation"
+      }
     },
     "domainname": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
     },
     "domainNetbiosName": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
     },
     "forestMode": {
@@ -59,6 +93,24 @@
         "group": "Settings",
         "description": "Domain Controller Functionning Level"
       }
+    },    
+    "AutoShutdown": {
+      "type": "string",     
+      "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
+        "1500",
+        "1600",
+        "1700",
+        "1800",
+        "1900",
+        "2000"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Daily Auto Shutdown time"
+      }
     }
   },
   "variables": {
@@ -67,7 +119,10 @@
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
     "forestMode": "[parameters('forestMode')]",
-    "RetryCount": 60,
+    "fileShareSAAccount": "[concat('share', substring(replace(subscription().subscriptionId,'-', ''), 0, 19))]",
+    "shareResourceGroupName": "TCShare",
+    "fileShare": "share",    
+    "RetryCount": 150,
     "RetryIntervalSec": 30,
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
     "VSubnetName": "vs",
@@ -93,7 +148,38 @@
         "sitelink": "[concat(toUpper(variables('CSubnetName')),',',toUpper(variables('VSubnetName')))]"        
       }
     ],
-
+    "datadisks": [      
+      {              
+        "name": "DirectoryLogs",
+        "diskSizeGB": 50,
+        "letter": "E"              
+      },
+      {              
+        "name": "FileShare",
+        "diskSizeGB": 100,
+        "letter": "F"              
+      }
+    ],
+    "virtualMachineSizeArraySeries": {
+      "Bs-Series" : { 
+        "S": "Standard_B2s",
+        "M": "Standard_B2ms",
+        "L": "Standard_B4ms",
+        "XL": "Standard_B8ms"
+      },
+      "Dv2-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v2",
+        "L": "Standard_D3_v2",
+        "XL": "Standard_D4_v2"
+      },
+      "Dv3-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v3",
+        "L": "Standard_D4_v3",
+        "XL": "Standard_D8_v3"
+      }
+    },
     "dc1VMName": "VD201",    
     "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
@@ -103,14 +189,14 @@
     "dc3VMName": "CD201",
     "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",    
     "dc3NicIPAddress": "10.0.2.5",
-    "virtualMachineSize": "Standard_D1_v2",
+    "virtualMachineSize": "Standard_B2s",
     "dcPrimaryInstallModule": {
-      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','CreatePrimaryDC.ps1.zip')]",
       "script": "CreatePrimaryDC.ps1",
       "function": "CreatePrimaryDC"
     },
     "dcSecondaryInstallModule": {
-      "url": "[concat(parameters('_artifactsLocation'),'/','dsc','/','ProvisionReplicaDCs.ps1.zip')]",
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','ProvisionReplicaDCs.ps1.zip')]",
       "script": "ProvisionReplicaDCs.ps1",
       "function": "ProvisionReplicaDCs"
     }
@@ -123,7 +209,7 @@
       "location": "[variables('location')]",
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
+          "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "osProfile": {
           "computerName": "[variables('dc1VMName')]",
@@ -134,23 +220,33 @@
           "imageReference": {
             "publisher": "MicrosoftWindowsServer",
             "offer": "WindowsServer",
-            "sku": "2016-Datacenter",
+            "sku": "2016-Datacenter-smalldisk",
             "version": "latest"
           },
           "osDisk": {
             "name": "[concat(variables('dc1VMName'),'_OSDisk')]",
             "caching": "ReadWrite",
-            "createOption": "FromImage"
+            "createOption": "FromImage",
+            "managedDisk": {                 
+              "storageAccountType": "Standard_LRS"
+            }
           },
-          "dataDisks": [
+          "copy": [
             {
-              "name": "[concat(variables('dc1VMName'),'_DataDisk1')]",
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "128",
-              "lun": 0
+              "name": "dataDisks",
+              "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, length(variables('datadisks')) )]",
+              "input": {
+                "name": "[if(not(equals(parameters('DiskSizes'), 'Default')), concat(variables('dc1VMName'), '_DataDisk'), concat(variables('dc1VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].letter, '_', replace(variables('datadisks')[copyIndex('dataDisks')].name,' ','_')) )]",
+                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), 32, int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB))]",
+                "lun": "[copyIndex('dataDisks')]",
+                "createOption": "Empty",
+                "managedDisk": {                 
+                  "storageAccountType": "Standard_LRS"
+                }
+              }
             }
           ]
+          
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -179,7 +275,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-             "time": "1800"
+             "time": "[parameters('AutoShutdown')]"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -209,21 +305,31 @@
                 "function": "[variables('dcPrimaryInstallModule').function]"
               },
               "configurationArguments": {
+                "DiskSize": "[parameters('DiskSizes')]",
+                "DisksizeGB": "5",
                 "domainName": "[variables('domainName')]",
                 "domainNetbiosName": "[variables('domainNetbiosName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "dataDisks": "[string(variables('datadisks'))]",
                 "sites": "[string(variables('sites'))]",
                 "forestMode": "[variables('forestMode')]",
+                "SourcePath" : "[concat('\\\\', variables('fileShareSAAccount'), '.file.core.windows.net', '\\', 'share')]",
                 "RetryCount": "[variables('RetryCount')]",
-                "RetryIntervalSec": "[variables('RetryIntervalSec')]"
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]",                
+                "ConfigurationMode" : "ApplyAndAutoCorrect",
+                "ConfigurationModeFrequencyMins" : 15
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
                   "Password": "[parameters('adminPassword')]"
+                },
+                "AzureShareCredential": {
+                  "UserName": "[concat('Azure', '\\', variables('fileShareSAAccount'))]",
+                  "Password": "[listKeys(resourceId(variables('shareResourceGroupName'), 'Microsoft.Storage/storageAccounts', variables('fileShareSAAccount')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
                 }
               }
             }
@@ -238,7 +344,7 @@
       "location": "[variables('location')]",
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
+          "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "osProfile": {
           "computerName": "[variables('dc2VMName')]",
@@ -249,21 +355,30 @@
           "imageReference": {
             "publisher": "MicrosoftWindowsServer",
             "offer": "WindowsServer",
-            "sku": "2016-Datacenter",
+            "sku": "2016-Datacenter-smalldisk",
             "version": "latest"
           },
           "osDisk": {
             "name": "[concat(variables('dc2VMName'),'_OSDisk')]",
             "caching": "ReadWrite",
-            "createOption": "FromImage"
+            "createOption": "FromImage",
+            "managedDisk": {                 
+              "storageAccountType": "Standard_LRS"
+            }
           },
-          "dataDisks": [
+          "copy": [
             {
-              "name": "[concat(variables('dc2VMName'),'_DataDisk1')]",
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "128",
-              "lun": 0
+              "name": "dataDisks",
+              "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, length(variables('datadisks')) )]",
+              "input": {
+                "name": "[if(not(equals(parameters('DiskSizes'), 'Default')), concat(variables('dc2VMName'), '_DataDisk'), concat(variables('dc2VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].letter, '_', replace(variables('datadisks')[copyIndex('dataDisks')].name,' ','_')) )]",
+                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), 32, int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB))]",
+                "lun": "[copyIndex('dataDisks')]",
+                "createOption": "Empty",
+                "managedDisk": {                 
+                  "storageAccountType": "Standard_LRS"
+                }
+              }
             }
           ]
         },
@@ -294,7 +409,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-             "time": "1800"
+             "time": "[parameters('AutoShutdown')]"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -324,15 +439,18 @@
                 "function": "[variables('dcSecondaryInstallModule').function]"
               },
               "configurationArguments": {
+                "DiskSize": "[parameters('DiskSizes')]",
+                "DisksizeGB": "5",
                 "domainName": "[variables('domainName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "dataDisks": "[string(variables('datadisks'))]",
                 "site": "[toUpper(variables('KSubnetName'))]",
                 "RetryCount": "[variables('RetryCount')]",
                 "RetryIntervalSec": "[variables('RetryIntervalSec')]"
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
@@ -351,7 +469,7 @@
       "location": "[variables('location')]",
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
+          "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "osProfile": {
           "computerName": "[variables('dc3VMName')]",
@@ -362,21 +480,30 @@
           "imageReference": {
             "publisher": "MicrosoftWindowsServer",
             "offer": "WindowsServer",
-            "sku": "2016-Datacenter",
+            "sku": "2016-Datacenter-smalldisk",
             "version": "latest"
           },
           "osDisk": {
             "name": "[concat(variables('dc3VMName'),'_OSDisk')]",
             "caching": "ReadWrite",
-            "createOption": "FromImage"
+            "createOption": "FromImage",
+            "managedDisk": {                 
+              "storageAccountType": "Standard_LRS"
+            }
           },
-          "dataDisks": [
+          "copy": [
             {
-              "name": "[concat(variables('dc3VMName'),'_DataDisk1')]",
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "128",
-              "lun": 0
+              "name": "dataDisks",
+              "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, length(variables('datadisks')) )]",
+              "input": {
+                "name": "[if(not(equals(parameters('DiskSizes'), 'Default')), concat(variables('dc3VMName'), '_DataDisk'), concat(variables('dc3VMName'),'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].letter, '_', replace(variables('datadisks')[copyIndex('dataDisks')].name,' ','_')) )]",
+                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), 32, int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB))]",
+                "lun": "[copyIndex('dataDisks')]",
+                "createOption": "Empty",
+                "managedDisk": {                 
+                  "storageAccountType": "Standard_LRS"
+                }
+              }
             }
           ]
         },
@@ -407,7 +534,7 @@
             "status": "Enabled",
             "taskType": "ComputeVmShutdownTask",
             "dailyRecurrence": {
-             "time": "1800"
+            "time": "[parameters('AutoShutdown')]"
             },
             "timeZoneId": "Pacific Standard Time",
             "notificationSettings": {
@@ -437,15 +564,18 @@
                 "function": "[variables('dcSecondaryInstallModule').function]"
               },
               "configurationArguments": {
+                "DiskSize": "[parameters('DiskSizes')]",
+                "DisksizeGB": "5",
                 "domainName": "[variables('domainName')]",              
                 "dnsServer": "[variables('dc1NicIPAddress')]",
+                "dataDisks": "[string(variables('datadisks'))]",
                 "site": "[toUpper(variables('CSubnetName'))]",
                 "RetryCount": "[variables('RetryCount')]",
-                "RetryIntervalSec": "[variables('RetryIntervalSec')]"           
+                "RetryIntervalSec": "[variables('RetryIntervalSec')]"                         
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
@@ -459,4 +589,6 @@
     }
   ],
   "outputs": {}
+
+
 }

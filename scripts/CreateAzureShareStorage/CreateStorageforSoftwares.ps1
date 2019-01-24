@@ -9,15 +9,15 @@
 #Connect-AzureRmAccount
 
 # change
-$Location     =   Read-Host -Prompt "Input share location for softwares" # local location to upload files
-$sourceFolder =   Read-Host -Prompt "Input folder to upload"  # Folder to upload based on services
+$Location     =   Read-Host -Prompt "Location of Softwares" # local location to upload files
+$sourceFolder =   Read-Host -Prompt "Folder to Upload" # local location to upload files
 
 Write-Host $Location -ForegroundColor Yellow
 Write-Host $sourceFolder -ForegroundColor Yellow
 
 # Do not change, these are constant for the project
 $ResourceGroupLocation = "eastus"
-$StorageResourceGroupName = "ThunderChickenShare"
+$StorageResourceGroupName = "TCShare"
 $StorageContainerName = "share"
 $UploadArtifacts = $true
 
@@ -33,17 +33,15 @@ Set-StrictMode -Version 3
 
 $StorageAccountName = 'share' + ((Get-AzureRmContext).Subscription.Id).Replace('-', '').substring(0, 19)
 
+# Convert relative paths to absolute paths if needed  
 
-# Convert relative paths to absolute paths if needed
-    
 $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $StorageAccountName})
 
 # Create the storage account if it doesn't already exist
 if ($StorageAccount -eq $null) {
 
     New-AzureRmResourceGroup -Location "$ResourceGroupLocation" -Name $StorageResourceGroupName -Force
-    $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $StorageAccountName -Type 'Standard_LRS' -ResourceGroupName $StorageResourceGroupName -Location "$ResourceGroupLocation"
-   
+    $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $StorageAccountName -Type 'Standard_LRS' -ResourceGroupName $StorageResourceGroupName -Location "$ResourceGroupLocation"   
 }
 
 $StorageFileShare =  (Get-AzureStorageShare -Context $StorageAccount.Context | Where-Object{$_.Name -eq $StorageContainerName})
@@ -53,18 +51,20 @@ if ($StorageFileShare -eq $null) {
     #Set-AzureStorageShareQuota -ShareName $StorageContainerName -Quota  10240
 }
 
-$softwareKeys = Get-AzureRmStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName `
-                                                 -Name $StorageAccountName
-$Location  = $Location + '\' + $sourceFolder    
+$softwareKeys = Get-AzureRmStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName -Name $StorageAccountName
+
+if ($sourceFolder -ne $null) {
+    $Location  = $Location + '\' + $sourceFolder    
+}
 
 if ($UploadArtifacts -and (Test-Path $Location))
-{
-    
+{    
     Write-Host "Uploading softwares..." -ForegroundColor Yellow
     # get all the folders in the source directory
     # create top folder for service
-    
-    New-AzureStorageDirectory -Share $StorageFileShare -Path $sourceFolder -ErrorAction SilentlyContinue
+    if ($sourceFolder -ne $null) {
+        New-AzureStorageDirectory -Share $StorageFileShare -Path $sourceFolder -ErrorAction SilentlyContinue    
+    }
 
     $Folders = Get-ChildItem -Path $Location  -Directory -Recurse
     foreach($Folder in $Folders)

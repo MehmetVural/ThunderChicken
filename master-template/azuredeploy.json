@@ -17,34 +17,34 @@
         "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
-    "_artifactsLocation": {
+    "ArtifactsLocation": {
       "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/master/master-template",
       "metadata": {
         "group": "Base Settings",
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      },
-      "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/master/master-template"
+      }      
     },
-    "_artifactsLocationSasToken": {
+    "ArtifactsLocationSasToken": {
       "type": "securestring",
+      "defaultValue": "",
       "metadata": {
         "group": "Base Settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      },
-      "defaultValue": ""
-    },
-    "deployJumpBoxTemplate": {
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }      
+    }, 
+    "deployJumpbox": {
       "type": "string",
-      "defaultValue": "Yes",      
-      "metadata": {
-        "group": "Template Settings",
-        "description": "Indicates wheter or not include JumpBox in this deployment"
-      },
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
-      ]
-    },
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates wheter or not include DMZ Domain template in this deployment"
+      }
+    },   
     "deployDomincontrollers": {
       "type": "string",
       "defaultValue": "Yes",
@@ -55,6 +55,18 @@
       "metadata": {
         "group": "Template Settings",
         "description": "Indicates wheter or not include Domain Controller template in this deployment"
+      }
+    },
+    "deployDomincontrollersDMZ": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates wheter or not include DMZ Domain template in this deployment"
       }
     },
     "forestMode": {
@@ -79,7 +91,7 @@
         "None",
         "AD-DS-DNS",
         "SCOM",
-        "SQL",
+        "SharedSQL",
         "FileServer",
         "DHCP",       
         "SharePoint",
@@ -90,21 +102,93 @@
       "metadata": {
         "group": "Template Settings",
         "description": "Indicates Which Service Enviornment to Build"
+      }      
+    },   
+    "VirtualMachineSizes": {
+      "type": "string",
+      "defaultValue": "Small",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, RegularTemplate: size defined in Service Templates"
+      }
+    },       
+    "DiskSizes": {
+      "type": "string",
+      "defaultValue": "Small-2GB",
+      "allowedValues": [
+        "Small-2GB",
+        "Medium-20GB",
+        "Large-50GB" 
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, RegularTemplate: size defined in Service Templates"
+      }
+    },       
+    "OSDiskSize": {
+      "type": "string",
+      "defaultValue": "Small-30GB",
+      "allowedValues": [
+        "Small-30GB",
+        "Regular-127GB"        
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VMs OS disk size "
+      }
+    },       
+    "VMSeries": {
+      "type": "string",
+      "defaultValue": "Dv3-Series",
+      "allowedValues": [
+        "Dv3-Series",
+        "Dv2-Series",
+        "Bs-Series"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Defines VM Series - CPU and memory allocation"
+      }
+    },    
+    "AutoShutdown": {
+      "type": "string",
+      "defaultValue": "1700",
+      "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
+        "1500",
+        "1600",
+        "1700",
+        "1800",
+        "1900",
+        "2000"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Daily Auto Shutdown schedule for each vms."
       }
     }
   },
   "variables": {    
-    "location": "[resourceGroup().location]",
+    "location": "[resourceGroup().location]",    
+    "deployJumpBoxTemplate":"[parameters('deployJumpbox')]", 
     "domainName": "Domain.com",
     "domainNetbiosName": "LAB",
     "domainNameDMZ": "DomainDmz.com",
-    "domainNetbiosNameDMZ": "LABDMZ",
+    "domainNetbiosNameDMZ": "LABDMZ",    
     "forestMode": "[parameters('forestMode')]",    
-    "baseTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('_artifactsLocationSasToken'))]",    
-    "jumpboxTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('_artifactsLocationSasToken'))]",
-    "domainTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('_artifactsLocationSasToken'))]",
-    "domainDMZTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('_artifactsLocationSasToken'))]",
-    "serviceTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('_artifactsLocationSasToken'))]"    
+    "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",    
+    "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
+    "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",
+    "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
+    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]"    
   },
   "resources": [
     {
@@ -124,7 +208,7 @@
       "name": "ProvisioningJumbBox",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployJumpBoxTemplate'), 'Yes')]",
+      "condition":  "[equals(variables('deployJumpBoxTemplate'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -140,6 +224,15 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
         }
       }
@@ -165,12 +258,21 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
           },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
           "domainname": {
             "value": "[variables('domainname')]"
           },
@@ -179,7 +281,11 @@
           },
           "forestMode": {
             "value": "[parameters('forestMode')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
+
         }
       }
     },    
@@ -187,7 +293,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomincontrollers'), 'Yes')]",
+      "condition": "[equals(parameters('deployDomincontrollersDMZ'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -204,12 +310,21 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
           },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          },         
           "domainname": {
             "value": "[variables('domainnameDMZ')]"
           },
@@ -218,6 +333,9 @@
           },
           "forestMode": {
             "value": "[parameters('forestMode')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
         }
       }
@@ -243,14 +361,29 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
           },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
           "template": {
             "value": "[parameters('template')]"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
           }
         }
       }
