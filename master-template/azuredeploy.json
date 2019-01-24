@@ -17,7 +17,7 @@
         "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
-    "_artifactsLocation": {
+    "ArtifactsLocation": {
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/master/master-template",
       "metadata": {
@@ -25,12 +25,12 @@
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       }      
     },
-    "_artifactsLocationSasToken": {
+    "ArtifactsLocationSasToken": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
         "group": "Base Settings",
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }      
     },    
     "deployDomincontrollers": {
@@ -169,11 +169,11 @@
     "domainNameDMZ": "DomainDmz.com",
     "domainNetbiosNameDMZ": "LABDMZ",    
     "forestMode": "[parameters('forestMode')]",    
-    "baseTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('_artifactsLocationSasToken'))]",    
-    "jumpboxTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('_artifactsLocationSasToken'))]",
-    "domainTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('_artifactsLocationSasToken'))]",
-    "domainDMZTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('_artifactsLocationSasToken'))]",
-    "serviceTemplateUrl": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('_artifactsLocationSasToken'))]"    
+    "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",    
+    "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
+    "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",
+    "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
+    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]"    
   },
   "resources": [
     {
@@ -243,11 +243,11 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
           },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
           "VirtualMachineSizes": {
             "value": "[parameters('VirtualMachineSizes')]"
@@ -295,11 +295,11 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
           },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
           "VirtualMachineSizes": {
             "value": "[parameters('VirtualMachineSizes')]"
@@ -346,11 +346,11 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
           },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
           "VirtualMachineSizes": {
             "value": "[parameters('VirtualMachineSizes')]"
