@@ -95,6 +95,10 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "JumpBox",
+        "Site": "[ variables('VSubnetName') ]"
+      },
       "properties": {
         "publicIPAllocationMethod": "Static",
         "dnsSettings": {
@@ -107,6 +111,10 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-06-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "JumpBox",
+        "Site": "[ variables('VSubnetName') ]"
+      },
       "comments": "Jump Box NIC",
       "dependsOn": [
         "[variables('publicIPAddressName')]"
@@ -133,7 +141,11 @@
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2017-03-30",
       "location": "[variables('location')]",
-      "comments": "This is the virtual machine that you're building.",
+      "tags": {
+        "Service": "JumpBox",
+        "Site": "[ variables('VSubnetName') ]"
+      },
+      "comments": "This is Jumpbox you are going to RDP to connects each machine.",
       "dependsOn": [
         "[variables('jumpBoxNic')]"
       ],

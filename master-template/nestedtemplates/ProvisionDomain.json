@@ -207,6 +207,10 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('dc1VMName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Domain",
+        "Site": "[ variables('VSubnetName') ]"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
@@ -342,6 +346,10 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('dc2VMName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Domain",
+        "Site": "[ variables('KSubnetName') ]"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
@@ -467,6 +475,10 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('dc3VMName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Domain",
+        "Site": "[ variables('CSubnetName') ]"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"

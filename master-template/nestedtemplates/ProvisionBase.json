@@ -93,6 +93,10 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('VNSGName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('VSubnetName') ]"
+      },
       "properties": {
         "securityRules": [
           {
@@ -116,6 +120,10 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('KNSGName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KSubnetName') ]"
+      },
       "properties": {
         "securityRules": []
       }
@@ -125,6 +133,10 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('CNSGName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CSubnetName') ]"
+      },
       "properties": {
         "securityRules": []
       }
@@ -134,6 +146,10 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('KDMZNSGName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KDMZSubnetName') ]"
+      },
       "properties": {
         "securityRules": []
       }
@@ -143,6 +159,10 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('CDMZNSGName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CDMZSubnetName') ]"
+      },
       "properties": {
         "securityRules": []
       }
@@ -152,6 +172,9 @@
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base"        
+      },
       "dependsOn": [
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('VNSGName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('KNSGName'))]",
@@ -173,6 +196,9 @@
       "name": "[variables('storageAccountNamePrefix')]",
       "apiVersion": "2016-01-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base"       
+      },
       "sku": {
         "name": "Standard_LRS"
       },
@@ -184,6 +210,10 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-06-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('VSubnetName') ]"
+      },
       "comments": "This will be your file server nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
@@ -208,6 +238,10 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-06-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KSubnetName') ]"
+      },
       "comments": "Replica DC nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
@@ -232,6 +266,10 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-06-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CSubnetName') ]"
+      },
       "comments": "Replica DC nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
@@ -256,6 +294,10 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-06-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KDMZSubnetName') ]"
+      },
       "comments": "Primary DMZ DC nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
@@ -280,6 +322,10 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2017-06-01",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CDMZSubnetName') ]"
+      },
       "comments": "Replica DMZ DC nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
