@@ -11,10 +11,10 @@
 # Connect-AzureRmAccount
 
 #DSC Configuration files
-$DSCconfigFile = "SQLSetup.ps1"
-$ConfigurationName = "SQLSetup"
-$DSCconfigDataFile = "SQLSetupData.psd1"
-$DSCMoffFolder = 'SQLSetup'
+$DSCconfigFile = "SCOMSetup.ps1"
+$ConfigurationName = "SCOMSetup"
+$DSCconfigDataFile = "SCOMSetupData.psd1"
+$DSCMoffFolder = 'SCOMSetup'
 #DSC Automation config
 $ConfigurationMode = "ApplyandAutoCorrect"  #ApplyOnly, ApplyAndMonitor, ApplyAndAutoCorrect
 $AutomationAccountName = "DSCAutomationAccount"
