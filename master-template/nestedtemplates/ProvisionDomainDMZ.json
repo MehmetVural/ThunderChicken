@@ -194,6 +194,10 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('dc1VMName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Domain",
+        "Site": "[ variables('KDMZSubnetName') ]"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
@@ -323,6 +327,10 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('dc2VMName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "Service": "Domain",
+        "Site": "[ variables('CDMZSubnetName') ]"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"

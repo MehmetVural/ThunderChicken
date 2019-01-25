@@ -1675,6 +1675,10 @@
       "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic')]",
       "location": "[variables('location')]",
       "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",
+      "tags": {
+        "Service": "[variables('template')]",
+        "Site": "[ variables('subnetMap')[ variables('templates')[variables('template')].servers[copyIndex()].subnet ] ]"
+      },
       "copy": {
         "name": "nicLoop",
         "count": "[length(variables('templates')[variables('template')].servers)]"
@@ -1700,6 +1704,10 @@
       "name": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
       "location": "[variables('location')]",
       "condition": "[greater(length(variables('templates')[variables('template')].servers), 0)]",
+      "tags": {
+        "Service": "[variables('template')]",
+        "Site": "[ variables('subnetMap')[ variables('templates')[variables('template')].servers[copyIndex()].subnet ] ]"
+      },
       "dependsOn": [
         "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-nic'))]"
       ],
