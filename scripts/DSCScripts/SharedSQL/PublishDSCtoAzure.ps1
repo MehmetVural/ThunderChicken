@@ -11,23 +11,26 @@
 # Connect-AzureRmAccount
 
 #DSC Configuration files
-$DSCconfigFile = "DSCConfig.ps1"
-$ConfigurationName = "DSCConfig"
-$DSCconfigDataFile = "DSCConfigData.psd1"
-
+$DSCconfigFile = "SQLSetup.ps1"
+$ConfigurationName = "SQLSetup"
+$DSCconfigDataFile = "SQLSetupData.psd1"
+$DSCMoffFolder = 'moff'
 #DSC Automation config
 $ConfigurationMode = "ApplyandAutoCorrect"  #ApplyOnly, ApplyAndMonitor, ApplyAndAutoCorrect
 $AutomationAccountName = "DSCAutomationAccount"
 
 Write-Host "Registering Configuration" -ForegroundColor Yellow
 
+#Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
+
 $DSCconfigFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCconfigFile))
 $DSCconfigDataFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCconfigDataFile))
+$DSCMofFolder = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCMoffFolder))
 
 $ConfigData = Import-PowerShellDataFile $DSCconfigDataFile
 
 # Check AzureAutomation Account, if Null, create one
-$vm = Get-AzureRMVM | Where-Object Name -like "master-dc1vm" | Select-Object ResourceGroupName, Name, Location
+$vm = Get-AzureRMVM | Where-Object Name -like "VD201" | Select-Object ResourceGroupName, Name, Location
 if ($vm) { $ResourceGroupName = $vm.ResourceGroupName }
 $AutomationAccount = Get-AzureRmAutomationAccount | Where-Object AutomationAccountName -eq $AutomationAccountName
 if ($vm -and !$AutomationAccount) { $AutomationAccount = New-AzureRmAutomationAccount -Name $AutomationAccountName -Location "East US 2" -ResourceGroupName $ResourceGroupName }
@@ -36,12 +39,23 @@ $AutomationAccountName = $AutomationAccount.AutomationAccountName
 if ($AutomationAccount -and $vm) {
     # Import Configuraiton into Azure DSC Automation
     Write-Host "Importing Configuration to Azure DSC" -ForegroundColor Yellow
-    $DSCImport = Import-AzureRmAutomationDscConfiguration -SourcePath $DSCconfigFile -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -Published -Force
+    #$DSCImport = Import-AzureRmAutomationDscConfiguration -SourcePath $DSCconfigFile -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -Published -Force
 
     # Complies MOF Files for each nodes defined in DSCconfigDataFile
     Write-Host "Compling MOF Files for each node in config data" -ForegroundColor Yellow
-    $DSCComp = Start-AzureRmAutomationDscCompilationJob -AutomationAccountName $AutomationAccountName -ConfigurationName $ConfigurationName -ConfigurationData $ConfigData -ResourceGroupName  $ResourceGroupName
-    
+    # Create DSC configuration archive
+    ##$DSCComp = Start-AzureRmAutomationDscCompilationJob -AutomationAccountName $AutomationAccountName -ConfigurationName $ConfigurationName -ConfigurationData $ConfigData -ResourceGroupName  $ResourceGroupName
+
+    # Import Pre-build moff files if applicable
+    if (Test-Path $DSCMoffFolder) {
+        $DSCSourceFilePaths = @(Get-ChildItem $DSCMofFolder -File -Filter '*.mof' | ForEach-Object -Process {$_.FullName})
+        foreach ($DSCSourceFilePath in $DSCSourceFilePaths) {
+            #$DSCArchiveFilePath = $DSCSourceFilePath.Substring(0, $DSCSourceFilePath.Length - 4) + '.moff'
+            Write-Host $DSCSourceFilePath
+            $DSCMof = Import-AzureRmAutomationDscNodeConfiguration -AutomationAccountName $AutomationAccountName -ResourceGroupName $ResourceGroupName -ConfigurationName $ConfigurationName -Path $DSCSourceFilePath -Force 
+        }
+    }
+
     Write-Host "Searching each node if it is registered with Azure DSC or not" 
     $ConfigData.AllNodes | Where-Object {$_.NodeName -ne "*"} | ForEach-Object {
     
