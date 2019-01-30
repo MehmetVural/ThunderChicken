@@ -17,9 +17,10 @@ $DSCconfigDataFile = "SQLSetupData.psd1"
 $DSCMofFolder = 'SQLSetup'
 #DSC Automation config
 $ConfigurationMode = "ApplyandAutoCorrect"  #ApplyOnly, ApplyAndMonitor, ApplyAndAutoCorrect
-$AutomationAccountName = "DSCAutomationAccount"
-
-Write-Host "Registering Configuration" -ForegroundColor Yellow
+$RebootNodeIfNeeded = $true
+$AutomationAccountName = "DSCAccount"
+$AzureVMLocation = "eastus" 
+Write-Host "Starting..." -ForegroundColor Yellow
 
 #Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 
@@ -29,10 +30,55 @@ $DSCMofFolder = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScrip
 
 $ConfigData = Import-PowerShellDataFile $DSCconfigDataFile
 
-# Check AzureAutomation Account, if Null, create one
+# Check AzureAutomation Account, if Null, create one 
 $vm = Get-AzureRMVM | Where-Object Name -like "VD201" | Select-Object ResourceGroupName, Name, Location
+
+function selectOptions
+{
+    param( [string[]]$ResourceGroupName)    
+    $option = 1;
+    Write-Host "Available resource groups to deploy:" 
+    $ResourceGroupName | ForEach-Object -Process {
+        Write-Host "$option) $_" -ForegroundColor Yellow
+        $option += 1 ;
+    }
+}
+
 if ($vm) { $ResourceGroupName = $vm.ResourceGroupName }
-$AutomationAccount = Get-AzureRmAutomationAccount | Where-Object AutomationAccountName -eq $AutomationAccountName
+
+if($ResourceGroupName.Length -gt 1 -and $vm -is [system.array]) 
+{   
+    do {
+        try {
+            selectOptions($ResourceGroupName)
+            $numOk = $true
+            [int]$selected = Read-host "Select available Resource group between 1 to $($ResourceGroupName.Length)" 
+            } # end try
+        catch {$numOK = $false}
+    } # end do 
+    until (($selected -ge 1 -and $selected -le $ResourceGroupName.Length) -and $numOK)
+
+    #$selected = Read-Host "Select ResourceGroup to deploy"
+    $ResourceGroupName = $ResourceGroupName[$selected-1]    
+    $AzureVMLocation = $vm[$selected-1].location
+    $AutomationAccountName += $ResourceGroupName
+}
+else
+{  
+  $ResourceGroupName = $ResourceGroupName   
+  $AzureVMLocation = $vm.location
+}
+
+$ResourceGroupName
+$AzureVMLocation
+
+Write-Host "Configurations will be deployed in $ResourceGroupName" -ForegroundColor Yellow
+
+Write-Host "Creating Automation Account" -ForegroundColor Yellow
+
+$AutomationAccount = Get-AzureRmAutomationAccount -ResourceGroupName $ResourceGroupName | Where-Object AutomationAccountName -eq $AutomationAccountName
+#$AutomationAccount = Get-AzureRmAutomationAccount -ResourceGroupName $ResourceGroupName | Where-Object AutomationAccountName -eq $AutomationAccountName
+
 if ($vm -and !$AutomationAccount) { $AutomationAccount = New-AzureRmAutomationAccount -Name $AutomationAccountName -Location "East US 2" -ResourceGroupName $ResourceGroupName }
 $AutomationAccountName = $AutomationAccount.AutomationAccountName 
 
@@ -68,7 +114,7 @@ if ($AutomationAccount -and $vm) {
             $nodeConfigurationName = $ConfigurationName + '.' + $NodeName
 
             # Register each VM to Azure DSC Pull Server for MOF pull
-            Register-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AzureVMResourceGroup $ResourceGroupName  -AutomationAccountName $AutomationAccountName -ConfigurationMode $ConfigurationMode -NodeConfigurationName $nodeConfigurationName -AzureVMName $NodeName -AzureVMLocation $vm.Location -Verbose
+            Register-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AzureVMResourceGroup $ResourceGroupName  -AutomationAccountName $AutomationAccountName -ConfigurationMode $ConfigurationMode -RebootNodeIfNeeded $RebootNodeIfNeeded -NodeConfigurationName $nodeConfigurationName -AzureVMName $NodeName -AzureVMLocation $AzureVMLocation -Verbose
         }
     }
 
