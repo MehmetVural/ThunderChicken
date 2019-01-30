@@ -14,7 +14,7 @@
 $DSCconfigFile = "SQLSetup.ps1"
 $ConfigurationName = "SQLSetup"
 $DSCconfigDataFile = "SQLSetupData.psd1"
-$DSCMoffFolder = 'SQLSetup'
+$DSCMofFolder = 'SQLSetup'
 #DSC Automation config
 $ConfigurationMode = "ApplyandAutoCorrect"  #ApplyOnly, ApplyAndMonitor, ApplyAndAutoCorrect
 $AutomationAccountName = "DSCAutomationAccount"
@@ -25,7 +25,7 @@ Write-Host "Registering Configuration" -ForegroundColor Yellow
 
 $DSCconfigFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCconfigFile))
 $DSCconfigDataFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCconfigDataFile))
-$DSCMofFolder = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCMoffFolder))
+$DSCMofFolder = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $DSCMofFolder))
 
 $ConfigData = Import-PowerShellDataFile $DSCconfigDataFile
 
@@ -47,7 +47,7 @@ if ($AutomationAccount -and $vm) {
     ##$DSCComp = Start-AzureRmAutomationDscCompilationJob -AutomationAccountName $AutomationAccountName -ConfigurationName $ConfigurationName -ConfigurationData $ConfigData -ResourceGroupName  $ResourceGroupName
 
     # Import Pre-build moff files if applicable
-    if (Test-Path $DSCMoffFolder) {
+    if (Test-Path $DSCMofFolder) {
         $DSCSourceFilePaths = @(Get-ChildItem $DSCMofFolder -File -Filter '*.mof' | ForEach-Object -Process {$_.FullName})
         foreach ($DSCSourceFilePath in $DSCSourceFilePaths) {
             #$DSCArchiveFilePath = $DSCSourceFilePath.Substring(0, $DSCSourceFilePath.Length - 4) + '.moff'
@@ -71,4 +71,8 @@ if ($AutomationAccount -and $vm) {
             Register-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AzureVMResourceGroup $ResourceGroupName  -AutomationAccountName $AutomationAccountName -ConfigurationMode $ConfigurationMode -NodeConfigurationName $nodeConfigurationName -AzureVMName $NodeName -AzureVMLocation $vm.Location -Verbose
         }
     }
+
+    # List all registered Nodes.
+    #Get-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName
 }
+
