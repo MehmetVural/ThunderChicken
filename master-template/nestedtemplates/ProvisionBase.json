@@ -1,12 +1,31 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": "vmadmin"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    }
+  },
   "variables": {
     "templatePrefix": "master",
+    "domainNetbiosName": "LAB",
     "location": "[resourceGroup().location]",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
-    
+    "AutomationAccount" : "[concat('DSCAccount', resourcegroup().name)]",
+    "base64String" : "[base64(resourcegroup().name)]",
+    "Thumbprint" : "[resourcegroup().name]",
     "virtualNetworkName": "[concat(variables('templatePrefix'), '-vn')]",
     "addressPrefix": "10.0.0.0/16",
     "VSubnetPrefix": "10.0.0.0/24",
@@ -344,8 +363,39 @@
           }
         ]
       }
+    },
+    {
+      "name": "[variables('AutomationAccount')]",
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2015-10-31",
+      "location": "East US 2",
+      "comments": "Automation account",           
+      "tags": {
+        "Service": "Base"        
+      },
+      "properties": {
+        "sku": {
+          "name": "Basic"
+        }
+      },
+      "resources":
+      [
+        {
+          "name": "DomainAdminCredential",
+          "type": "credentials",
+          "apiVersion": "2015-10-31",
+          "dependsOn": [
+            "[variables('AutomationAccount')]"
+          ],
+          "properties": {
+            "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+            "Password": "[parameters('adminPassword')]",            
+            "description": "Domain administration Credential"
+          }
+        }
+
+      ]     
     }
-   
   ],
   "outputs": {}
 }

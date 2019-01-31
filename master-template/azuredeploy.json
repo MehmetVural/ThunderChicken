@@ -86,7 +86,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SharedSQL",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -188,7 +188,8 @@
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
     "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",
     "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
-    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]"    
+    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",    
+    "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]"    
   },
   "resources": [
     {
@@ -201,7 +202,14 @@
           "uri": "[variables('baseTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
-        "parameters": {}
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          }
+        }
       }
     },
     {
@@ -384,6 +392,42 @@
           },
           "AutoShutdown": {
             "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    },    
+    {
+      "name": "ConfigureSQLVms",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('template'), 'SharedSQL')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningServiceVms')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sqlTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
           }
         }
       }

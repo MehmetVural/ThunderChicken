@@ -1874,7 +1874,46 @@
                 }
               }
             }
-          }          
+          }
+          
+        },
+        {
+          "type": "extensions",
+          "name": "Microsoft.Powershell.DSC",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "condition": "[not(empty(variables('templates')[variables('template')].servers[copyIndex()].dscModule))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname)]",            
+            "[concat('Microsoft.Compute/virtualMachines/', variables('templates')[variables('template')].servers[copyIndex()].hostname,'/extensions/Microsoft.Powershell.DSC.PrepareVM')]"
+           
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.20",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('templates')[variables('template')].servers[copyIndex()].dscModule.url]",
+                "script": "[variables('templates')[variables('template')].servers[copyIndex()].dscModule.script]",
+                "function": "[variables('templates')[variables('template')].servers[copyIndex()].dscModule.function]"
+              },
+              "configurationArguments": {    
+                "ConfigurationData" : "[variables('SQLConfiguration')]"            
+              }
+            },
+            "protectedSettings": {
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
+              "configurationArguments": {
+                "SqlInstallCredential": {
+                  "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                }
+              }
+            }
+          }
+          
         }
         
       ]
