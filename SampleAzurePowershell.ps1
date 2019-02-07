@@ -1,8 +1,10 @@
 # Azure Account
-# Connect-AzureRmAccount
+#Connect-AzureRmAccount
+
+#powershell -executionpolicy bypass
 
 # region variables
-$QuickSartDirectory = "C:\github\ThunderChicken" # set samples directory
+$QuickSartDirectory = "U:\github\ThunderChicken" # set samples directory
 
 Write-Host "Setting Location for Azure Templates Master"
 Set-Location -Path $QuickSartDirectory

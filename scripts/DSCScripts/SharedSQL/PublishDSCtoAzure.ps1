@@ -11,16 +11,17 @@
 # Connect-AzureRmAccount
 
 #DSC Configuration files
-$DSCconfigFile = "SQLSetup.ps1"
-$ConfigurationName = "SQLSetup"
-$DSCconfigDataFile = "SQLSetupData.psd1"
-$DSCMofFolder = 'SQLSetup'
+$DSCconfigFile = "ConfigureSQL.ps1"
+$ConfigurationName = "ConfigureSQL"
+$DSCconfigDataFile = "ConfigureSQLData.psd1"
+$DSCMofFolder = ''
 #DSC Automation config
 $ConfigurationMode = "ApplyandAutoCorrect"  #ApplyOnly, ApplyAndMonitor, ApplyAndAutoCorrect
 $RebootNodeIfNeeded = $true
 $AutomationAccountName = "DSCAccount"
 $AzureVMLocation = "eastus" 
 Write-Host "Starting..." -ForegroundColor Yellow
+
 
 #Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 
@@ -89,22 +90,22 @@ $AutomationAccountName = $AutomationAccount.AutomationAccountName
 if ($AutomationAccount -and $vm) {
     # Import Configuraiton into Azure DSC Automation
     Write-Host "Importing Configuration to Azure DSC" -ForegroundColor Yellow
-    #$DSCImport = Import-AzureRmAutomationDscConfiguration -SourcePath $DSCconfigFile -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -Published -Force
+    $DSCImport = Import-AzureRmAutomationDscConfiguration -SourcePath $DSCconfigFile -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -Published -Force
 
     # Complies MOF Files for each nodes defined in DSCconfigDataFile
     Write-Host "Compling MOF Files for each node in config data" -ForegroundColor Yellow
     # Create DSC configuration archive
-    ##$DSCComp = Start-AzureRmAutomationDscCompilationJob -AutomationAccountName $AutomationAccountName -ConfigurationName $ConfigurationName -ConfigurationData $ConfigData -ResourceGroupName  $ResourceGroupName
+    $DSCComp = Start-AzureRmAutomationDscCompilationJob -AutomationAccountName $AutomationAccountName -ConfigurationName $ConfigurationName -ConfigurationData $ConfigData -ResourceGroupName  $ResourceGroupName
 
     # Import Pre-build moff files if applicable
-    if (Test-Path $DSCMofFolder) {
-        $DSCSourceFilePaths = @(Get-ChildItem $DSCMofFolder -File -Filter '*.mof' | ForEach-Object -Process {$_.FullName})
-        foreach ($DSCSourceFilePath in $DSCSourceFilePaths) {
-            #$DSCArchiveFilePath = $DSCSourceFilePath.Substring(0, $DSCSourceFilePath.Length - 4) + '.moff'
-            Write-Host $DSCSourceFilePath
-            $DSCMof = Import-AzureRmAutomationDscNodeConfiguration -AutomationAccountName $AutomationAccountName -ResourceGroupName $ResourceGroupName -ConfigurationName $ConfigurationName -Path $DSCSourceFilePath -Force 
-        }
-    }
+    # if (Test-Path $DSCMofFolder) {
+    #     $DSCSourceFilePaths = @(Get-ChildItem $DSCMofFolder -File -Filter '*.mof' | ForEach-Object -Process {$_.FullName})
+    #     foreach ($DSCSourceFilePath in $DSCSourceFilePaths) {
+    #         #$DSCArchiveFilePath = $DSCSourceFilePath.Substring(0, $DSCSourceFilePath.Length - 4) + '.moff'
+    #         Write-Host $DSCSourceFilePath
+    #         $DSCMof = Import-AzureRmAutomationDscNodeConfiguration -AutomationAccountName $AutomationAccountName -ResourceGroupName $ResourceGroupName -ConfigurationName $ConfigurationName -Path $DSCSourceFilePath -Force 
+    #     }
+    # }
 
     Write-Host "Searching each node if it is registered with Azure DSC or not" 
     $ConfigData.AllNodes | Where-Object {$_.NodeName -ne "*"} | ForEach-Object {
@@ -118,7 +119,7 @@ if ($AutomationAccount -and $vm) {
             $nodeConfigurationName = $ConfigurationName + '.' + $NodeName
 
             # Register each VM to Azure DSC Pull Server for MOF pull
-            Register-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AzureVMResourceGroup $ResourceGroupName  -AutomationAccountName $AutomationAccountName -ConfigurationMode $ConfigurationMode -RebootNodeIfNeeded $RebootNodeIfNeeded -NodeConfigurationName $nodeConfigurationName -AzureVMName $NodeName -AzureVMLocation $AzureVMLocation -Verbose
+            Register-AzureRmAutomationDscNode -ResourceGroupName $ResourceGroupName -AzureVMResourceGroup $ResourceGroupName  -AutomationAccountName $AutomationAccountName -ConfigurationMode $ConfigurationMode -RebootNodeIfNeeded $RebootNodeIfNeeded -NodeConfigurationName $nodeConfigurationName -AzureVMName $NodeName -AzureVMLocation $AzureVMLocation -Verbose 
         }
     }
 

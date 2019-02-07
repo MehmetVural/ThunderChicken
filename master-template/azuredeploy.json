@@ -84,9 +84,22 @@
         "description": "Domain Controller Functioning Level"
       }
     },
+    "SharedService": {
+      "type": "string",
+      "defaultValue": "SQLandSCOM",
+      "allowedValues": [
+        "None",
+        "SQLOnly",
+        "SQLandSCOM"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Indicates which service layer vms to build and prepare"
+      }      
+    },   
     "template": {
       "type": "string",
-      "defaultValue": "SharedSQL",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS-DNS",
@@ -184,12 +197,13 @@
     "domainNameDMZ": "DomainDmz.com",
     "domainNetbiosNameDMZ": "LABDMZ",    
     "forestMode": "[parameters('forestMode')]",    
-    "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",    
+    "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
     "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",
     "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
-    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",    
-    "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]"    
+    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",
+    "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]",
+    "scomTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSCOM.json', parameters('ArtifactsLocationSasToken'))]"
   },
   "resources": [
     {
@@ -301,7 +315,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomincontrollersDMZ'), 'Yes')]",
+      "condition": "[ or( equals(parameters('deployDomincontrollersDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'AirWatch'), equals(parameters('template'), 'Skype') )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -349,7 +363,7 @@
       }
     },
     {
-      "name": "ProvisioningServiceVms",
+      "name": "[concat('Provisioning', parameters('template'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "condition": "[not(equals(parameters('template'), 'None'))]",
@@ -397,12 +411,61 @@
       }
     },    
     {
-      "name": "ConfigureSQLVms",
+      "name": "ProvisioningSQL",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('template'), 'SharedSQL')]",
+      "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningServiceVms')]"
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('serviceTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
+          "template": {
+            "value": "SharedSQL"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    },    
+    {
+      "name": "ConfigureSQL",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQL')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningDomains')]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -428,10 +491,103 @@
           },
           "domainNetbiosName": {
             "value": "[variables('domainNetbiosName')]"
+          },
+          "template": {
+            "value": "SharedSQL"
           }
         }
       }
-    }
+    },    
+    {
+      "name": "ProvisioningSCOM",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('serviceTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
+          "template": {
+            "value": "SCOM"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    },    
+    {
+      "name": "ConfigureSCOM",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQL')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningDomains')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ConfigureSQL')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOM')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('scomTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "template": {
+            "value": "SCOM"
+          }
+        }
+      }
+    }    
   ],
   "outputs": {}
 }

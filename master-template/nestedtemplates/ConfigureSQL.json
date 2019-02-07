@@ -1,114 +1,413 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "adminUsername": {
-        "type": "string",
-        "metadata": {
-          "group": "Template settings",
-          "description": "The name of the administrator account of the new VMs and Domain"
-        },
-        "defaultValue": "vmadmin"
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "adminPassword": {
-        "type": "securestring",
-        "metadata": {
-          "group": "Template settings",
-          "description": "The password for the administrator account of the new VMs and Domain"
-        }
-      },
-      "ArtifactsLocation": {
-        "type": "string",
-        "metadata": {
-          "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-        }
-      },
-      "ArtifactsLocationSasToken": {
-        "type": "securestring",
-        "metadata": {
-          "group": "Template settings",
-          "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-        },
-        "defaultValue": ""
-      },
-      "domainname": {
-        "type": "securestring",
-        "metadata": {
-          "group": "Template settings",
-          "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-        }
-      },
-      "domainNetbiosName": {
-        "type": "securestring",
-        "metadata": {
-          "group": "Template settings",
-          "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-        }
+      "defaultValue": "vmadmin"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
-    "variables": {
-      "templatePrefix": "DSC",
-      "location": "[resourceGroup().location]",
-      "domainName": "[parameters('domainName')]",
-      "domainNetbiosName": "[parameters('domainNetbiosName')]",      
-      "moduleSQL": {
-        "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','SqlTest.ps1.zip')]",
-        "script": "SqlTest.ps1",
-        "function": "SqlTest"
-      },
-      "SQLConfiguration" : {
-        "NonNodeData" : 
-        {
-          "ClusterName"                 : "V-Cluster",
-          "ClusterIPAddress"            : "10.0.0.150/24",
-          "InstanceName"                : "MSSQLSERVER",
-          "AvailabilityGroupName"    : "TestAG",
-          "TestDBName"               : "TestDB",  
-          "ShareFolder" : "\\\\VD201\\Share",
-          "SQLAGBackup" : "\\\\VD201\\SQLAGBackup",
-          "SQLInstalISO" : "\\\\VD201\\Share\\SharedSQL\\en_sql_server_2016_enterprise_with_service_pack_2_x64_dvd_12124051.iso",
-          "SQLManagementStudio2017Path" : "\\\\VD201\\Share\\SharedSQL\\SSMS.17.9.1\\SSMS-Setup-ENU.exe",
-          "SQLManagementStudio2017ProductId" : "91a1b895-c621-4038-b34a-01e7affbcb6b",
-          "SQLManagementStudio2016Path" : "\\\\vd201\\Share\\SharedSQL\\SSMS.16.5.3\\SSMS-Setup-ENU.exe",
-          "SQLManagementStudio2016ProductId" : "2d1a30f7-a163-4aa7-a10e-e936aeba38fe"
-        }
+    "ArtifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       }
     },
-    "resources": [
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat('VS221','/Microsoft.Powershell.DSC')]",
-            "apiVersion": "2015-05-01-preview",
-            "location": "[resourceGroup().location]",
-            "properties": {
-              "publisher": "Microsoft.Powershell",
-              "type": "DSC",
-              "typeHandlerVersion": "2.20",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "configuration": {
-                  "url": "[variables('moduleSQL').url]",
-                  "script": "[variables('moduleSQL').script]",
-                  "function": "[variables('moduleSQL').function]"
-                },
-                "configurationArguments": {    
-                  "ConfigurationData" : "[variables('SQLConfiguration')]"            
-                }
+    "ArtifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    },
+    "domainname": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }
+    },
+    "domainNetbiosName": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }
+    },
+    "template": {
+      "type": "string",
+      "defaultValue": "None",
+      "allowedValues": [
+        "None",
+        "AD-DS-DNS",
+        "SCOM",
+        "SharedSQL",
+        "FileServer",
+        "DHCP",
+        "SharePoint",
+        "Exchange",
+        "AirWatch",
+        "Skype"
+      ],
+      "metadata": {
+        "group": "Lab Enviornment Template",
+        "description": "Indicates Which enviornment to build"
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "DSC",
+    "template": "[parameters('template')]",
+    "location": "[resourceGroup().location]",
+    "domainName": "[parameters('domainName')]",
+    "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "moduleDSC": {
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','ConfigureSQL.ps1.zip')]",
+      "script": "ConfigureSQL.ps1",
+      "function": "ConfigureSQL"
+    },
+    "moduleDSCConfigData": {
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','ConfigureSQLData.psd1')]"
+    },
+    "templates": {
+      "None": {
+        "prefix": "blank",
+        "servers": []
+      },
+      "SharedSQL": {
+        "prefix": "sql",
+        "servers": [
+          {
+            "hostname": "VS222",
+            "size": "L",
+            "subnet": "V",
+            "ip": "10.0.0.16",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
               },
-              "protectedSettings": {
-                "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
-                "configurationArguments": {
-                  "SqlInstallCredential": {
-                    "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
-                    "Password": "[parameters('adminPassword')]"
-                  }
-                }
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
               }
+            ],
+            "dscModule": {
+              "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','SQLSetup.ps1.zip')]",
+              "script": "ReplicaSQL.ps1",
+              "function": "SQLSetup"
             }
-            
+          },
+          {
+            "hostname": "VS221",
+            "size": "L",
+            "subnet": "V",
+            "ip": "10.0.0.17",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ],
+            "dscModule": {
+              "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','SQLSetup.ps1.zip')]",
+              "script": "PrimarySQL.ps1",
+              "function": "SQLSetup"
+            }
+          },
+          {
+            "hostname": "CS222",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.18",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ],
+            "dscModule": null
+          },
+          {
+            "hostname": "CS221",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.19",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ],
+            "dscModule": null
+          },
+          {
+            "hostname": "KS222",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.20",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ],
+            "dscModule": null
+          },
+          {
+            "hostname": "KS221",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.21",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 500,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 100,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 500,
+                "letter": "H"
+              }
+            ],
+            "dscModule": null
           }
-    ],
-    "outputs": {}
-  
-  
-  }
+        ]
+      }
+    },
+    "ConfigData": {
+      "V": {
+        "Nodes": [
+          {
+            "Name": "VS221",
+            "Role": "Primary"
+          },
+          {
+            "Name": "VS222",
+            "Role": "Secondary"
+          }
+        ],
+        "NonNodeData": {
+          "ClusterName": "VCluster",
+          "ClusterIPAddress": "10.0.0.150/24"
+        }
+      },
+      "K": {
+        "Nodes": [
+          {
+            "Name": "KS221",
+            "Role": "Primary"
+          },
+          {
+            "Name": "KS222",
+            "Role": "Secondary"
+          }
+        ],
+        "NonNodeData": {
+          "ClusterName": "KCluster",
+          "ClusterIPAddress": "10.0.1.150/24"
+        }
+      },
+      "C": {
+        "Nodes": [
+          {
+            "Name": "CS221",
+            "Role": "Primary"
+          },
+          {
+            "Name": "CS222",
+            "Role": "Secondary"
+          }
+        ],
+        "NonNodeData": {
+          "ClusterName": "CCluster",
+          "ClusterIPAddress": "10.0.2.150/24"
+        }
+      },
+      "Config": {
+        "InstanceName": "MSSQLSERVER",
+        "AvailabilityGroupName": "TestAG",
+        "TestDBName": "TestDB",
+        "ShareFolder": "\\\\VD201\\Share",
+        "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
+        "SQLInstalISO": "\\\\VD201\\Share\\SharedSQL\\en_sql_server_2016_enterprise_with_service_pack_2_x64_dvd_12124051.iso",
+        "SQLManagementStudio2017Path": "\\\\VD201\\Share\\SharedSQL\\SSMS.17.9.1\\SSMS-Setup-ENU.exe",
+        "SQLManagementStudio2017ProductId": "91a1b895-c621-4038-b34a-01e7affbcb6b",
+        "SQLManagementStudio2016Path": "\\\\vd201\\Share\\SharedSQL\\SSMS.16.5.3\\SSMS-Setup-ENU.exe",
+        "SQLManagementStudio2016ProductId": "2d1a30f7-a163-4aa7-a10e-e936aeba38fe"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('templates')[variables('template')].servers[copyIndex()].hostname,'/Microsoft.Powershell.DSC')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "vmExtensionLoop",
+        "count": "[length(variables('templates')[variables('template')].servers)]"
+      },
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.20",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "configuration": {
+            "url": "[variables('moduleDSC').url]",
+            "script": "[variables('moduleDSC').script]",
+            "function": "[variables('moduleDSC').function]"
+          },
+          "configurationArguments": {
+            "Nodes": "[string(variables('ConfigData')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]",
+            "Config": "[string(variables('ConfigData').Config)]",
+            "ServerName": "[string(variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
+          }
+        },
+        "protectedSettings": {
+          "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
+          "configurationArguments": {
+            "SqlInstallCredential": {
+              "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+              "Password": "[parameters('adminPassword')]"
+            },
+            "DomainAdminCredential": {
+              "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+              "Password": "[parameters('adminPassword')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
