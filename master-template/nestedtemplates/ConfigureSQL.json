@@ -72,6 +72,11 @@
     "location": "[resourceGroup().location]",
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3NicIPAddress": "10.0.2.5",
+    "RetryCount": 600,
+    "RetryIntervalSec": 60,
     "moduleDSC": {
       "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','ConfigureSQL.ps1.zip')]",
       "script": "ConfigureSQL.ps1",
@@ -317,6 +322,8 @@
         ],
         "NonNodeData": {
           "ClusterName": "VCluster",
+          "SqlDnsPrefix": "VSql",
+          "DnsServer": "[variables('dc1NicIPAddress')]",
           "ClusterIPAddress": "10.0.0.150/24"
         }
       },
@@ -333,6 +340,8 @@
         ],
         "NonNodeData": {
           "ClusterName": "KCluster",
+          "SqlDnsPrefix": "KSql",
+          "DnsServer": "[variables('dc2NicIPAddress')]",
           "ClusterIPAddress": "10.0.1.150/24"
         }
       },
@@ -349,6 +358,8 @@
         ],
         "NonNodeData": {
           "ClusterName": "CCluster",
+          "SqlDnsPrefix": "CSql",
+          "DnsServer": "[variables('dc3NicIPAddress')]",
           "ClusterIPAddress": "10.0.2.150/24"
         }
       },
@@ -388,9 +399,13 @@
             "function": "[variables('moduleDSC').function]"
           },
           "configurationArguments": {
-            "Nodes": "[string(variables('ConfigData')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]",
+            "DomainName": "[variables('domainName')]",
+            "Nodes": "[string(variables('ConfigData')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]",            
             "Config": "[string(variables('ConfigData').Config)]",
-            "ServerName": "[string(variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
+            "ServerName": "[string(variables('templates')[variables('template')].servers[copyIndex()].hostname)]",
+            "ServerIP": "[string(variables('templates')[variables('template')].servers[copyIndex()].ip)]",
+            "RetryCount": "[variables('RetryCount')]",
+            "RetryIntervalSec": "[variables('RetryIntervalSec')]"
           }
         },
         "protectedSettings": {

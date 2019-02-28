@@ -133,9 +133,9 @@
     },       
     "DiskSizes": {
       "type": "string",
-      "defaultValue": "Small-2GB",
+      "defaultValue": "Small-4GB",
       "allowedValues": [
-        "Small-2GB",
+        "Small-4GB",
         "Medium-20GB",
         "Large-50GB" 
       ],
@@ -171,7 +171,7 @@
     },    
     "AutoShutdown": {
       "type": "string",
-      "defaultValue": "1700",
+      "defaultValue": "1800",
       "allowedValues": [
         "1200",
         "1300",
@@ -464,8 +464,7 @@
       "apiVersion": "2015-01-01",
       "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQL')]",
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningDomains')]"
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQL')]"        
       ],
       "properties": {
         "mode": "Incremental",
@@ -552,10 +551,7 @@
       "apiVersion": "2015-01-01",
       "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQL')]",
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningDomains')]",
-        "[resourceId('Microsoft.Resources/deployments', 'ConfigureSQL')]",
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOM')]"
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOM')]"        
       ],
       "properties": {
         "mode": "Incremental",

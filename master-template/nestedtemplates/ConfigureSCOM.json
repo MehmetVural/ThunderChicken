@@ -72,6 +72,11 @@
     "location": "[resourceGroup().location]",
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3NicIPAddress": "10.0.2.5",
+    "RetryCount": 600,
+    "RetryIntervalSec": 60,
     "moduleDSC": {
       "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','ConfigureSCOM.ps1.zip')]",
       "script": "ConfigureSCOM.ps1",
@@ -183,11 +188,15 @@
           }
         ],
         "NonNodeData": {
-          "SqlServer" : "VS221",
-          "SqlServerInstance" : "VS221\\MSSQLSERVER",
+          "SqlServerPrimary" : "VS221",
+          "SqlServerSecondary" : "VS222",
+          "SqlServerDNSAlias" : "VSql.domain.com",
+          "SqlServerInstance" : "VSql.domain.com\\MSSQLSERVER",          
           "DwSqlServerInstance" : "VS221\\MSSQLSERVER",
           "SRSInstance" : "VS221\\MSSQLSERVER",
-          "ManagementGroupName" : "VSCOM"
+          "ManagementGroupName" : "VSCOM",
+          "DnsPrefix": "VScom",
+          "DnsServer": "[variables('dc1NicIPAddress')]"
         }
       },
       "K": {
@@ -202,11 +211,15 @@
           }
         ],
         "NonNodeData": {
-          "SqlServer" : "KS221",
-          "SqlServerInstance" : "KS221\\MSSQLSERVER",
+          "SqlServerPrimary" : "KS221",
+          "SqlServerSecondary" : "KS222",
+          "SqlServerDNSAlias" : "KSql.domain.com",
+          "SqlServerInstance" : "KSql.domain.com\\MSSQLSERVER",          
           "DwSqlServerInstance" : "KS221\\MSSQLSERVER",
           "SRSInstance" : "KS221\\MSSQLSERVER",
-          "ManagementGroupName" : "KSCOM"
+          "ManagementGroupName" : "KSCOM",
+          "DnsPrefix": "KScom",
+          "DnsServer": "[variables('dc2NicIPAddress')]"
         }
       },
       "C": {
@@ -221,26 +234,31 @@
           }
         ],
         "NonNodeData": {
-          "SqlServer" : "CS221",
-          "SqlServerInstance" : "CS221\\MSSQLSERVER",
+          "SqlServerPrimary" : "CS221",
+          "SqlServerSecondary" : "CS222",
+          "SqlServerDNSAlias" : "CSql.domain.com",
+          "SqlServerInstance" : "CSql.domain.com\\MSSQLSERVER",
           "DwSqlServerInstance" : "CS221\\MSSQLSERVER",
-          "SRSInstance" : "CS221\\MSSQLSERVER",
-          "ManagementGroupName" : "CSCOM"
+          "SRSInstance" : "CS221\\MSSQLSERVER",          
+          "ManagementGroupName" : "CSCOM",
+          "DnsPrefix": "CScom",
+          "DnsServer": "[variables('dc3NicIPAddress')]"
         }
       },
       "Config": {
         "ShareFolder" : "\\\\VD201\\Share",
-        "SCOMSourcePath" : "\\\\VD201\\Share\\SCOM\\SC 2016 RTM SCOM",
+        "SCOMSourcePath" : "\\\\VD201\\Share\\SCOM\\SC 2016 RTM SCOM\\",
         "SQLSysClrTypesSource" : "\\\\VD201\\Share\\SCOM\\SQLSysClrTypes.msi",
         "SysClrTypesProductID" : "68BA34E8-9B9D-4A74-83F0-7D366B532D75",
         "ReportViewerSource" : "\\\\VD201\\Share\\SCOM\\ReportViewer.msi",
         "ReportViewerProductID" : "3ECE8FC7-7020-4756-A71C-C345D4725B77",
-        "SCOMProducKey" : "", 
+        "SCOMProducKey" : "",
         "ManagementGroupName" : "SCOM",
         "SQL2016ManagedPack" : "\\\\VD201\\Share\\SCOM\\SQLServer2016MP.msi",
         "SQL2016ManagedPackProductID" : "2CCCD49C-7B9A-4703-A8AE-F28CDE94C126",
-        
-       
+        "InstanceName" : "MSSQLSERVER",
+        "SqlServerAG" : "SCOMAG",
+        "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
         "ModulesPath" : "\\VD201\\Share\\SCOM\\Modules",
         "ManagementPacksPath" : "\\\\VD201\\Share\\SCOM\\ManagementPack"
       }
@@ -268,9 +286,13 @@
             "function": "[variables('moduleDSC').function]"
           },
           "configurationArguments": {
+            "DomainName": "[variables('domainName')]",
             "Nodes": "[string(variables('ConfigData')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]",
             "Config": "[string(variables('ConfigData').Config)]",
-            "ServerName": "[string(variables('templates')[variables('template')].servers[copyIndex()].hostname)]"
+            "ServerName": "[string(variables('templates')[variables('template')].servers[copyIndex()].hostname)]",
+            "ServerIP": "[string(variables('templates')[variables('template')].servers[copyIndex()].ip)]",
+            "RetryCount": "[variables('RetryCount')]",
+            "RetryIntervalSec": "[variables('RetryIntervalSec')]"
           }
         },
         "protectedSettings": {

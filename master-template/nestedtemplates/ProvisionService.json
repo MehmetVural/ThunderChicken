@@ -53,7 +53,7 @@
     "DiskSizes": {
       "type": "string",     
       "allowedValues": [
-        "Small-2GB",
+        "Small-4GB",
         "Medium-20GB",
         "Large-50GB",        
         "Default"
@@ -1587,7 +1587,7 @@
     "domainNetbiosName": "LAB",
     "domainNameDMZ": "DomainDmz.com",
     "domainNetbiosNameDMZ": "LABDMZ",
-    "RetryCount": 150,
+    "RetryCount": 300,
     "RetryIntervalSec": 60,
     "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
     "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
@@ -1605,26 +1605,31 @@
       "V": {
         "name": "[variables('VSubnetName')]",
         "domain": "[variables('domainName')]",
+        "domainNetbiosName": "[variables('domainNetbiosName')]",
         "dns": "[variables('dc1NicIPAddress')]"
       },
       "K": {
         "name": "[variables('CSubnetName')]",
         "domain": "[variables('domainName')]",
+        "domainNetbiosName": "[variables('domainNetbiosName')]",
         "dns": "[variables('dc2NicIPAddress')]"
       },
       "C": {
         "name": "[variables('KSubnetName')]",
         "domain": "[variables('domainName')]",
+        "domainNetbiosName": "[variables('domainNetbiosName')]",
         "dns": "[variables('dc3NicIPAddress')]"
       },
       "KD": {
         "name": "[variables('KDMZSubnetName')]",
         "domain": "[variables('domainNameDMZ')]",
+        "domainNetbiosName": "[variables('domainNetbiosNameDMZ')]",
         "dns": "[variables('dmzdc1NicIPAddress')]"
       },
       "CD": {
         "name": "[variables('CDMZSubnetName')]",
         "domain": "[variables('domainNameDMZ')]",
+        "domainNetbiosName": "[variables('domainNetbiosNameDMZ')]",
         "dns": "[variables('dmzdc2NicIPAddress')]"
       }
     },
@@ -1672,7 +1677,7 @@
       "Large": "L"      
     },   
     "DisksizeGB": {
-      "Small-2GB": 2,
+      "Small-4GB": 4,
       "Medium-20GB": 20,
       "Large-50GB": 50
     },   
@@ -1761,7 +1766,7 @@
               "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, if(equals( length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0 ), 1, length(variables('templates')[variables('template')].servers[copyIndex()].datadisks)) )]",
               "input": {
                 "name": "[if(not(equals(parameters('DiskSizes'), 'Default')), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk'), if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0),concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', 'dummy'), concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '_DataDisk_', variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].letter, '_' , replace(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].name,' ','_')))   )]",
-                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), add(mul( int( variables('DisksizeGB')[parameters('DiskSizes')]),  length(variables('templates')[variables('template')].servers[copyIndex()].datadisks)), 10), if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0), 1, int(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].diskSizeGB)    ))]",
+                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), add(mul( int( variables('DisksizeGB')[parameters('DiskSizes')]),  length(variables('templates')[variables('template')].servers[copyIndex()].datadisks)), 4), if(equals(length(variables('templates')[variables('template')].servers[copyIndex()].datadisks),0), 1, int(variables('templates')[variables('template')].servers[copyIndex()].datadisks[copyIndex('dataDisks')].diskSizeGB)    ))]",
                 "lun": "[copyIndex('dataDisks')]",
                 "createOption": "Empty",
                 "managedDisk": {                 
@@ -1843,7 +1848,7 @@
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
-                  "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+                  "UserName": "[concat(variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domainNetbiosName, '\\', parameters('adminUserName'))]",
                   "Password": "[parameters('adminPassword')]"
                 }
               }
