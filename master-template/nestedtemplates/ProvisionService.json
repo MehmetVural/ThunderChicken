@@ -1587,7 +1587,7 @@
     "domainNetbiosName": "LAB",
     "domainNameDMZ": "DomainDmz.com",
     "domainNetbiosNameDMZ": "LABDMZ",
-    "RetryCount": 300,
+    "RetryCount": 600,
     "RetryIntervalSec": 60,
     "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
     "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
