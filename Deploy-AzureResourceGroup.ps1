@@ -1,6 +1,7 @@
 ﻿#Requires -Version 3.0
 #Requires -Module AzureRM.Resources
-#Requires -Module Azure.Storage
+#Requires -Module AzureRM.Storage
+#Requires -Module AzureRM.Compute
 #Requires -Module @{ModuleName="AzureRm.Profile";ModuleVersion="3.0"}
 
 

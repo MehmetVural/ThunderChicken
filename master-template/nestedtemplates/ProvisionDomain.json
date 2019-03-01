@@ -48,7 +48,7 @@
     "DiskSizes": {
       "type": "string",     
       "allowedValues": [
-        "Small-2GB",
+        "Small-4GB",
         "Medium-20GB",
         "Large-50GB",        
         "Default"
@@ -122,8 +122,8 @@
     "fileShareSAAccount": "[concat('share', substring(replace(subscription().subscriptionId,'-', ''), 0, 19))]",
     "shareResourceGroupName": "TCShare",
     "fileShare": "share",    
-    "RetryCount": 150,
-    "RetryIntervalSec": 30,
+    "RetryCount": 300,
+    "RetryIntervalSec": 60,
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
     "VSubnetName": "vs",
     "KSubnetName": "ks",
