@@ -86,7 +86,7 @@
     },
     "SharedService": {
       "type": "string",
-      "defaultValue": "SQLandSCOM",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "SQLOnly",
