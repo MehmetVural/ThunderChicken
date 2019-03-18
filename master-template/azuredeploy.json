@@ -411,7 +411,7 @@
       }
     },    
     {
-      "name": "ProvisioningSQL",
+      "name": "ProvisioningSQLFull",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
@@ -464,7 +464,7 @@
       "apiVersion": "2015-01-01",
       "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQL')]"        
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQLFull')]"        
       ],
       "properties": {
         "mode": "Incremental",
@@ -498,7 +498,7 @@
       }
     },    
     {
-      "name": "ProvisioningSCOM",
+      "name": "ProvisioningSCOMFull",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
@@ -551,7 +551,7 @@
       "apiVersion": "2015-01-01",
       "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOM')]"        
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOMFull')]"        
       ],
       "properties": {
         "mode": "Incremental",
