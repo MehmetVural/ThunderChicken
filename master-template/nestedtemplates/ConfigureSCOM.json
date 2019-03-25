@@ -192,8 +192,8 @@
           "SqlServerSecondary" : "VS222",
           "SqlServerDNSAlias" : "VSql.domain.com",
           "SqlServerInstance" : "VSql.domain.com\\MSSQLSERVER",          
-          "DwSqlServerInstance" : "VS221\\MSSQLSERVER",
-          "SRSInstance" : "VS221\\MSSQLSERVER",
+          "DwSqlServerInstance" :  "VSql.domain.com\\MSSQLSERVER",
+          "SRSInstance" :  "VSql.domain.com\\MSSQLSERVER",
           "ManagementGroupName" : "VSCOM",
           "DnsPrefix": "VScom",
           "DnsServer": "[variables('dc1NicIPAddress')]"
@@ -215,8 +215,8 @@
           "SqlServerSecondary" : "KS222",
           "SqlServerDNSAlias" : "KSql.domain.com",
           "SqlServerInstance" : "KSql.domain.com\\MSSQLSERVER",          
-          "DwSqlServerInstance" : "KS221\\MSSQLSERVER",
-          "SRSInstance" : "KS221\\MSSQLSERVER",
+          "DwSqlServerInstance" : "KSql.domain.com\\MSSQLSERVER",
+          "SRSInstance" : "KSql.domain.com\\MSSQLSERVER",
           "ManagementGroupName" : "KSCOM",
           "DnsPrefix": "KScom",
           "DnsServer": "[variables('dc2NicIPAddress')]"
@@ -238,8 +238,8 @@
           "SqlServerSecondary" : "CS222",
           "SqlServerDNSAlias" : "CSql.domain.com",
           "SqlServerInstance" : "CSql.domain.com\\MSSQLSERVER",
-          "DwSqlServerInstance" : "CS221\\MSSQLSERVER",
-          "SRSInstance" : "CS221\\MSSQLSERVER",          
+          "DwSqlServerInstance" : "CSql.domain.com\\MSSQLSERVER",
+          "SRSInstance" : "CSql.domain.com\\MSSQLSERVER",          
           "ManagementGroupName" : "CSCOM",
           "DnsPrefix": "CScom",
           "DnsServer": "[variables('dc3NicIPAddress')]"
