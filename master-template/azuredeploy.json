@@ -47,7 +47,7 @@
     },
     "enterpriseGithubUsername": {
       "type": "string",
-      "defaultValue": "[subscription().id]",   
+      "defaultValue": "",   
       "metadata": {
         "group": "JumbBox Github settings",
         "description": "UserName for Enterprise Github connection"
@@ -619,11 +619,5 @@
       }
     }    
   ],
-  "outputs": {
-    "subscription" : 
-    {
-      "type" : "object",
-      "value" : "[subscription()]"
-    }
-  }
+  "outputs": {}
 }
