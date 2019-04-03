@@ -222,7 +222,7 @@
                 "storageAccountType": "Standard_LRS"
             }
           },          
-           "copy": [
+          "copy": [
             {
               "name": "dataDisks",
               "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, length(variables('datadisks')) )]",

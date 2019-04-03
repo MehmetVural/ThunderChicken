@@ -44,7 +44,24 @@
         "group": "Template Settings",
         "description": "Indicates wheter or not include Jumpbox in this deployment"
       }
-    },   
+    },
+    "enterpriseGithubUsername": {
+      "type": "string",
+      "defaultValue": "[subscription().id]",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "UserName for Enterprise Github connection"
+      }
+    },  
+    "enterpriseGithubToken": {
+      "type": "string",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "Token for Enterprise Github connection"
+      }
+    }, 
+
     "deployDomincontrollers": {
       "type": "string",
       "defaultValue": "Yes",
@@ -246,6 +263,23 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },          
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+
+          "enterpriseGithubUsername": {
+            "value": "[parameters('enterpriseGithubUsername')]"            
+          },  
+          "enterpriseGithubToken": {
+            "value": "[parameters('enterpriseGithubToken')]"           
+          }, 
+
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
           },
           "OSDiskSize": {
             "value": "[parameters('OSDiskSize')]"
@@ -585,5 +619,11 @@
       }
     }    
   ],
-  "outputs": {}
+  "outputs": {
+    "subscription" : 
+    {
+      "type" : "object",
+      "value" : "[subscription()]"
+    }
+  }
 }
