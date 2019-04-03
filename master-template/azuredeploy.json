@@ -54,7 +54,7 @@
       }
     },  
     "enterpriseGithubToken": {
-      "type": "string",
+      "type": "securestring",
       "defaultValue": "",   
       "metadata": {
         "group": "JumbBox Github settings",
