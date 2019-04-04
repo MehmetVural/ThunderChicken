@@ -1743,7 +1743,11 @@
         "osProfile": {
           "computerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": "[parameters('adminPassword')]",
+          "windowsConfiguration": {
+            "provisionVmAgent": "true",
+            "TimeZone": "Pacific Standard Time"
+          }
         },
         "storageProfile": {
           "imageReference": {

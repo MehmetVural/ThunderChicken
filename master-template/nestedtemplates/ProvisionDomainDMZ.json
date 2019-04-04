@@ -205,7 +205,11 @@
         "osProfile": {
           "computerName": "[variables('dc1VMName')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": "[parameters('adminPassword')]",
+          "windowsConfiguration": {
+            "provisionVmAgent": "true",
+            "TimeZone": "Pacific Standard Time"
+          }
         },
         "storageProfile": {
           "imageReference": {
@@ -338,7 +342,11 @@
         "osProfile": {
           "computerName": "[variables('dc2VMName')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": "[parameters('adminPassword')]",
+          "windowsConfiguration": {
+            "provisionVmAgent": "true",
+            "TimeZone": "Pacific Standard Time"
+          }
         },
         "storageProfile": {
           "imageReference": {
