@@ -93,7 +93,7 @@
         "DHCP",
         "SharePoint",
         "Exchange",
-        "AirWatch",
+        "UEM",
         "Skype"
       ],
       "metadata": {
@@ -1318,8 +1318,8 @@
           }
         ]
       },
-      "AirWatch": {
-        "prefix": "aw",
+      "UEM": {
+        "prefix": "uem",
         "servers": [
           {
             "hostname": "KM206",
@@ -1333,7 +1333,7 @@
                 "letter": "D"
               },
               {
-                "name": "AWData",
+                "name": "UEMData",
                 "diskSizeGB": 50,
                 "letter": "E"
               }
@@ -1351,7 +1351,7 @@
                 "letter": "D"
               },
               {
-                "name": "AWData",
+                "name": "UEMData",
                 "diskSizeGB": 100,
                 "letter": "E"
               }
@@ -1369,7 +1369,7 @@
                 "letter": "D"
               },
               {
-                "name": "AWData",
+                "name": "UEMData",
                 "diskSizeGB": 100,
                 "letter": "E"
               }
@@ -1387,7 +1387,7 @@
                 "letter": "D"
               },
               {
-                "name": "AWData",
+                "name": "UEMData",
                 "diskSizeGB": 50,
                 "letter": "E"
               }
@@ -1405,7 +1405,7 @@
                 "letter": "D"
               },
               {
-                "name": "AWData",
+                "name": "UEMData",
                 "diskSizeGB": 100,
                 "letter": "E"
               }
@@ -1423,7 +1423,7 @@
                 "letter": "D"
               },
               {
-                "name": "AWData",
+                "name": "UEMData",
                 "diskSizeGB": 100,
                 "letter": "E"
               }

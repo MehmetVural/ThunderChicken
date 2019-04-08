@@ -126,7 +126,7 @@
         "DHCP",       
         "SharePoint",
         "Exchange",
-        "AirWatch",        
+        "UEM",        
         "Skype"
       ],
       "metadata": {
@@ -349,7 +349,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[ or( equals(parameters('deployDomincontrollersDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'AirWatch'), equals(parameters('template'), 'Skype') )]",
+      "condition": "[ or( equals(parameters('deployDomincontrollersDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'UEM'), equals(parameters('template'), 'Skype') )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
