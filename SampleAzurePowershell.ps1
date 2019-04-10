@@ -5,12 +5,12 @@ $Global:ServicePath = $PSScriptRoot
 # Imports Common CI Utilities
   Write-Host "Importing CI Common functions"
   if((Get-Module -Name 'CI.Common')){ Remove-Module -Name 'CI.Common' }
-  Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path -Path $Global:ServicePath  ) -ChildPath "CI.Common") -ChildPath 'CI.Common.psd1') 
+  Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path -Path $Global:ServicePath  ) -ChildPath "CI.Common") -ChildPath 'CI.Common.psd1') -DisableNameChecking 
 #
 
 
 Write-Host "Test if it is connected to Microsoft Azure" -ForegroundColor Yellow
-# login to Azure Account
+# login to Azure Account #Connect-AzureRmAccount
 Login-Azure
 
 #powershell -executionpolicy bypass

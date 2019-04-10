@@ -119,12 +119,15 @@
       "defaultValue": "None",
       "allowedValues": [
         "None",
-        "AD-DS-DNS",
+        "AD-DS",
+        "DNS",
+        "NPS",
         "SCOM",
         "SharedSQL",
         "FileServer",
         "DHCP",       
         "SharePoint",
+        "OOS",
         "Exchange",
         "UEM",        
         "Skype"
@@ -222,7 +225,7 @@
     "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]",
     "scomTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSCOM.json', parameters('ArtifactsLocationSasToken'))]"
   },
-  "resources": [
+  "resources": [    
     {
       "name": "ProvisioningBase",
       "type": "Microsoft.Resources/deployments",

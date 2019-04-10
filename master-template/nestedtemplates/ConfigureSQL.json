@@ -50,14 +50,17 @@
       "defaultValue": "None",
       "allowedValues": [
         "None",
-        "AD-DS-DNS",
+        "AD-DS",
+        "DNS",
+        "NPS",
         "SCOM",
         "SharedSQL",
         "FileServer",
-        "DHCP",
+        "DHCP",       
         "SharePoint",
+        "OOS",
         "Exchange",
-        "UEM",
+        "UEM",        
         "Skype"
       ],
       "metadata": {
@@ -369,7 +372,8 @@
         "TestDBName": "TestDB",
         "ShareFolder": "\\\\VD201\\Share",
         "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
-        "SQLInstalISO": "\\\\VD201\\Share\\SharedSQL\\en_sql_server_2016_enterprise_with_service_pack_2_x64_dvd_12124051.iso",
+        "SQLInstallSource": "\\\\VD201\\Share\\SharedSQL\\SQL2016",
+        "SQLInstallDestination": "C:\\INSTALL\\SQL2016",
         "SQLManagementStudio2017Path": "\\\\VD201\\Share\\SharedSQL\\SSMS.17.9.1\\SSMS-Setup-ENU.exe",
         "SQLManagementStudio2017ProductId": "91a1b895-c621-4038-b34a-01e7affbcb6b",
         "SQLManagementStudio2016Path": "\\\\vd201\\Share\\SharedSQL\\SSMS.16.5.3\\SSMS-Setup-ENU.exe",
@@ -411,7 +415,7 @@
         "protectedSettings": {
           "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
           "configurationArguments": {
-            "SqlInstallCredential": {
+            "InstallCredential": {
               "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
               "Password": "[parameters('adminPassword')]"
             },

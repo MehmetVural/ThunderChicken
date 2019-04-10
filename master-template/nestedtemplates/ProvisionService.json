@@ -86,14 +86,17 @@
       "defaultValue": "None",
       "allowedValues": [
         "None",
-        "AD-DS-DNS",
+        "AD-DS",
+        "DNS",
+        "NPS",
         "SCOM",
         "SharedSQL",
         "FileServer",
-        "DHCP",
+        "DHCP",       
         "SharePoint",
+        "OOS",
         "Exchange",
-        "UEM",
+        "UEM",        
         "Skype"
       ],
       "metadata": {
@@ -128,8 +131,8 @@
         "prefix": "blank",
         "servers": []
       },
-      "AD-DS-DNS": {
-        "prefix": "ds",
+      "AD-DS": {
+        "prefix": "ad-ds",
         "servers": [
           {
             "hostname": "VD202",
@@ -168,32 +171,6 @@
             ]
           },
           {
-            "hostname": "CS203",
-            "size": "S",
-            "subnet": "C",
-            "ip": "10.0.2.7",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "CH221",
-            "size": "S",
-            "subnet": "C",
-            "ip": "10.0.2.8",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
             "hostname": "KD202",
             "size": "S",
             "subnet": "K",
@@ -210,9 +187,45 @@
                 "letter": "E"
               }
             ]
+          }
+        ]
+      },
+      "DNS": {
+        "prefix": "dns",
+        "servers": [
+          {
+            "hostname": "KH179",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.8",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
           },
           {
-            "hostname": "KS203",
+            "hostname": "CH179",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.8",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          }
+        ]
+      },
+      "NPS": {
+        "prefix": "nps",
+        "servers": [
+          {
+            "hostname": "KS207",
             "size": "S",
             "subnet": "K",
             "ip": "10.0.1.7",
@@ -225,10 +238,10 @@
             ]
           },
           {
-            "hostname": "KH179",
+            "hostname": "CS207",
             "size": "S",
-            "subnet": "K",
-            "ip": "10.0.1.8",
+            "subnet": "C",
+            "ip": "10.0.2.7",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -902,32 +915,6 @@
             ]
           },
           {
-            "hostname": "CP204",
-            "size": "XL",
-            "subnet": "C",
-            "ip": "10.0.2.38",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "CP205",
-            "size": "XL",
-            "subnet": "C",
-            "ip": "10.0.2.39",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
             "hostname": "CP206",
             "size": "L",
             "subnet": "C",
@@ -1005,32 +992,6 @@
             ]
           },
           {
-            "hostname": "KP204",
-            "size": "XL",
-            "subnet": "K",
-            "ip": "10.0.1.44",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "KP205",
-            "size": "XL",
-            "subnet": "K",
-            "ip": "10.0.1.45",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
             "hostname": "KP206",
             "size": "L",
             "subnet": "K",
@@ -1081,6 +1042,64 @@
               }
             ]
           }
+        ]
+      },
+      "OOS": {
+        "prefix": "oos",
+        "servers": [          
+          {
+            "hostname": "KP204",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.44",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
+            "hostname": "KP205",
+            "size": "XL",
+            "subnet": "K",
+            "ip": "10.0.1.45",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },          
+          {
+            "hostname": "CP204",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.38",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
+            "hostname": "CP205",
+            "size": "XL",
+            "subnet": "C",
+            "ip": "10.0.2.39",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          }
+          
         ]
       },
       "Exchange": {
