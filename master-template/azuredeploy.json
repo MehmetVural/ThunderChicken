@@ -44,7 +44,24 @@
         "group": "Template Settings",
         "description": "Indicates wheter or not include Jumpbox in this deployment"
       }
-    },   
+    },
+    "enterpriseGithubUsername": {
+      "type": "string",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "UserName for Enterprise Github connection"
+      }
+    },  
+    "enterpriseGithubToken": {
+      "type": "securestring",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "Token for Enterprise Github connection"
+      }
+    }, 
+
     "deployDomincontrollers": {
       "type": "string",
       "defaultValue": "Yes",
@@ -102,14 +119,17 @@
       "defaultValue": "None",
       "allowedValues": [
         "None",
-        "AD-DS-DNS",
+        "AD-DS",
+        "DNS",
+        "NPS",
         "SCOM",
         "SharedSQL",
         "FileServer",
         "DHCP",       
         "SharePoint",
+        "OOS",
         "Exchange",
-        "AirWatch",        
+        "UEM",        
         "Skype"
       ],
       "metadata": {
@@ -205,7 +225,7 @@
     "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]",
     "scomTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSCOM.json', parameters('ArtifactsLocationSasToken'))]"
   },
-  "resources": [
+  "resources": [    
     {
       "name": "ProvisioningBase",
       "type": "Microsoft.Resources/deployments",
@@ -246,6 +266,23 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },          
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+
+          "enterpriseGithubUsername": {
+            "value": "[parameters('enterpriseGithubUsername')]"            
+          },  
+          "enterpriseGithubToken": {
+            "value": "[parameters('enterpriseGithubToken')]"           
+          }, 
+
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
           },
           "OSDiskSize": {
             "value": "[parameters('OSDiskSize')]"
@@ -315,7 +352,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[ or( equals(parameters('deployDomincontrollersDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'AirWatch'), equals(parameters('template'), 'Skype') )]",
+      "condition": "[ or( equals(parameters('deployDomincontrollersDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'UEM'), equals(parameters('template'), 'Skype') )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],

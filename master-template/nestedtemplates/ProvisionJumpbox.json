@@ -17,11 +17,61 @@
         "description": "The password for the administrator account of the new VMs and Domain"
       }
     },
+    "ArtifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/servicemodular/service-template",
+      "metadata": {
+        "group": "Template settings",
+        "description": "Location of the artifacts"
+      }
+    },
+    "ArtifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    },
+    
+    "enterpriseGithubUsername": {
+      "type": "string",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "UserName for Enterprise Github connection"
+      }
+    },  
+    "enterpriseGithubToken": {
+      "type": "string",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "Token for Enterprise Github connection"
+      }
+    }, 
+
+    "DiskSizes": {
+      "type": "string",     
+      "allowedValues": [
+        "Small-4GB",
+        "Medium-20GB",
+        "Large-50GB",        
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, Default: Attach individual disks for each drive letter and very costly"
+      }
+    },
     "OSDiskSize": {
-      "type": "string",      
+      "type": "string",
       "allowedValues": [
         "Small-30GB",
-        "Regular-127GB"        
+        "Regular-127GB"
       ],
       "metadata": {
         "group": "Template Settings",
@@ -29,14 +79,14 @@
       }
     },
     "VMSeries": {
-      "type": "string",      
+      "type": "string",
       "metadata": {
         "group": "Template Settings",
         "description": "Defines VM Series - CPU and memory allocation"
       }
-    },    
+    },
     "AutoShutdown": {
-      "type": "string",     
+      "type": "string",
       "allowedValues": [
         "1200",
         "1300",
@@ -53,7 +103,6 @@
         "description": "Daily Auto Shutdown time"
       }
     }
-
   },
   "variables": {
     "templatePrefix": "master",
@@ -66,27 +115,45 @@
     "jumpBoxVmName": "JumpBox",
     "publicIPAddressName": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-publicip')]",
     "dnsPrefix": "[concat('dns',uniqueString(resourceGroup().id))]",
-    "jumpBoxNic": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-nic')]",   
-    "virtualMachineSize": "Standard_B2s",    
+    "jumpBoxNic": "[concat(variables('templatePrefix'), '-', variables('jumpBoxVmName'), '-nic')]",
+    "virtualMachineSize": "Standard_B2s",
     "virtualMachineSizeArraySeries": {
-      "Bs-Series" : { 
+      "Bs-Series": {
         "S": "Standard_B2s",
         "M": "Standard_B2ms",
         "L": "Standard_B4ms",
         "XL": "Standard_B8ms"
       },
-      "Dv2-Series" : {
+      "Dv2-Series": {
         "S": "Standard_D1_v2",
         "M": "Standard_D2_v2",
         "L": "Standard_D3_v2",
         "XL": "Standard_D4_v2"
       },
-      "Dv3-Series" : {
+      "Dv3-Series": {
         "S": "Standard_D1_v2",
         "M": "Standard_D2_v3",
         "L": "Standard_D4_v3",
         "XL": "Standard_D8_v3"
       }
+    },
+    "dscModulePrepare": {
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','PrepareVms.ps1.zip')]",
+      "script": "PrepareVms.ps1",
+      "function": "PrepareVms"
+    },
+    "setupConfig": {
+      "url": "[concat(parameters('ArtifactsLocation'),'/','scripts','/','JumbBoxSetup.ps1')]"
+    },
+    "vmDscSettings": {
+      "DiskSizes": "Small-4GB",
+      "DisksizeGB": 4,
+      "domainName": "Domain.com",
+      "domainNetbiosName": "LAB",
+      "dns": "10.0.0.5",
+      "RetryCount": 600,
+      "RetryIntervalSec": 60,
+      "datadisks": []
     }
   },
   "resources": [
@@ -143,7 +210,7 @@
       "location": "[variables('location')]",
       "tags": {
         "Service": "JumpBox",
-        "Site": "[ variables('VSubnetName') ]"
+        "Site": "[variables('VSubnetName')]"
       },
       "comments": "This is Jumpbox you are going to RDP to connects each machine.",
       "dependsOn": [
@@ -153,14 +220,14 @@
         "osProfile": {
           "computerName": "[variables('jumpBoxVmName')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]",
+          "adminPassword": "[parameters('adminPassword')]",          
           "windowsConfiguration": {
-            "provisionVmAgent": "true"
+            "provisionVmAgent": "true",
+            "TimeZone": "Pacific Standard Time"
           }
         },
         "hardwareProfile": {
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
-          
         },
         "storageProfile": {
           "imageReference": {
@@ -173,9 +240,9 @@
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
             "createOption": "FromImage",
-            "managedDisk": {                 
+            "managedDisk": {
               "storageAccountType": "Standard_LRS"
-            }            
+            }
           },
           "dataDisks": []
         },
@@ -192,30 +259,83 @@
             "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNamePrefix')), '2017-06-01').primaryEndpoints['blob']]"
           }
         }
-      }
-    },
-    {
-      "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
-      "type": "microsoft.devtestlab/schedules",
-      "name": "[concat('shutdown-computevm-',variables('jumpBoxVmName'))]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('jumpBoxVmName'))]"
-      ],
-      "properties": {
-        "status": "Enabled",
-        "taskType": "ComputeVmShutdownTask",
-        "dailyRecurrence": {
-          "time": "[parameters('AutoShutdown')]"
+      },
+      "resources": [
+        {
+          "apiVersion": "[providers('Microsoft.DevTestLab','labs').apiVersions[0]]",
+          "type": "microsoft.devtestlab/schedules",
+          "name": "[concat('shutdown-computevm-',variables('jumpBoxVmName'))]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('jumpBoxVmName'))]"
+          ],
+          "properties": {
+            "status": "Enabled",
+            "taskType": "ComputeVmShutdownTask",
+            "dailyRecurrence": {
+              "time": "[parameters('AutoShutdown')]"
+            },
+            "timeZoneId": "Pacific Standard Time",
+            "notificationSettings": {
+              "status": "Disabled",
+              "timeInMinutes": 15
+            },
+            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('jumpBoxVmName'))]"
+          }
         },
-        "timeZoneId": "Pacific Standard Time",
-        "notificationSettings": {
-          "status": "Disabled",
-          "timeInMinutes": 15
-        },
-        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('jumpBoxVmName'))]"
-      }
+        {
+          "type": "extensions",
+          "name": "Microsoft.Powershell.DSC",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('jumpBoxVmName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.20",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('dscModulePrepare').url]",
+                "script": "[variables('dscModulePrepare').script]",
+                "function": "[variables('dscModulePrepare').function]"
+              },
+              "configurationArguments": {
+                "DiskSize": "[parameters('DiskSizes')]",
+                "DisksizeGB": "[int(variables('vmDscSettings').DisksizeGB)]",
+                "domainName": "[variables('vmDscSettings').domainName]",
+                "dnsServer": "[variables('vmDscSettings').dns]",
+                "dataDisks": "[string(variables('vmDscSettings').datadisks)]",
+                "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
+                "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]", 
+                "retryCount": "[int(variables('vmDscSettings').RetryCount)]",
+                "retryIntervalSec": "[int(variables('vmDscSettings').RetryIntervalSec)]",                
+                "ConfigurationMode": "ApplyOnly",
+                "ConfigurationModeFrequencyMins": 15
+              }
+            },
+            "protectedSettings": {
+              "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
+              "configurationArguments": {
+                "DomainAdminCredential": {
+                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "setupConfig" : 
+    {
+      "type" : "string",
+      "value" : "[variables('setupConfig')]"
+    }
+
+  }
 }

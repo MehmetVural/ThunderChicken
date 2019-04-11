@@ -50,14 +50,17 @@
       "defaultValue": "None",
       "allowedValues": [
         "None",
-        "AD-DS-DNS",
+        "AD-DS",
+        "DNS",
+        "NPS",
         "SCOM",
         "SharedSQL",
         "FileServer",
-        "DHCP",
+        "DHCP",       
         "SharePoint",
+        "OOS",
         "Exchange",
-        "AirWatch",
+        "UEM",        
         "Skype"
       ],
       "metadata": {
@@ -247,7 +250,8 @@
       },
       "Config": {
         "ShareFolder" : "\\\\VD201\\Share",
-        "SCOMFolder" : "\\\\VD201\\Share\\SCOM",
+        "SCOMInstallSource" : "\\\\VD201\\Share\\SCOM",
+        "SCOMInstallDestination" : "C:\\INSTALL\\SCOM2016",
         "SCOMSourcePath" : "\\SC 2016 RTM SCOM\\",
         "SQLSysClrTypesSource" : "\\SQLSysClrTypes.msi",
         "SysClrTypesProductID" : "68BA34E8-9B9D-4A74-83F0-7D366B532D75",
