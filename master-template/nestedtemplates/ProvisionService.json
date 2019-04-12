@@ -153,10 +153,46 @@
             ]
           },
           {
+            "hostname": "VD203",
+            "size": "S",
+            "subnet": "V",
+            "ip": "10.0.0.9",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "Directory Logs",
+                "diskSizeGB": 50,
+                "letter": "E"
+              }
+            ]
+          },
+          {
             "hostname": "CD202",
             "size": "S",
             "subnet": "C",
             "ip": "10.0.2.6",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "Directory Logs",
+                "diskSizeGB": 50,
+                "letter": "E"
+              }
+            ]
+          },          
+          {
+            "hostname": "CD203",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.9",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -175,6 +211,24 @@
             "size": "S",
             "subnet": "K",
             "ip": "10.0.1.6",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "Directory Logs",
+                "diskSizeGB": 50,
+                "letter": "E"
+              }
+            ]
+          },          
+          {
+            "hostname": "KD203",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.9",
             "datadisks": [
               {
                 "name": "Local Data",
