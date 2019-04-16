@@ -8,7 +8,7 @@
         "group": "Base Settings",
         "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "defaultValue": "vmadmin"
+      "defaultValue": "localadmin"
     },
     "adminPassword": {
       "type": "securestring",
@@ -213,9 +213,10 @@
     "location": "[resourceGroup().location]",    
     "deployJumpBoxTemplate":"[parameters('deployJumpbox')]", 
     "domainName": "Domain.com",
-    "domainNetbiosName": "LAB",
+    "domainNetbiosName": "Domain",
     "domainNameDMZ": "DomainDmz.com",
-    "domainNetbiosNameDMZ": "LABDMZ",    
+    "domainNetbiosNameDMZ": "DomainDmz",
+    "domainAdminUsername" : "domainadmin",    
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
@@ -242,6 +243,18 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },          
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
           }
         }
       }
@@ -266,7 +279,22 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
-          },          
+          },   
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },  
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },               
           "ArtifactsLocation": {
             "value": "[parameters('ArtifactsLocation')]"
           },
@@ -312,7 +340,7 @@
         },
         "parameters": {
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('domainAdminUsername')]"
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
@@ -364,7 +392,7 @@
         },
         "parameters": {
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('domainAdminUsername')]"
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
@@ -420,6 +448,21 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
           "ArtifactsLocation": {
             "value": "[parameters('ArtifactsLocation')]"
           },
@@ -467,6 +510,18 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
           },
           "ArtifactsLocation": {
             "value": "[parameters('ArtifactsLocation')]"
@@ -516,11 +571,8 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "ArtifactsLocation": {
-            "value": "[parameters('ArtifactsLocation')]"
-          },
-          "ArtifactsLocationSasToken": {
-            "value": "[parameters('ArtifactsLocationSasToken')]"
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
           },
           "domainname": {
             "value": "[variables('domainname')]"
@@ -528,6 +580,18 @@
           "domainNetbiosName": {
             "value": "[variables('domainNetbiosName')]"
           },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },         
           "template": {
             "value": "SharedSQL"
           }
@@ -554,6 +618,18 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
           },
           "ArtifactsLocation": {
             "value": "[parameters('ArtifactsLocation')]"
@@ -603,17 +679,26 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "ArtifactsLocation": {
-            "value": "[parameters('ArtifactsLocation')]"
-          },
-          "ArtifactsLocationSasToken": {
-            "value": "[parameters('ArtifactsLocationSasToken')]"
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
           },
           "domainname": {
             "value": "[variables('domainname')]"
           },
           "domainNetbiosName": {
             "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           },
           "template": {
             "value": "SCOM"

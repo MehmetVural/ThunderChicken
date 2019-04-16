@@ -8,7 +8,7 @@
         "group": "Template settings",
         "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "defaultValue": "vmadmin"
+      "defaultValue": ""
     },
     "adminPassword": {
       "type": "securestring",
@@ -118,6 +118,7 @@
     "location": "[resourceGroup().location]",
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "domainAdmin": "[parameters('domainName')]",
     "forestMode": "[parameters('forestMode')]",
     "fileShareSAAccount": "[concat('share', substring(replace(subscription().subscriptionId,'-', ''), 0, 19))]",
     "shareResourceGroupName": "TCShare",
