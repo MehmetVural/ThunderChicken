@@ -8,7 +8,7 @@
         "group": "Template settings",
         "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "defaultValue": "vmadmin"
+      "defaultValue": ""
     },
     "adminPassword": {
       "type": "securestring",
@@ -16,11 +16,50 @@
         "group": "Template settings",
         "description": "The password for the administrator account of the new VMs and Domain"
       }
+    },
+    "domainAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": ""
+    },
+    "domainname": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosName": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
     }
   },
   "variables": {
     "templatePrefix": "master",
-    "domainNetbiosName": "LAB",
+    "domainName": "[parameters('domainName')]",
+    "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "domainNameDMZ": "[parameters('domainNameDMZ')]",
+    "domainNetbiosNameDMZ": "[parameters('domainNetbiosNameDMZ')]",
     "location": "[resourceGroup().location]",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
     "AutomationAccount" : "[concat('DSCAccount', resourcegroup().name)]",
@@ -389,9 +428,22 @@
             "[variables('AutomationAccount')]"
           ],
           "properties": {
-            "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+            "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('domainAdminUsername'))]",
             "Password": "[parameters('adminPassword')]",            
             "description": "Domain administration Credential"
+          }
+        },
+        {
+          "name": "LocalAdminCredential",
+          "type": "credentials",
+          "apiVersion": "2015-10-31",
+          "dependsOn": [
+            "[variables('AutomationAccount')]"
+          ],
+          "properties": {
+            "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUsername'))]",
+            "Password": "[parameters('adminPassword')]",            
+            "description": "Local administration Credential for Vms"
           }
         }
 

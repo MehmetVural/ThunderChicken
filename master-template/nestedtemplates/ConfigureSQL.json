@@ -8,13 +8,49 @@
         "group": "Template settings",
         "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "defaultValue": "vmadmin"
+      "defaultValue": ""
     },
     "adminPassword": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
         "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },
+    "domainAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": ""
+    },
+    "domainname": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosName": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
       }
     },
     "ArtifactsLocation": {
@@ -30,20 +66,6 @@
         "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       },
       "defaultValue": ""
-    },
-    "domainname": {
-      "type": "securestring",
-      "metadata": {
-        "group": "Template settings",
-        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      }
-    },
-    "domainNetbiosName": {
-      "type": "securestring",
-      "metadata": {
-        "group": "Template settings",
-        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      }
     },
     "template": {
       "type": "string",
@@ -75,6 +97,8 @@
     "location": "[resourceGroup().location]",
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "domainNameDMZ": "[parameters('domainNameDMZ')]",
+    "domainNetbiosNameDMZ": "[parameters('domainNetbiosNameDMZ')]",
     "dc1NicIPAddress": "10.0.0.5",
     "dc2NicIPAddress": "10.0.1.5",
     "dc3NicIPAddress": "10.0.2.5",
@@ -420,7 +444,7 @@
               "Password": "[parameters('adminPassword')]"
             },
             "DomainAdminCredential": {
-              "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUserName'))]",
+              "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('domainAdminUsername'))]",
               "Password": "[parameters('adminPassword')]"
             }
           }

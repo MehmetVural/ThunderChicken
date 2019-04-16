@@ -8,13 +8,49 @@
         "group": "Template settings",
         "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "defaultValue": "vmadmin"
+      "defaultValue": ""
     },
     "adminPassword": {
       "type": "securestring",
       "metadata": {
         "group": "Template settings",
         "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },    
+    "domainAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": ""
+    },
+    "domainname": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosName": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
       }
     },
     "ArtifactsLocation": {
@@ -147,9 +183,11 @@
     },
     "vmDscSettings": {
       "DiskSizes": "Small-4GB",
-      "DisksizeGB": 4,
-      "domainName": "Domain.com",
-      "domainNetbiosName": "LAB",
+      "DisksizeGB": 4,      
+      "domainName": "[parameters('domainName')]",
+      "domainNetbiosName": "[parameters('domainNetbiosName')]",      
+      "domainNameDMZ": "[parameters('domainName')]",
+      "domainNetbiosNameDMZ": "[parameters('domainNetbiosName')]",      
       "dns": "10.0.0.5",
       "RetryCount": 600,
       "RetryIntervalSec": 60,
@@ -320,7 +358,7 @@
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
                 "DomainAdminCredential": {
-                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('domainAdminUsername'))]",
                   "Password": "[parameters('adminPassword')]"
                 }
               }

@@ -8,7 +8,7 @@
         "group": "Template settings",
         "description": "The name of the administrator account of the new VMs and Domain"
       },
-      "defaultValue": "vmadmin"
+      "defaultValue": ""
     },
     "adminPassword": {
       "type": "securestring",
