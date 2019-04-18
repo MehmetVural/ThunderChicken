@@ -66,14 +66,14 @@
       }
     },
     "domainname": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "group": "Template settings",
         "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
       }
     },
     "domainNetbiosName": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "group": "Template settings",
         "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."

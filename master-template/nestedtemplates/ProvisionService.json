@@ -1220,7 +1220,20 @@
                 "letter": "D"
               }
             ]
-          },
+          },          
+          {
+            "hostname": "KM203",
+            "size": "M",
+            "subnet": "K",
+            "ip": "10.0.1.57",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          }
           {
             "hostname": "KM204",
             "size": "L",
@@ -1409,19 +1422,6 @@
                 "name": "RECOVERY",
                 "diskSizeGB": 50,
                 "letter": "I"
-              }
-            ]
-          },
-          {
-            "hostname": "KM203",
-            "size": "M",
-            "subnet": "K",
-            "ip": "10.0.1.57",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
               }
             ]
           }
