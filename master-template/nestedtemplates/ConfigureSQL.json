@@ -428,6 +428,7 @@
           },
           "configurationArguments": {
             "DomainName": "[variables('domainName')]",
+            "DomainNetbiosName":  "[variables('DomainNetbiosName')]",
             "Nodes": "[string(variables('ConfigData')[variables('templates')[variables('template')].servers[copyIndex()].subnet])]",            
             "Config": "[string(variables('ConfigData').Config)]",
             "ServerName": "[string(variables('templates')[variables('template')].servers[copyIndex()].hostname)]",
