@@ -513,6 +513,9 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },          
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
           },
           "domainname": {
             "value": "[variables('domainname')]"
@@ -621,6 +624,9 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
           },
           "domainname": {
             "value": "[variables('domainname')]"
