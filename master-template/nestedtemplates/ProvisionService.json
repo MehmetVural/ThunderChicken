@@ -1984,7 +1984,7 @@
 
                 "ServiceName": "[variables('template')]",
                 "ServerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
-                "ConfigData": "[if(variables('templates')[variables('template')].ConfigData, variables('templates')[variables('template')].ConfigData, json('null'))]",               
+                "ConfigData": "[variables('templates')[variables('template')].ConfigData]",               
 
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
                 "retryCount": "[variables('RetryCount')]",
