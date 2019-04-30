@@ -284,10 +284,36 @@
         "prefix": "dns",
         "servers": [
           {
+            "hostname": "KH178",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.10",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
             "hostname": "KH179",
             "size": "S",
             "subnet": "K",
             "ip": "10.0.1.8",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
+            "hostname": "CH178",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.10",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -309,7 +335,12 @@
               }
             ]
           }
-        ]
+        ],
+        "ConfigData": {
+            "PrimaryServer" : "KH178",
+            "SecondaryServer" : "CH178"
+        }
+
       },
       "NPS": {
         "prefix": "nps",
@@ -1950,6 +1981,11 @@
                 "DisksizeGB": "[int(variables('DisksizeGB')[parameters('DiskSizes')])]",
                 "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
+
+                "ServiceName": "[variables('template')]",
+                "ServerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
+                "ConfigData": "[if(variables('templates')[variables('template')].ConfigData, variables('templates')[variables('template')].ConfigData, json('null'))]",               
+
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
                 "retryCount": "[variables('RetryCount')]",
                 "retryIntervalSec": "[variables('RetryIntervalSec')]",
