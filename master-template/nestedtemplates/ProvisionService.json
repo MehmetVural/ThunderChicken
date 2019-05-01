@@ -169,6 +169,7 @@
       },
       "AD-DS": {
         "prefix": "ad-ds",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VD202",
@@ -281,7 +282,7 @@
         ]
       },
       "DNS": {
-        "prefix": "dns",
+        "prefix": "dns",       
         "servers": [
           {
             "hostname": "KH178",
@@ -350,6 +351,7 @@
       },
       "NPS": {
         "prefix": "nps",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KS207",
@@ -381,6 +383,7 @@
       },
       "SCOM": {
         "prefix": "scom",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VS201",
@@ -464,6 +467,7 @@
       },
       "SharedSQL": {
         "prefix": "sql",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VS222",
@@ -682,6 +686,7 @@
       },
       "FileServer": {
         "prefix": "fs",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VF201",
@@ -816,6 +821,7 @@
       },
       "DHCP": {
         "prefix": "dhcp",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VS203",
@@ -976,6 +982,7 @@
       },
       "SharePoint": {
         "prefix": "sp",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "CP201",
@@ -1173,6 +1180,7 @@
       },
       "OOS": {
         "prefix": "oos",
+        "ConfigData": {},
         "servers": [          
           {
             "hostname": "KP204",
@@ -1231,6 +1239,7 @@
       },
       "Exchange": {
         "prefix": "ex",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KM201",
@@ -1466,6 +1475,7 @@
       },
       "UEM": {
         "prefix": "uem",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KM206",
@@ -1579,6 +1589,7 @@
       },
       "Skype": {
         "prefix": "sk",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KM209",
