@@ -169,6 +169,7 @@
       },
       "AD-DS": {
         "prefix": "ad-ds",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VD202",
@@ -281,13 +282,39 @@
         ]
       },
       "DNS": {
-        "prefix": "dns",
+        "prefix": "dns",       
         "servers": [
+          {
+            "hostname": "KH178",
+            "size": "S",
+            "subnet": "K",
+            "ip": "10.0.1.10",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
           {
             "hostname": "KH179",
             "size": "S",
             "subnet": "K",
             "ip": "10.0.1.8",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
+            "hostname": "CH178",
+            "size": "S",
+            "subnet": "C",
+            "ip": "10.0.2.10",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -309,10 +336,22 @@
               }
             ]
           }
-        ]
+        ],
+        "ConfigData": {
+          "ZoneName"  : "Split.com",
+          "ZoneFile"  : "Split.com.dns",
+          "DynamicUpdate" : "NonsecureAndSecure",
+          "TransferType" : "Specific",
+          "PrimaryServer" : "KH178",
+          "PrimaryServerIP" : "10.0.1.10",
+          "SecondaryServer" : "CH178",
+          "SecondaryServerIP" : ["10.0.2.10", "10.0.1.8", "10.0.2.8"]
+        }
+
       },
       "NPS": {
         "prefix": "nps",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KS207",
@@ -344,6 +383,7 @@
       },
       "SCOM": {
         "prefix": "scom",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VS201",
@@ -427,6 +467,7 @@
       },
       "SharedSQL": {
         "prefix": "sql",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VS222",
@@ -645,6 +686,7 @@
       },
       "FileServer": {
         "prefix": "fs",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VF201",
@@ -779,6 +821,7 @@
       },
       "DHCP": {
         "prefix": "dhcp",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "VS203",
@@ -939,6 +982,7 @@
       },
       "SharePoint": {
         "prefix": "sp",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "CP201",
@@ -1136,6 +1180,7 @@
       },
       "OOS": {
         "prefix": "oos",
+        "ConfigData": {},
         "servers": [          
           {
             "hostname": "KP204",
@@ -1194,6 +1239,7 @@
       },
       "Exchange": {
         "prefix": "ex",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KM201",
@@ -1429,6 +1475,7 @@
       },
       "UEM": {
         "prefix": "uem",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KM206",
@@ -1542,6 +1589,7 @@
       },
       "Skype": {
         "prefix": "sk",
+        "ConfigData": {},
         "servers": [
           {
             "hostname": "KM209",
@@ -1950,6 +1998,11 @@
                 "DisksizeGB": "[int(variables('DisksizeGB')[parameters('DiskSizes')])]",
                 "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
+
+                "ServiceName": "[variables('template')]",
+                "ServerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
+                "ConfigData": "[string(variables('templates')[variables('template')].ConfigData)]",
+
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
                 "retryCount": "[variables('RetryCount')]",
                 "retryIntervalSec": "[variables('RetryIntervalSec')]",
