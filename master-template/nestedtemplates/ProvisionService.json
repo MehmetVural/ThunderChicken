@@ -860,19 +860,6 @@
             ]
           },
           {
-            "hostname": "VS205",
-            "size": "M",
-            "subnet": "V",
-            "ip": "10.0.0.27",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
             "hostname": "CS203",
             "size": "M",
             "subnet": "C",
@@ -909,32 +896,6 @@
             ]
           },
           {
-            "hostname": "CS205",
-            "size": "M",
-            "subnet": "C",
-            "ip": "10.0.2.30",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "CS206",
-            "size": "M",
-            "subnet": "C",
-            "ip": "10.0.2.31",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
             "hostname": "KS203",
             "size": "M",
             "subnet": "K",
@@ -962,19 +923,6 @@
                 "name": "DHCP Database",
                 "diskSizeGB": 10,
                 "letter": "E"
-              }
-            ]
-          },
-          {
-            "hostname": "KS205",
-            "size": "M",
-            "subnet": "K",
-            "ip": "10.0.1.34",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
               }
             ]
           }
