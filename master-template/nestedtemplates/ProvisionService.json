@@ -342,7 +342,7 @@
           "ZoneFile"  : "Split.com.dns",
           "DynamicUpdate" : "NonsecureAndSecure",
           "TransferType" : "Specific",
-          "PrimaryServer" : "KH178",
+          "PrimaryServer" : "KH178",          
           "PrimaryServerIP" : "10.0.1.10",
           "SecondaryServer" : "CH178",
           "SecondaryServerIP" : ["10.0.2.10", "10.0.1.8", "10.0.2.8"]
