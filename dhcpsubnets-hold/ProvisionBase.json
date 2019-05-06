@@ -1,0 +1,504 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": ""
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },
+    "domainAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": ""
+    },
+    "domainname": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosName": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    },
+    "domainNetbiosNameDMZ": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": ""
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "master",
+    "domainName": "[parameters('domainName')]",
+    "domainNetbiosName": "[parameters('domainNetbiosName')]",
+    "domainNameDMZ": "[parameters('domainNameDMZ')]",
+    "domainNetbiosNameDMZ": "[parameters('domainNetbiosNameDMZ')]",
+    "location": "[resourceGroup().location]",
+    "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+    "AutomationAccount" : "[concat('DSCAccount', resourcegroup().name)]",
+    "base64String" : "[base64(resourcegroup().name)]",
+    "Thumbprint" : "[resourcegroup().name]",
+    "virtualNetworkName": "[concat(variables('templatePrefix'), '-vn')]",
+    "addressPrefix": "10.0.0.0/16",
+    "VSubnetPrefix": "10.0.0.0/24",
+    "KSubnetPrefix": "10.0.1.0/24",
+    "CSubnetPrefix": "10.0.2.0/24",
+    "KDMZSubnetPrefix": "10.0.3.0/24",
+    "CDMZSubnetPrefix": "10.0.4.0/24",
+    "KDHCPSubnetPrefix": "10.0.5.0/24",
+    "CDHCPSubnetPrefix": "10.0.6.0/24",
+    "VNSGName": "[concat(variables('templatePrefix'), '-vnsg')]",
+    "KNSGName": "[concat(variables('templatePrefix'), '-knsg')]",
+    "CNSGName": "[concat(variables('templatePrefix'), '-cnsg')]",
+    "CDMZNSGName": "[concat(variables('templatePrefix'), '-cdmznsg')]",
+    "KDMZNSGName": "[concat(variables('templatePrefix'), '-kdmznsg')]",
+    "KDHCPNSGName": "[concat(variables('templatePrefix'), '-kdhcpnsg')]",
+    "CDHCPNSGName": "[concat(variables('templatePrefix'), '-cdhcpnsg')]",
+    "VSubnetName": "vs",
+    "KSubnetName": "ks",
+    "CSubnetName": "cs",
+    "CDMZSubnetName": "cdmz",
+    "KDMZSubnetName": "kdmz",
+    "KDHCPSubnetName": "kdhcp",
+    "CDHCPSubnetName": "cdhcp",
+    "dc1VMName": "VD201",
+    "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2VMName": "KD201",
+    "dc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dc2VMName'), '-nic')]",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3VMName": "CD201",
+    "dc3NicName": "[concat(variables('templatePrefix'), '-' , variables('dc3VMName'), '-nic')]",
+    "dc3NicIPAddress": "10.0.2.5",
+    "dmzdc1VMName": "KDZ201",
+    "dmzdc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc1VMName'), '-nic')]",
+    "dmzdc1NicIPAddress": "10.0.3.5",
+    "dmzdc2VMName": "CDZ201",
+    "dmzdc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc2VMName'), '-nic')]",
+    "dmzdc2NicIPAddress": "10.0.4.5",
+    "subnets": [
+      {
+        "name": "[variables('VSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('VSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('KSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('KSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('KNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('CSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('CSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('KDMZSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('KDMZSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('KDMZNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('CDMZSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('CDMZSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CDMZNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('KDHCPSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('KDHCPSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('KDHCPNSGName'))]"
+          }
+        }
+      },
+      {
+        "name": "[variables('CDHCPSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('CDHCPSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CDHCPNSGName'))]"
+          }
+        }
+      }
+    ]
+  },
+  "resources": [
+   
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('VNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('VSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "Tcp",
+              "destinationPortRange": "3389",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('KNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('CNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('KDMZNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KDMZSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('CDMZNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CDMZSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": []
+      }
+    },    
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('KDHCPNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KDHCPSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('CDHCPNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CDHCPSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base"        
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('VNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('KNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('CNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('CDMZNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('KDMZNSGName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": "[variables('subnets')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountNamePrefix')]",
+      "apiVersion": "2016-01-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base"       
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "properties": {}
+    },
+    {
+      "name": "[variables('dc1NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('VSubnetName') ]"
+      },
+      "comments": "This will be your file server nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('VSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dc1NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dc2NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KSubnetName') ]"
+      },
+      "comments": "Replica DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('KSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dc2NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dc3NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CSubnetName') ]"
+      },
+      "comments": "Replica DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('CSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dc3NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dmzdc1NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('KDMZSubnetName') ]"
+      },
+      "comments": "Primary DMZ DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('KDMZSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dmzdc1NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('dmzdc2NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('CDMZSubnetName') ]"
+      },
+      "comments": "Replica DMZ DC nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('CDMZSubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('dmzdc2NicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('AutomationAccount')]",
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2015-10-31",
+      "location": "East US 2",
+      "comments": "Automation account",           
+      "tags": {
+        "Service": "Base"        
+      },
+      "properties": {
+        "sku": {
+          "name": "Basic"
+        }
+      },
+      "resources":
+      [
+        {
+          "name": "DomainAdminCredential",
+          "type": "credentials",
+          "apiVersion": "2015-10-31",
+          "dependsOn": [
+            "[variables('AutomationAccount')]"
+          ],
+          "properties": {
+            "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('domainAdminUsername'))]",
+            "Password": "[parameters('adminPassword')]",            
+            "description": "Domain administration Credential"
+          }
+        },
+        {
+          "name": "LocalAdminCredential",
+          "type": "credentials",
+          "apiVersion": "2015-10-31",
+          "dependsOn": [
+            "[variables('AutomationAccount')]"
+          ],
+          "properties": {
+            "UserName": "[concat(variables('domainNetbiosName'), '\\', parameters('adminUsername'))]",
+            "Password": "[parameters('adminPassword')]",            
+            "description": "Local administration Credential for Vms"
+          }
+        }
+
+      ]     
+    }
+  ],
+  "outputs": {}
+}
