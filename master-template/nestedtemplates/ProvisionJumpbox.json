@@ -283,7 +283,7 @@
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "storageProfile": {
-          "imageReference": "[variables('imageReference')['Windows10Desktop']",
+          "imageReference": "[variables('imageReference')['Windows10Desktop']]",
           "osDisk": {
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
