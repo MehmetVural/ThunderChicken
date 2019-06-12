@@ -283,7 +283,12 @@
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "storageProfile": {
-          "imageReference": "[variables('imageReference')['Windows10Desktop']]",
+          "imageReference": {
+            "publisher": "MicrosoftWindowsDesktop",
+            "offer": "Windows-10",
+            "sku": "rs5-pro",
+            "version": "latest"
+          },
           "osDisk": {
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
