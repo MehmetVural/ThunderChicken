@@ -195,7 +195,7 @@
     },
     "imageReference": {
       "Windows10Desktop" : {
-        "publisher": "MicrosoftWindogit swsDesktop",
+        "publisher": "MicrosoftWindowsDesktop",
         "offer": "Windows-10",
         "sku": "rs5-pro",
         "version": "latest"
