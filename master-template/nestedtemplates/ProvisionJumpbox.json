@@ -192,7 +192,22 @@
       "RetryCount": 600,
       "RetryIntervalSec": 60,
       "datadisks": []
+    },
+    "imageReference": {
+      "Windows10Desktop" : {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "Windows-10",
+        "sku": "rs5-pro",
+        "version": "latest"
+      },    
+      "Windows2016Server": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2016-Datacenter-smalldisk",
+        "version": "latest"
+      }
     }
+
   },
   "resources": [
     {
