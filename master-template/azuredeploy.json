@@ -184,7 +184,7 @@
         "Default"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "VM Settings",
         "description": "Builds virtual machine to T-Shirt size: Small: 1 or 2 cores Core, Medium:4 Core: Large: 8 Cores, Default: T-Shirt sizes defined in each service layer templates."
       }
     },       
@@ -197,7 +197,7 @@
         "Large-50GB" 
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "VM Settings",
         "description": "Configures size of each drives defined in service layers."
       }
     },       
@@ -209,7 +209,7 @@
         "Regular-127GB"        
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "VM Settings",
         "description": "Defines Windows OS disk size. Small is for development, Reguler is full capacity tests"
       }
     },       
@@ -222,7 +222,7 @@
         "Bs-Series"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "VM Settings",
         "description": "Defines Azure VM Series - CPU and memory optimization."
       }
     },    
@@ -241,7 +241,7 @@
         "2000"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "VM Settings",
         "description": "Daily Auto Shutdown schedule for each vms."
       }
     }
