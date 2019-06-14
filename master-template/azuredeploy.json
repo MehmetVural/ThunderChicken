@@ -137,42 +137,19 @@
         "description": "Indicates which service layer vms to build and prepare"
       }      
     },   
-    "InternalTest": {
+    "IncludeTestEnviornment": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "None",
       "allowedValues": [
-        "Yes",
-        "No"        
+        "Internal Test",
+        "External Test",
+        "DMZ Test"                
       ],
       "metadata": {
         "group": "Service Settings",
         "description": "Includes Internal Test Machines, windows desktop in each site"
       }      
-    },
-    "ExternalTest": {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"        
-      ],
-      "metadata": {
-        "group": "Service Settings",
-        "description": "Includes Separate Network, Client Domain, DC and Test Machine Box"
-      }      
-    },
-    "DMZTest": {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"        
-      ],
-      "metadata": {
-        "group": "Service Settings",
-        "description": "includes Load Balance and VPN Machines"
-      }      
-    },
+    },    
 
     "VirtualMachineSizes": {
       "type": "string",
