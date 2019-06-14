@@ -110,7 +110,7 @@
         "SQLandSCOM"
       ],
       "metadata": {
-        "group": "Shared Services Settings",
+        "group": "Service Settings",
         "description": "Indicates which service layer vms to build and prepare"
       }      
     },   
@@ -137,6 +137,43 @@
         "description": "Indicates which service layer vms to build and prepare"
       }      
     },   
+    "InternalTest": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"        
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "includes Internal Test Machines"
+      }      
+    },
+    "ExternalTest": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"        
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "includes External Domain and Machines"
+      }      
+    },
+    "DMZTest": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"        
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "includes External Domain and Machines"
+      }      
+    },
+
     "VirtualMachineSizes": {
       "type": "string",
       "defaultValue": "Small",
