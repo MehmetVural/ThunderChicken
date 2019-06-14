@@ -6,7 +6,7 @@
       "type": "string",
       "metadata": {
         "group": "Base Settings",
-        "description": "The name of the administrator account for each machine. 'domainadmin' and 'user', 'user_a', 'testuser' user accounts also will be created with sam epassword defined below. "
+        "description": "The name of the administrator account for each machine. 'domainadmin' and 'user', 'user_a', 'testuser'  also will be created at each domain defined below"
       },
       "defaultValue": "localadmin"
     },
@@ -101,7 +101,7 @@
         "description": "Domain Controller Functioning Level"
       }
     },
-    "SharedService": {
+    "ConfiguredSharedService": {
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
@@ -114,7 +114,7 @@
         "description": "Indicates which service layer vms to build and prepare"
       }      
     },   
-    "template": {
+    "BlankService": {
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
@@ -254,6 +254,7 @@
     "domainNameDMZ": "DomainDmz.com",
     "domainNetbiosNameDMZ": "DomainDmz",
     "domainAdminUsername" : "domainadmin",    
+    "template" : "[parameters('BlankService')]",
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
@@ -420,7 +421,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'UEM'), equals(parameters('template'), 'Skype') )]",
+      "condition": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(variables('template'), 'Exchange'), equals(variables('template'), 'UEM'), equals(variables('template'), 'Skype') )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -468,10 +469,10 @@
       }
     },
     {
-      "name": "[concat('Provisioning', parameters('template'))]",
+      "name": "[concat('Provisioning', variables('template'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[not(equals(parameters('template'), 'None'))]",
+      "condition": "[not(equals(variables('template'), 'None'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -522,7 +523,7 @@
             "value": "[parameters('VMSeries')]"
           }, 
           "template": {
-            "value": "[parameters('template')]"
+            "value": "[variables('template')]"
           },
           "AutoShutdown": {
             "value": "[parameters('AutoShutdown')]"
@@ -534,7 +535,7 @@
       "name": "ProvisioningSQLFull",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
+      "condition": "[or(equals(parameters('ConfiguredSharedService'), 'SQLOnly'),equals(parameters('ConfiguredSharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -597,7 +598,7 @@
       "name": "ConfigureSQL",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[or(equals(parameters('SharedService'), 'SQLOnly'),equals(parameters('SharedService'), 'SQLandSCOM'))]",
+      "condition": "[or(equals(parameters('ConfiguredSharedService'), 'SQLOnly'),equals(parameters('ConfiguredSharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQLFull')]"        
       ],
@@ -645,7 +646,7 @@
       "name": "ProvisioningSCOMFull",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
+      "condition": "[equals(parameters('ConfiguredSharedService'), 'SQLandSCOM')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -708,7 +709,7 @@
       "name": "ConfigureSCOM",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('SharedService'), 'SQLandSCOM')]",
+      "condition": "[equals(parameters('ConfiguredSharedService'), 'SQLandSCOM')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOMFull')]"        
       ],
