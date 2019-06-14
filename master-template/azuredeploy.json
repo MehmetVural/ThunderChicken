@@ -70,7 +70,7 @@
         "No"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "Domain Settings",
         "description": "Indicates wheter or not include Domain Controller in this deployment"
       }
     },
@@ -82,7 +82,7 @@
         "No"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "Domain Settings",
         "description": "Indicates wheter or not include DMZ zone Domain  in this deployment"
       }
     },
@@ -97,7 +97,7 @@
         "Win2008"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "Domain Settings",
         "description": "Domain Controller Functioning Level"
       }
     },
@@ -110,7 +110,7 @@
         "SQLandSCOM"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "Shared Services Settings",
         "description": "Indicates which service layer vms to build and prepare"
       }      
     },   
@@ -133,7 +133,7 @@
         "Skype"
       ],
       "metadata": {
-        "group": "Template Settings",
+        "group": "Service Settings",
         "description": "Indicates which service layer vms to build and prepare"
       }      
     },   
