@@ -6,7 +6,7 @@
       "type": "string",
       "metadata": {
         "group": "Base Settings",
-        "description": "The name of the administrator account of the new VMs and Domain"
+        "description": "The name of the administrator account for each machine. 'domainadmin' and 'user', 'user_a', 'testuser' user accounts also will be created with sam epassword defined below. "
       },
       "defaultValue": "localadmin"
     },
@@ -14,7 +14,7 @@
       "type": "securestring",
       "metadata": {
         "group": "Base Settings",
-        "description": "The password for the administrator account of the new VMs and Domains"
+        "description": "Password for 'localadmin', 'domainadmin', 'user', 'user_a', 'testuser'"
       }
     },
     "ArtifactsLocation": {
@@ -62,7 +62,7 @@
       }
     }, 
 
-    "deployDomincontrollers": {
+    "deployDomain": {
       "type": "string",
       "defaultValue": "Yes",
       "allowedValues": [
@@ -74,7 +74,7 @@
         "description": "Indicates wheter or not include Domain Controller in this deployment"
       }
     },
-    "deployDomincontrollersDMZ": {
+    "deployDomainDMZ": {
       "type": "string",
       "defaultValue": "No",
       "allowedValues": [
@@ -146,7 +146,7 @@
       ],
       "metadata": {
         "group": "Service Settings",
-        "description": "includes Internal Test Machines"
+        "description": "Includes Internal Test Machines, windows desktop in each site"
       }      
     },
     "ExternalTest": {
@@ -158,7 +158,7 @@
       ],
       "metadata": {
         "group": "Service Settings",
-        "description": "includes External Domain and Machines"
+        "description": "Includes Separate Network, Client Domain, DC and Test Machine Box"
       }      
     },
     "DMZTest": {
@@ -170,7 +170,7 @@
       ],
       "metadata": {
         "group": "Service Settings",
-        "description": "includes External Domain and Machines"
+        "description": "includes Load Balance and VPN Machines"
       }      
     },
 
@@ -368,7 +368,7 @@
       "name": "ProvisioningDomains",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomincontrollers'), 'Yes')]",
+      "condition": "[equals(parameters('deployDomain'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -420,7 +420,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[ or( equals(parameters('deployDomincontrollersDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'UEM'), equals(parameters('template'), 'Skype') )]",
+      "condition": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(parameters('template'), 'Exchange'), equals(parameters('template'), 'UEM'), equals(parameters('template'), 'Skype') )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
