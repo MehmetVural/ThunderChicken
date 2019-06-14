@@ -141,6 +141,7 @@
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
+        "None",
         "Internal Test",
         "External Test",
         "DMZ Test"                
@@ -232,6 +233,7 @@
     "domainNetbiosNameDMZ": "DomainDmz",
     "domainAdminUsername" : "domainadmin",    
     "template" : "[parameters('BlankService')]",
+    "SharedService" : "[parameters('ConfiguredSharedService')]",
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
@@ -512,7 +514,7 @@
       "name": "ProvisioningSQLFull",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[or(equals(parameters('ConfiguredSharedService'), 'SQLOnly'),equals(parameters('ConfiguredSharedService'), 'SQLandSCOM'))]",
+      "condition": "[or(equals(variables('SharedService'), 'SQLOnly'),equals(variables('SharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -575,7 +577,7 @@
       "name": "ConfigureSQL",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[or(equals(parameters('ConfiguredSharedService'), 'SQLOnly'),equals(parameters('ConfiguredSharedService'), 'SQLandSCOM'))]",
+      "condition": "[or(equals(variables('SharedService'), 'SQLOnly'),equals(variables('SharedService'), 'SQLandSCOM'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSQLFull')]"        
       ],
@@ -623,7 +625,7 @@
       "name": "ProvisioningSCOMFull",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('ConfiguredSharedService'), 'SQLandSCOM')]",
+      "condition": "[equals(variables('SharedService'), 'SQLandSCOM')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -686,7 +688,7 @@
       "name": "ConfigureSCOM",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('ConfiguredSharedService'), 'SQLandSCOM')]",
+      "condition": "[equals(variables('SharedService'), 'SQLandSCOM')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOMFull')]"        
       ],
