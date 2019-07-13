@@ -137,19 +137,30 @@
         "description": "Indicates which service layer vms to build and prepare"
       }
     },
-    "IncludeTestEnviornment": {
+    "InternalTestEnvironment": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "No",
       "allowedValues": [
-        "None",
-        "Internal Test",
-        "External Test"        
+        "Yes",
+        "No"   
       ],
       "metadata": {
         "group": "Service Settings",
         "description": "Includes Internal Test Machines, windows desktop in each site"
       }      
-    },    
+    },
+    "ExternalTestEnvironment": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"                
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "Includes External network, domain and win 10 test machine"
+      }      
+    },        
 
     "VirtualMachineSizes": {
       "type": "string",
@@ -226,7 +237,8 @@
   "variables": {    
     "location": "[resourceGroup().location]",    
     "deployJumpBoxTemplate":"[parameters('deployJumpbox')]",
-    "IncludeTestEnviornment" : "[parameters('IncludeTestEnviornment')]", 
+    "InternalTestEnvironment" : "[parameters('InternalTestEnvironment')]",
+    "ExternalTestEnvironment" : "[parameters('ExternalTestEnvironment')]",  
     "domainName": "Domain.com",
     "domainNetbiosName": "Domain",
     "domainNameDMZ": "DomainDmz.com",
@@ -254,7 +266,7 @@
     "VSubnetPrefix": "10.0.0.0/24",
     "KSubnetPrefix": "10.0.1.0/24",
     "CSubnetPrefix": "10.0.2.0/24",
-    "_conditionfordeploymentDMZ": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(variables('template'), 'UEM'), equals(variables('IncludeTestEnviornment'), 'External Test') )]",
+    "_conditionfordeploymentDMZ": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(variables('template'), 'UEM'), equals(variables('ExternalTestEnvironment'), 'Yes') )]",
 
     "_conditionForLoadbalancing": "[ or( equals(variables('template'), 'Skype'), equals(variables('template'), 'Exchange')  )]",
 
@@ -615,7 +627,7 @@
       "name": "ProvisioningInternalTest",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(variables('IncludeTestEnviornment'), 'Internal Test')]",
+      "condition": "[equals(variables('InternalTestEnvironment'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -678,7 +690,7 @@
       "name": "ProvisioningExternalTest",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(variables('IncludeTestEnviornment'), 'External Test')]",
+      "condition": "[equals(variables('ExternalTestEnvironment'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
