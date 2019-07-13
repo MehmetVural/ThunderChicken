@@ -673,26 +673,7 @@
           }
         }
       }
-    },   
-    {
-      "name": "ProvisioningLoadBalancing",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",      
-      "condition": "[equals(parameters('deployJumpbox'), 'Yes')]",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('loadBalancingTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {          
-          "ConfigData" : { 
-            "value" : "[variables('ConfigData').LoadBalancing]"
-          }
-
-        }
-      }
-    },          
+    },
     {
       "name": "ProvisioningExternalTest",
       "type": "Microsoft.Resources/deployments",
