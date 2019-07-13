@@ -47,7 +47,7 @@
     },
     "enterpriseGithubUsername": {
       "type": "string",
-      "defaultValue": "mvural",   
+      "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "UserName for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -55,7 +55,7 @@
     },  
     "enterpriseGithubToken": {
       "type": "securestring",
-      "defaultValue": "f76729f7f0491b411a3cf8be02ec19062f8262d4",   
+      "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Token for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
