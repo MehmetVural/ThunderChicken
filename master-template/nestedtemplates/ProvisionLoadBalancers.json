@@ -413,7 +413,7 @@
         ]
       },
       {     
-        "Name" : "KDMZ1",
+        "Name" : "KDMZPublic",
         "Site" : "kdmz",
         "Type" : "Public",          
         "SKU"  : "Basic",
@@ -468,7 +468,7 @@
         ]
       },          
       {     
-        "Name" : "CDMZ1",
+        "Name" : "CDMZPublic",
         "Site" : "cdmz",
         "Type" : "Public",          
         "SKU"  : "Basic",
