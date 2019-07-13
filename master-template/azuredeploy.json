@@ -243,7 +243,7 @@
     "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
     "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",
     "externalTestTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionExternalTest.json', parameters('ArtifactsLocationSasToken'))]",
-    "loadBalancingTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionLoadBalancing.json', parameters('ArtifactsLocationSasToken'))]",
+    "loadBalancingTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionLoadBalancers.json', parameters('ArtifactsLocationSasToken'))]",
     "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]",
     "scomTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSCOM.json', parameters('ArtifactsLocationSasToken'))]",
     
