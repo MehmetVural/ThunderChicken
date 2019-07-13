@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "templatePrefix": "master",
+    "publicIPAddresses" : 
+    [
+      {
+        "Name" : "publicIpExchangeEdgeKDMZ",        
+        "Site" : "KDMZ",
+        "ipAddress": "40.80.157.185",
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 4,
+        "dnsSettings": {            
+          "domainNameLabel": "[concat('exchangeedgekdmz', uniqueString(resourceGroup().id))]"       
+         }        
+      },
+      {
+        "Name" : "publicIpSkypeEdgeKDMZ", 
+        "Site" : "KDMZ",       
+        "ipAddress": "40.80.157.186",
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 4,
+        "dnsSettings": {            
+          "domainNameLabel": "[concat('skypeedgekdmz', uniqueString(resourceGroup().id))]"       
+         }        
+      },
+      {
+        "Name" : "publicIpExchangeEdgeCDMZ",
+        "Site" : "CDMZ",        
+        "ipAddress": "40.80.157.187",
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 4,
+        "dnsSettings": {            
+          "domainNameLabel": "[concat('exchangeedgecdmz', uniqueString(resourceGroup().id))]"
+         }        
+      },
+      {
+        "Name" : "publicIpSkypeEdgeCDMZ", 
+        "Site" : "CDMZ",       
+        "ipAddress": "40.80.157.188",
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 4,
+        "dnsSettings": {            
+          "domainNameLabel": "[concat('skypeedgecdmz', uniqueString(resourceGroup().id))]"       
+         }        
+      }
+    ]
+  },
+  "resources": [ 
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2019-02-01",
+      "name": "[concat(variables('templatePrefix'), '-' , variables('publicIPAddresses')[copyIndex()].Name)]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Service": "PublicIPAddresses",
+        "Site": "[variables('publicIPAddresses')[copyIndex()].Site]"
+      },
+      "copy": {
+        "name": "publicIpLoop",
+        "count": "[length(variables('publicIPAddresses'))]"
+      },
+      "sku": {
+          "name": "Basic"
+      },
+      "properties": {  
+          "provisioningState": "Succeeded",
+          "publicIPAddressVersion": "[variables('publicIPAddresses')[copyIndex()].publicIPAddressVersion]",
+          "publicIPAllocationMethod": "[variables('publicIPAddresses')[copyIndex()].publicIPAllocationMethod]",
+          "idleTimeoutInMinutes":  "[variables('publicIPAddresses')[copyIndex()].idleTimeoutInMinutes]",
+          "dnsSettings": "[variables('publicIPAddresses')[copyIndex()].dnsSettings]",
+          "ipTags": []
+      }
+    }  
+    
+  ],
+  "outputs": {}
+}

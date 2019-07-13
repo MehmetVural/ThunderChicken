@@ -194,13 +194,13 @@
       "datadisks": []
     },
     "imageReference": {
-      "Windows10Desktop" : {
+      "Windows10" : {
         "publisher": "MicrosoftWindowsDesktop",
         "offer": "Windows-10",
         "sku": "rs5-pro",
         "version": "latest"
       },    
-      "Windows2016Server": {
+      "Windows2016": {
         "publisher": "MicrosoftWindowsServer",
         "offer": "WindowsServer",
         "sku": "2016-Datacenter-smalldisk",
@@ -283,12 +283,7 @@
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "2016-Datacenter-smalldisk",
-            "version": "latest"
-          },
+          "imageReference": "[variables('imageReference')['Windows10']]",
           "osDisk": {
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
@@ -361,6 +356,7 @@
                 "domainName": "[variables('vmDscSettings').domainName]",
                 "dnsServer": "[variables('vmDscSettings').dns]",
                 "dataDisks": "[string(variables('vmDscSettings').datadisks)]",
+                "joinDomain" : true,
                 "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
                 "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]", 
                 "retryCount": "[int(variables('vmDscSettings').RetryCount)]",

@@ -16,6 +16,25 @@
         "group": "Template settings",
         "description": "The password for the administrator account of the new VMs and Domain"
       }
+    }, 
+    "ArtifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/CIThunderChicken/ThunderChicken/servicemodular/service-template",
+      "metadata": {
+        "group": "Template settings",
+        "description": "Location of the artifacts"
+      }
+    },
+    "ArtifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
     },
     "domainAdminUsername": {
       "type": "string",
@@ -62,6 +81,7 @@
     "domainNetbiosNameDMZ": "[parameters('domainNetbiosNameDMZ')]",
     "location": "[resourceGroup().location]",
     "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+
     "AutomationAccount" : "[concat('DSCAccount', resourcegroup().name)]",
     "base64String" : "[base64(resourcegroup().name)]",
     "Thumbprint" : "[resourcegroup().name]",
@@ -97,6 +117,11 @@
     "dmzdc2VMName": "CDZ201",
     "dmzdc2NicName": "[concat(variables('templatePrefix'), '-' , variables('dmzdc2VMName'), '-nic')]",
     "dmzdc2NicIPAddress": "10.0.4.5",
+    "dnsServers" : [  
+      "[variables('dc1NicIPAddress')]",
+      "[variables('dc2NicIPAddress')]",
+      "[variables('dc3NicIPAddress')]"
+    ],
     "subnets": [
       {
         "name": "[variables('VSubnetName')]",
@@ -144,9 +169,28 @@
         }
       }
     ]
+
   },
-  "resources": [
-   
+  "resources": [     
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[concat(variables('templatePrefix'), '-', variables('subnets')[copyIndex()].Name, '-avset')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('subnets')[copyIndex()].Name ]"
+      },
+      "copy": {
+        "name": "avsetLoop",
+        "count": "[length( variables('subnets')  )]"
+      },
+      "properties": {
+        "platformFaultDomainCount": 2,
+        "platformUpdateDomainCount": 2,       
+        "managed": true
+      }
+    },  
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -246,7 +290,7 @@
           "addressPrefixes": [
             "[variables('addressPrefix')]"
           ]
-        },
+        },        
         "subnets": "[variables('subnets')]"
       }
     },
@@ -273,7 +317,7 @@
         "Service": "Base",
         "Site": "[ variables('VSubnetName') ]"
       },
-      "comments": "This will be your file server nic",
+      "comments": "DC server nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
       ],
@@ -301,7 +345,7 @@
         "Service": "Base",
         "Site": "[ variables('KSubnetName') ]"
       },
-      "comments": "Replica DC nic",
+      "comments": "DC server nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
       ],
@@ -329,7 +373,7 @@
         "Service": "Base",
         "Site": "[ variables('CSubnetName') ]"
       },
-      "comments": "Replica DC nic",
+      "comments": "DC server nic",
       "dependsOn": [
         "[variables('virtualNetworkName')]"
       ],

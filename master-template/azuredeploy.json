@@ -35,7 +35,7 @@
     }, 
     "deployJumpbox": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -47,7 +47,7 @@
     },
     "enterpriseGithubUsername": {
       "type": "string",
-      "defaultValue": "",   
+      "defaultValue": "mvural",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "UserName for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -55,7 +55,7 @@
     },  
     "enterpriseGithubToken": {
       "type": "securestring",
-      "defaultValue": "",   
+      "defaultValue": "f76729f7f0491b411a3cf8be02ec19062f8262d4",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Token for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -64,7 +64,7 @@
 
     "deployDomain": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -116,7 +116,7 @@
     },   
     "BlankService": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "Skype",
       "allowedValues": [
         "None",
         "AD-DS",
@@ -125,26 +125,25 @@
         "SCOM",
         "SharedSQL",
         "FileServer",
-        "DHCP",       
+        "DHCP",
         "SharePoint",
         "OOS",
         "Exchange",
-        "UEM",        
+        "UEM",
         "Skype"
       ],
       "metadata": {
         "group": "Service Settings",
         "description": "Indicates which service layer vms to build and prepare"
-      }      
-    },   
+      }
+    },
     "IncludeTestEnviornment": {
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
         "None",
         "Internal Test",
-        "External Test",
-        "DMZ Test"                
+        "External Test"        
       ],
       "metadata": {
         "group": "Service Settings",
@@ -226,7 +225,8 @@
   },
   "variables": {    
     "location": "[resourceGroup().location]",    
-    "deployJumpBoxTemplate":"[parameters('deployJumpbox')]", 
+    "deployJumpBoxTemplate":"[parameters('deployJumpbox')]",
+    "IncludeTestEnviornment" : "[parameters('IncludeTestEnviornment')]", 
     "domainName": "Domain.com",
     "domainNetbiosName": "Domain",
     "domainNameDMZ": "DomainDmz.com",
@@ -237,13 +237,74 @@
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
+    "publicIpTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionPublicIPs.json', parameters('ArtifactsLocationSasToken'))]",
+    "loadBalancersTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionLoadBalancers.json', parameters('ArtifactsLocationSasToken'))]",    
     "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",
     "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
     "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",
+    "externalTestTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionExternalTest.json', parameters('ArtifactsLocationSasToken'))]",
+    "loadBalancingTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionLoadBalancing.json', parameters('ArtifactsLocationSasToken'))]",
     "sqlTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSQL.json', parameters('ArtifactsLocationSasToken'))]",
-    "scomTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSCOM.json', parameters('ArtifactsLocationSasToken'))]"
+    "scomTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ConfigureSCOM.json', parameters('ArtifactsLocationSasToken'))]",
+    
+    "_Comment" : "trying to place all config data here at front.",
+    "VSubnetName": "vs",
+    "KSubnetName": "ks",
+    "CSubnetName": "cs",
+    "VSubnetPrefix": "10.0.0.0/24",
+    "KSubnetPrefix": "10.0.1.0/24",
+    "CSubnetPrefix": "10.0.2.0/24",
+    "_conditionfordeploymentDMZ": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(variables('template'), 'UEM'), equals(variables('IncludeTestEnviornment'), 'External Test') )]",
+
+    "_conditionForLoadbalancing": "[ or( equals(variables('template'), 'Skype'), equals(variables('template'), 'Exchange')  )]",
+
+    "ConfigData": {
+      "Domain" : {
+        "DomainGroups"  : [],
+        "DomainUsers"  : [
+          {
+            "UserName" : "user",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          },
+          {
+            "UserName" : "user_a",
+            "DomainGroups" : ["Account Operators"],
+            "LocalGroups" : ["Administrators"]
+          },
+          {
+            "UserName" : "testuser",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          }
+        ],
+      
+        "sites": [        
+          {
+            "name": "[toUpper(variables('KSubnetName'))]",
+            "prefix": "[variables('KSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('CSubnetName')))]"
+          },
+          {
+            "name": "[toUpper(variables('VSubnetName'))]",
+            "prefix": "[variables('VSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('VSubnetName')))]"
+          },
+          {
+            "name": "[toUpper(variables('CSubnetName'))]",
+            "prefix": "[variables('CSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('CSubnetName')),',',toUpper(variables('VSubnetName')))]"
+          }
+        ]
+      },
+      "LoadBalancing" : {
+       
+      }
+    }
+
   },
-  "resources": [    
+  "resources": [
+    
     {
       "name": "ProvisioningBase",
       "type": "Microsoft.Resources/deployments",
@@ -260,6 +321,12 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
           }, 
           "domainAdminUsername": {
             "value": "[variables('domainAdminUsername')]"
@@ -279,6 +346,38 @@
         }
       }
     },
+    {
+      "name": "ProvisioningPublicIPs",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",
+      "apiVersion": "2015-01-01",      
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('publicIpTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {}
+      }
+    },
+    {
+      "name": "ProvisionLoadBalancers",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",
+      "apiVersion": "2015-01-01",
+      "dependsOn" : [
+        "ProvisioningBase",
+        "ProvisioningPublicIPs"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('loadBalancersTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {}
+      }
+    },   
     {
       "name": "ProvisioningJumbBox",
       "type": "Microsoft.Resources/deployments",
@@ -321,14 +420,12 @@
           "ArtifactsLocationSasToken": {
             "value": "[parameters('ArtifactsLocationSasToken')]"
           },
-
           "enterpriseGithubUsername": {
             "value": "[parameters('enterpriseGithubUsername')]"            
           },  
           "enterpriseGithubToken": {
             "value": "[parameters('enterpriseGithubToken')]"           
-          }, 
-
+          },
           "DiskSizes": {
             "value": "[parameters('DiskSizes')]"
           },
@@ -391,6 +488,9 @@
           },          
           "AutoShutdown": {
             "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').Domain]"
           }
 
         }
@@ -400,7 +500,7 @@
       "name": "ProvisioningDomainsDMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(variables('template'), 'Exchange'), equals(variables('template'), 'UEM'), equals(variables('template'), 'Skype') )]",
+      "condition": "[equals(parameters('deployDomainDMZ'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -453,7 +553,8 @@
       "apiVersion": "2015-01-01",
       "condition": "[not(equals(variables('template'), 'None'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]",
+        "[if( or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))   , 'ProvisionLoadBalancers' ,  'ProvisioningBase')]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -510,6 +611,143 @@
         }
       }
     },    
+    {
+      "name": "ProvisioningInternalTest",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(variables('IncludeTestEnviornment'), 'Internal Test')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('serviceTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
+          "template": {
+            "value": "InternalTest"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    },   
+    {
+      "name": "ProvisioningLoadBalancing",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",      
+      "condition": "[equals(parameters('deployJumpbox'), 'Yes')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('loadBalancingTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {          
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').LoadBalancing]"
+          }
+
+        }
+      }
+    },          
+    {
+      "name": "ProvisioningExternalTest",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(variables('IncludeTestEnviornment'), 'External Test')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('externalTestTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "forestMode": {
+            "value": "[parameters('forestMode')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData')]"
+          }
+
+        }
+      }
+    },     
     {
       "name": "ProvisioningSQLFull",
       "type": "Microsoft.Resources/deployments",

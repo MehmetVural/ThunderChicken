@@ -125,19 +125,28 @@
     "KDMZSubnetName": "kdmz",  
     "CDMZSubnetName": "cdmz",
     "KDMZSubnetPrefix": "10.0.3.0/24",
-    "CDMZSubnetPrefix": "10.0.4.0/24",        
-    "sites": [
-      {
-        "name": "[toUpper(variables('KDMZSubnetName'))]",
-        "prefix": "[variables('KDMZSubnetPrefix')]",
-        "sitelink": "[concat(toUpper(variables('KDMZSubnetName')),',',toUpper(variables('CDMZSubnetName')))]"
-      },
-      {
-        "name": "[toUpper(variables('CDMZSubnetName'))]",
-        "prefix": "[variables('CDMZSubnetPrefix')]",
-        "sitelink": null
-      }
-    ],
+    "CDMZSubnetPrefix": "10.0.4.0/24",
+    
+    "ConfigData": {
+      "DomainUsers"  : [ 
+        "user",
+        "user_a",
+        "testuser"
+      ],
+      "DomainGroups"  : [],
+      "sites": [
+        {
+          "name": "[toUpper(variables('KDMZSubnetName'))]",
+          "prefix": "[variables('KDMZSubnetPrefix')]",
+          "sitelink": "[concat(toUpper(variables('KDMZSubnetName')),',',toUpper(variables('CDMZSubnetName')))]"
+        },
+        {
+          "name": "[toUpper(variables('CDMZSubnetName'))]",
+          "prefix": "[variables('CDMZSubnetPrefix')]",
+          "sitelink": null
+        }
+      ]
+    },    
     "datadisks": [     
       {              
         "name": "DirectoryLogs",
@@ -301,11 +310,11 @@
               "configurationArguments": {
                 "DiskSize": "[parameters('DiskSizes')]",
                 "DisksizeGB": "5",
+                "ConfigData"    : "[string(variables('ConfigData'))]",
                 "domainName": "[variables('domainName')]",
                 "domainNetbiosName": "[variables('domainNetbiosName')]",                
                 "dnsServer": "[variables('dc1NicIPAddress')]",
-                "dataDisks": "[string(variables('datadisks'))]",
-                "sites": "[string(variables('sites'))]",
+                "dataDisks": "[string(variables('datadisks'))]",                
                 "forestMode": "[variables('forestMode')]",
                 "RetryCount": "[variables('RetryCount')]",
                 "RetryIntervalSec": "[variables('RetryIntervalSec')]",
