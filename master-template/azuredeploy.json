@@ -163,7 +163,7 @@
     },
     "ReverseProxy": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"                
@@ -176,7 +176,7 @@
 
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Medium",
+      "defaultValue": "Small",
       "allowedValues": [
         "Small",
         "Medium",
@@ -190,7 +190,7 @@
     },       
     "DiskSizes": {
       "type": "string",
-      "defaultValue": "Medium-20GB",
+      "defaultValue": "Small-4GB",
       "allowedValues": [
         "Small-4GB",
         "Medium-20GB",
@@ -203,7 +203,7 @@
     },       
     "OSDiskSize": {
       "type": "string",
-      "defaultValue": "Regular-127GB",
+      "defaultValue": "Small-30GB",
       "allowedValues": [
         "Small-30GB",
         "Regular-127GB"        
@@ -267,9 +267,9 @@
     "loadBalancersTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionLoadBalancers.json', parameters('ArtifactsLocationSasToken'))]",    
     "applicationGatewayTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionApplicationGateWay.json', parameters('ArtifactsLocationSasToken'))]",    
     
-    "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",
-    
-    "domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
+    "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",    
+    "_domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
+
     "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",
     "externalTestTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionExternalTest.json', parameters('ArtifactsLocationSasToken'))]",
     
@@ -350,7 +350,7 @@
             "HostName" : "KD201",
             "Site"    :  "[variables('KSubnetName')]",
             "Primary" : true,
-            "FileShare"  : false,
+            "FileShare"  : true,
             "Ip" :  "10.0.1.5"
           },
           {
@@ -1466,7 +1466,7 @@
       }
     },
     {
-      "name": "ProvisioningDomains",
+      "name": "ProvisioningDomain",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "condition": "[equals(parameters('deployDomain'), 'Yes')]",
@@ -1507,10 +1507,10 @@
       }
     },   
     {
-      "name": "ProvisioningDomainsDMZ0",
+      "name": "ProvisioningDomain-DMZ",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomainDMZ'), 'Yes1')]",
+      "condition": "[equals(parameters('deployDomainDMZ'), 'Yes')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
       ],
@@ -1532,72 +1532,15 @@
           },
           "ArtifactsLocationSasToken": {
             "value": "[parameters('ArtifactsLocationSasToken')]"
-          },
-         
+          },         
           "DiskSizes": {
             "value": "[parameters('DiskSizes')]"
-          },
-                      
+          },                      
           "AutoShutdown": {
             "value": "[parameters('AutoShutdown')]"
           },
           "ConfigData" : { 
             "value" : "[variables('ConfigData').DMZDomain]"
-          }
-
-        }
-      }
-    },
-    {
-      "name": "ProvisioningDomainsDMZ",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "condition": "[equals(parameters('deployDomainDMZ'), 'Yes1')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('domainDMZTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminUsername": {
-            "value": "[variables('domainAdminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "ArtifactsLocation": {
-            "value": "[parameters('ArtifactsLocation')]"
-          },
-          "ArtifactsLocationSasToken": {
-            "value": "[parameters('ArtifactsLocationSasToken')]"
-          },
-          "VirtualMachineSizes": {
-            "value": "[parameters('VirtualMachineSizes')]"
-          },
-          "DiskSizes": {
-            "value": "[parameters('DiskSizes')]"
-          },
-          "VMSeries": {
-            "value": "[parameters('VMSeries')]"
-          },         
-          "domainname": {
-            "value": "[variables('domainnameDMZ')]"
-          },
-          "domainNetbiosName": {
-            "value": "[variables('domainNetbiosNameDMZ')]"
-          },
-          "forestMode": {
-            "value": "[parameters('forestMode')]"
-          },          
-          "AutoShutdown": {
-            "value": "[parameters('AutoShutdown')]"
-          },
-          "ConfigData" : { 
-            "value" : "[variables('ConfigData').PrimaryDomain]"
           }
         }
       }
