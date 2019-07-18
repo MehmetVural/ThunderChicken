@@ -134,7 +134,8 @@
         "Exchange",
         "UEM",        
         "Skype",
-        "InternalTest"
+        "InternalTest",
+        "ExternalTest"
       ],
       "metadata": {
         "group": "Lab Enviornment Template",
@@ -370,11 +371,16 @@
           "SecondaryServer" : "CH178",
           "SecondaryServerIP" : ["10.0.2.10", "10.0.1.8", "10.0.2.8"]
         }
-
       },
       "NPS": {
         "prefix": "nps",
-        "ConfigData": {},
+        "ConfigData": {
+          "WindowsFeatures"  : ["RemoteAccess", "DirectAccess-VPN", "RSAT-RemoteAccess"],
+          "VPNServers"       : [
+            "KS210",
+            "CS210"
+          ]
+        },
         "imageReference" : "Windows2016",
         "servers": [
           {
@@ -399,6 +405,36 @@
             "loadBalancerBackendAddressPools": [],
             "joinDomain" : true,
             "ip": "10.0.2.7",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },          
+          {
+            "hostname": "KS210",
+            "size": "S",
+            "subnet": "KD",
+            "loadBalancerBackendAddressPools": [],
+            "joinDomain" : false,
+            "ip": "10.0.3.10",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },          
+          {
+            "hostname": "CS210",
+            "size": "S",
+            "subnet": "CD",
+            "loadBalancerBackendAddressPools": [],
+            "joinDomain" : false,
+            "ip": "10.0.4.10",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -1903,7 +1939,7 @@
         ]
       },
       "InternalTest": {
-        "prefix": "test",
+        "prefix": "internal",
         "ConfigData": {},
         "imageReference" : "Windows10",
         "servers": [
@@ -1953,60 +1989,102 @@
             ]
           }
         ]
+      },
+      "ExternalTest": {
+        "prefix": "external",
+        "ConfigData": {},
+        "imageReference" : "Windows10",
+        "servers": [
+          {
+            "hostname": "CL210",
+            "size": "S",
+            "subnet": "E",   
+            "loadBalancerBackendAddressPools": [],
+            "joinDomain" : true,        
+            "ip": "10.1.0.6",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          }
+        ]
       }
     },
     "templatePrefix": "[variables('templates')[variables('template')].prefix]",
-    "mastertemplatePrefix": "master",    
+    "mastertemplatePrefix": "master", 
+    "externaltemplatePrefix": "external",    
     "availabilitySetsNameInternal" : "[concat(variables('mastertemplatePrefix'), '-avset-internal')]",
     "availabilitySetsNameExternal" : "[concat(variables('mastertemplatePrefix'), '-avset-external')]",
     "domainName": "[parameters('domainName')]",
     "domainNetbiosName": "[parameters('domainNetbiosName')]",
-    "domainNameDMZ": "[parameters('domainNameDMZ')]",
+    "domainNameDMZ": "[parameters('domainNameDMZ')]",    
     "domainNetbiosNameDMZ": "[parameters('domainNetbiosNameDMZ')]",
+    "domainNameClient": "Client.com",
+    "domainNetbiosNameClient": "Client",
     "RetryCount": 600,
     "RetryIntervalSec": 60,
     "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
     "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
+    "externalVirtualNetworkName": "[concat(variables('externaltemplatePrefix'), '-vn')]",
     "VSubnetName": "vs",
     "KSubnetName": "ks",
     "CSubnetName": "cs",
     "KDMZSubnetName": "kdmz",
     "CDMZSubnetName": "cdmz",
+    "ESubnetName": "es",
     "dc1NicIPAddress": "10.0.0.5",
     "dc2NicIPAddress": "10.0.1.5",
     "dc3NicIPAddress": "10.0.2.5",
     "dmzdc1NicIPAddress": "10.0.3.5",
     "dmzdc2NicIPAddress": "10.0.4.5",
+    "edcNicIPAddress": "10.1.0.5",
+
     "subnets": {
       "V": {
         "name": "[variables('VSubnetName')]",
         "domain": "[variables('domainName')]",
         "domainNetbiosName": "[variables('domainNetbiosName')]",
-        "dns": "[variables('dc1NicIPAddress')]"
+        "dns": "[variables('dc1NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
+        
       },
       "K": {
         "name": "[variables('KSubnetName')]",
         "domain": "[variables('domainName')]",
         "domainNetbiosName": "[variables('domainNetbiosName')]",
-        "dns": "[variables('dc2NicIPAddress')]"
+        "dns": "[variables('dc2NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
       },
       "C": {
         "name": "[variables('CSubnetName')]",
         "domain": "[variables('domainName')]",
         "domainNetbiosName": "[variables('domainNetbiosName')]",
-        "dns": "[variables('dc3NicIPAddress')]"
+        "dns": "[variables('dc3NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
       },
       "KD": {
         "name": "[variables('KDMZSubnetName')]",
         "domain": "[variables('domainNameDMZ')]",
         "domainNetbiosName": "[variables('domainNetbiosNameDMZ')]",
-        "dns": "[variables('dmzdc1NicIPAddress')]"        
+        "dns": "[variables('dmzdc1NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"        
       },
       "CD": {
         "name": "[variables('CDMZSubnetName')]",
         "domain": "[variables('domainNameDMZ')]",
         "domainNetbiosName": "[variables('domainNetbiosNameDMZ')]",
-        "dns": "[variables('dmzdc2NicIPAddress')]"
+        "dns": "[variables('dmzdc2NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
+      },
+      "E": {
+        "name": "[variables('ESubnetName')]",
+        "domain": "[variables('domainNameClient')]",
+        "domainNetbiosName": "[variables('domainNetbiosNameClient')]",
+        "dns": "[variables('edcNicIPAddress')]",
+        "virtualNetworkName" : "[variables('externalVirtualNetworkName')]"
       }
     },
     "imageReference2": {
@@ -2072,8 +2150,7 @@
       "Large-50GB": 50
     }    
   },
-  "resources": [
-    
+  "resources": [    
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
@@ -2094,7 +2171,7 @@
             "name": "[concat(variables('templatePrefix'), '-', variables('templates')[variables('template')].servers[copyIndex()].hostname, '-', 'ipconfig', add(copyIndex(), 1))]",
             "properties": {
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].Name)]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].virtualNetworkName,  variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].Name)]"
               },
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[if(equals('Static', 'Static'), variables('templates')[variables('template')].servers[copyIndex()].ip, json('null'))]",
@@ -2125,7 +2202,7 @@
       "properties": {
         "availabilitySet": 
         {
-          "id" : "[resourceId('Microsoft.Compute/availabilitySets', concat(variables('mastertemplatePrefix'), '-', variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].Name, '-avset'))]"          
+          "id" : "[resourceId('Microsoft.Compute/availabilitySets', concat(variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].virtualNetworkName, '-', variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].Name, '-avset'))]"          
         },        
         "hardwareProfile": {
           "vmSize": "[if(not(equals(parameters('VirtualMachineSizes'), 'Default')), variables('virtualMachineSizeArraySeries')[parameters('VMSeries')][variables('virtualMachineSizesMap')[parameters('VirtualMachineSizes')]], variables('virtualMachineSizeArraySeries')[parameters('VMSeries')][variables('templates')[variables('template')].servers[copyIndex()].size])]"

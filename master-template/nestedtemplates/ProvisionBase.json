@@ -102,6 +102,11 @@
     "CSubnetName": "cs",
     "CDMZSubnetName": "cdmz",
     "KDMZSubnetName": "kdmz",
+
+    "AGSubnetName": "ag",
+    "AGSubnetPrefix": "10.0.10.0/24",
+    "AGNSGName": "[concat(variables('templatePrefix'), '-agnsg')]",
+
     "dc1VMName": "VD201",
     "dc1NicName": "[concat(variables('templatePrefix'), '-' , variables('dc1VMName'), '-nic')]",
     "dc1NicIPAddress": "10.0.0.5",
@@ -167,14 +172,24 @@
             "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('CDMZNSGName'))]"
           }
         }
+      },
+      {
+        "name": "[variables('AGSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('AGSubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('AGNSGName'))]"
+          }
+        }
       }
+      
     ]
 
   },
   "resources": [     
     {
       "type": "Microsoft.Compute/availabilitySets",
-      "name": "[concat(variables('templatePrefix'), '-', variables('subnets')[copyIndex()].Name, '-avset')]",
+      "name": "[concat(variables('virtualNetworkName'), '-', variables('subnets')[copyIndex()].Name, '-avset')]",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -272,6 +287,33 @@
     },
     {
       "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('AGNSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('AGSubnetName') ]"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-http80",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "Tcp",
+              "destinationPortRange": "80",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "80",
+              "destinationAddressPrefix": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[variables('location')]",
@@ -283,7 +325,8 @@
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('KNSGName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('CNSGName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('CDMZNSGName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('KDMZNSGName'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('KDMZNSGName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('AGNSGName'))]"
       ],
       "properties": {
         "addressSpace": {
