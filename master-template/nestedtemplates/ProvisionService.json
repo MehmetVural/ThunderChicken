@@ -119,7 +119,7 @@
     },
     "template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "Exchange",
       "allowedValues": [
         "None",
         "AD-DS",
@@ -159,11 +159,24 @@
         "group": "Template Settings",
         "description": "Daily Auto Shutdown time"
       }
-    }
+    },
+    "enabledPublic": {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        true,
+        false
+      ],
+      "metadata": {
+        "description": ""
+      }
+    }   
+
   },
   "variables": {
-    "template": "[parameters('template')]",
+    "template": "[parameters('template')]",    
     "location": "[resourceGroup().location]",
+    "publicLBName" : "[if(parameters('enabledPublic'), 'Public', '') ]",
     "templates": {
       "None": {
         "prefix": "blank",
@@ -1334,7 +1347,7 @@
             "subnet": "KD",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-KDMZ-loadbalancer', 'backendpoolExchEdgeKDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-KDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolExchEdgeKDMZ')]"                 
               }
             ],
             "ip": "10.0.3.48",
@@ -1353,7 +1366,7 @@
             "subnet": "KD",            
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-KDMZ-loadbalancer', 'backendpoolExchEdgeKDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-KDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolExchEdgeKDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1387,7 +1400,7 @@
             "subnet": "K",            
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-K-loadbalancer', 'backendpoolMailBoxK')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolMailBoxK')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1431,7 +1444,7 @@
             "subnet": "K",
             "loadBalancerBackendAddressPools": [
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-K-loadbalancer', 'backendpoolMailBoxK')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K',  '-loadbalancer'), 'backendpoolMailBoxK')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1475,7 +1488,7 @@
             "subnet": "CD",              
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-CDMZ-loadbalancer', 'backendpoolExchEdgeCDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-CDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolExchEdgeCDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1494,7 +1507,7 @@
             "subnet": "CD",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-CDMZ-loadbalancer', 'backendpoolExchEdgeCDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-CDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolExchEdgeCDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1528,7 +1541,7 @@
             "subnet": "C",            
             "loadBalancerBackendAddressPools": [
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-C-loadbalancer', 'backendpoolMailBoxC')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer'), 'backendpoolMailBoxC')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1572,7 +1585,7 @@
             "subnet": "C",              
             "loadBalancerBackendAddressPools": [
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-C-loadbalancer', 'backendpoolMailBoxC')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer'), 'backendpoolMailBoxC')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1750,7 +1763,7 @@
             "subnet": "KD",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-KDMZ-loadbalancer', 'backendpoolSkypeEdgeKDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-KDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolSkypeEdgeKDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1774,7 +1787,7 @@
             "subnet": "KD",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-KDMZ-loadbalancer', 'backendpoolSkypeEdgeKDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-KDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolSkypeEdgeKDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1798,7 +1811,7 @@
             "subnet": "K",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-K-loadbalancer', 'backendpoolSkypeK')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer'), 'backendpoolSkypeK')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1822,7 +1835,7 @@
             "subnet": "K",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-K-loadbalancer', 'backendpoolSkypeK')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer'), 'backendpoolSkypeK')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1846,7 +1859,7 @@
             "subnet": "CD",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-CDMZ-loadbalancer', 'backendpoolSkypeEdgeCDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-CDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolSkypeEdgeCDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1870,7 +1883,7 @@
             "subnet": "CD",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-CDMZ-loadbalancer', 'backendpoolSkypeEdgeCDMZ')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-CDMZ', variables('publicLBName'), '-loadbalancer'), 'backendpoolSkypeEdgeCDMZ')]"                 
               }
             ],
             "joinDomain" : false,
@@ -1894,7 +1907,7 @@
             "subnet": "C",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-C-loadbalancer', 'backendpoolSkypeC')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer'), 'backendpoolSkypeC')]"                 
               }
             ],
             "joinDomain" : true,
@@ -1918,7 +1931,7 @@
             "subnet": "C",
             "loadBalancerBackendAddressPools": [ 
               {
-                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'master-C-loadbalancer', 'backendpoolSkypeC')]"                 
+                "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer'), 'backendpoolSkypeC')]"                 
               }
             ],
             "joinDomain" : true,

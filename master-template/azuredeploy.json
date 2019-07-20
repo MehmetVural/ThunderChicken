@@ -35,7 +35,7 @@
     }, 
     "deployJumpbox": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -64,7 +64,7 @@
 
     "deployDomain": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -163,10 +163,10 @@
     },
     "ReverseProxy": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
-        "No"                
+        "No"
       ],
       "metadata": {
         "group": "Service Settings",
@@ -328,6 +328,9 @@
       "KDMZ-ApplicationGateway",
       "CDMZ-ApplicationGateway"
     ],
+    
+    "enabledPublicAG" : false,
+    "enabledPublicLB": false,
 
     "ConfigData": {
       "PrimaryDomain" : {
@@ -350,7 +353,7 @@
             "HostName" : "KD201",
             "Site"    :  "[variables('KSubnetName')]",
             "Primary" : true,
-            "FileShare"  : true,
+            "FileShare"  : false,
             "Ip" :  "10.0.1.5"
           },
           {
@@ -543,7 +546,8 @@
             }        
           }
         ],
-        "LoadBalancers"   :  [  
+        "enabledPublic" :  "[variables('enabledPublicLB')]",
+        "LoadBalancersInternal"   :  [  
           {     
             "Name" : "K",
             "Site" : "ks",        
@@ -741,7 +745,9 @@
                 }
               }          
             ]
-          },
+          }
+        ],
+        "LoadBalancersDMZ"   :  [  
           {
             "Name" : "KDMZ",     
             "Site" : "kdmz",
@@ -944,7 +950,9 @@
                 }
               }          
             ]
-          },
+          }
+        ],
+        "LoadBalancersPublic"   :  [  
           {     
             "Name" : "KDMZPublic",
             "Site" : "kdmz",
@@ -1082,6 +1090,7 @@
             }        
           }
         ],
+        "enabledPublic" : "[variables('enabledPublicAG')]",
         "ApplicationGateways": [
           { 
             "Name" : "[variables('ApplicationGatewayNames')[0]]",
@@ -1103,26 +1112,16 @@
             ],
             "frontendIPConfigurations": [
               {
-                "name": "Public",               
+                "name": "frontendIPConfig",               
                 "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
                 "properties": {                    
-                    "privateIPAllocationMethod": "Dynamic",
-                    "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('templatePrefix'), '-' , 'publicIp-RP-KDMZ')     )]"
-                    }
-                }
-              },
-              {
-                "name": "Private",                
-                "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
-                "properties": {                    
-                    "privateIPAddress": "10.0.10.5",
-                    "privateIPAllocationMethod": "Static",
-                    "subnet": {
-                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName'))]"
-                    }
+                   "privateIPAddress": "10.0.10.50",
+                   "privateIPAllocationMethod": "Static",
+                    "subnet": "[ if( variables('enabledPublicAG') , json('null'), json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName')) ,'\"}' ) )   )     ]",                    
+                    "publicIPAddress": "[ if( variables('enabledPublicAG') , json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/publicIPAddresses',  concat( variables('templatePrefix'),'-publicIp-RP-KDMZ')   ) ,'\"}' ) ),  json('null') )     ]"
                 }
               }
+             
             ],
             "frontendPorts": [
               {
@@ -1169,7 +1168,7 @@
                 "name": "appGatewayHttpListener",
                 "properties": {
                   "FrontendIpConfiguration": {                
-                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-',variables('ApplicationGatewayNames')[0], '-ag')), '/frontendIPConfigurations/Public')]"
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-',variables('ApplicationGatewayNames')[0], '-ag')), '/frontendIPConfigurations/frontendIPConfig')]"
                   },
                   "FrontendPort": {                
                     "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[0], '-ag')), '/frontendPorts/appGatewayFrontendPort')]"
@@ -1217,26 +1216,16 @@
             ],
             "frontendIPConfigurations": [
               {
-                "name": "Public",               
+                "name": "frontendIPConfig",               
                 "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
                 "properties": {                    
-                    "privateIPAllocationMethod": "Dynamic",
-                    "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('templatePrefix'), '-' , 'publicIp-RP-CDMZ')     )]"
-                    }
+                    "privateIPAddress": "10.0.10.60",
+                    "privateIPAllocationMethod": "Static",                    
+                    "subnet": "[ if( variables('enabledPublicAG') , json('null'), json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName')) ,'\"}' ) )   )     ]",
+                    "publicIPAddress": "[ if( variables('enabledPublicAG') , json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/publicIPAddresses',  concat( variables('templatePrefix'),'-publicIp-RP-CDMZ') ) ,'\"}' ) ),  json('null') )     ]"
                 }
-              },        
-              {
-                "name": "Private",                
-                "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
-                "properties": {                    
-                    "privateIPAddress": "10.0.10.6",
-                    "privateIPAllocationMethod": "Static",
-                    "subnet": {
-                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName'))]"
-                    }
-                }
-              }              
+              }        
+                      
             ],
             "frontendPorts": [
               {
@@ -1283,7 +1272,7 @@
                 "name": "appGatewayHttpListener",
                 "properties": {
                   "FrontendIpConfiguration": {                
-                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-',variables('ApplicationGatewayNames')[1], '-ag')), '/frontendIPConfigurations/Private')]"
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-',variables('ApplicationGatewayNames')[1], '-ag')), '/frontendIPConfigurations/frontendIPConfig')]"
                   },
                   "FrontendPort": {                
                     "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[1], '-ag')), '/frontendPorts/appGatewayFrontendPort')]"
@@ -1362,8 +1351,8 @@
     },
     {
       "name": "ProvisionLoadBalancers",
-      "type": "Microsoft.Resources/deployments",  
-      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",    
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",
       "apiVersion": "2015-01-01",
       "dependsOn" : [
         "ProvisioningBase"      
@@ -1605,6 +1594,9 @@
           },
           "AutoShutdown": {
             "value": "[parameters('AutoShutdown')]"
+          },
+          "enabledPublic": {
+            "value": "[variables('ConfigData').Loadbalancer.enabledPublic]"
           }
         }
       }

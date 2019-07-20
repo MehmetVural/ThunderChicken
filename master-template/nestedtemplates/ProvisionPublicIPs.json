@@ -20,6 +20,7 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2019-02-01",
       "name": "[concat(variables('templatePrefix'), '-' , variables('publicIPAddresses')[copyIndex()].Name)]",
+      "condition": "[greater(length(variables('publicIPAddresses')), 0)]",
       "location": "[resourceGroup().location]",
       "tags": {
         "Service": "Base",

@@ -13,12 +13,14 @@
   "variables": {
     "templatePrefix": "master",
     "ConfigData": "[parameters('ConfigData')]",
+    "enabledPublic" : "[variables('ConfigData').enabledPublic]",
     "ApplicationGateways" : "[variables('ConfigData').ApplicationGateways]"    
   },
   "resources": [  
     {
       "name": "ProvisioningPublicIPs-AG",
-      "type": "Microsoft.Resources/deployments",    
+      "type": "Microsoft.Resources/deployments", 
+      "condition" : "[variables('enabledPublic')]",   
       "apiVersion": "2015-01-01",
       "properties": {
         "mode": "Incremental",
@@ -40,7 +42,7 @@
       "location": "[resourceGroup().location]",    
       "dependsOn": [
         "ProvisioningPublicIPs-AG"
-      ],  
+      ],
       "tags": {
         "Service": "Base",
         "Site": "[ variables('ApplicationGateways')[copyIndex()].Site ]"

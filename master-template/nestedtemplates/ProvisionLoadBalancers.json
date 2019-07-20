@@ -12,13 +12,16 @@
   },
   "variables": {
     "templatePrefix": "master",  
-    "ConfigData" : "[parameters('ConfigData')]",
-    "LoadBalancers" : "[variables('ConfigData').LoadBalancers]"
+    "ConfigData" : "[parameters('ConfigData')]",    
+    "enabledPublic" : "[variables('ConfigData').enabledPublic]",
+    "LoadBalancers" : "[if(variables('enabledPublic'), union(variables('ConfigData').LoadBalancersInternal, variables('ConfigData').LoadBalancersPublic) , union(variables('ConfigData').LoadBalancersInternal, variables('ConfigData').LoadBalancersDMZ)          ) ]",
+    "_dependsOn" : "[if(  variables('enabledPublic'), createArray('ProvisioningPublicIPs-LB'), json('null')   ) ]" 
   },
   "resources": [ 
     {
       "name": "ProvisioningPublicIPs-LB",
       "type": "Microsoft.Resources/deployments",    
+      "condition" : "[variables('enabledPublic')]",
       "apiVersion": "2015-01-01",
       "properties": {
         "mode": "Incremental",
@@ -32,7 +35,7 @@
           }
         }
       }
-    },
+    },    
     {
       "apiVersion": "2015-05-01-preview",
       "name": "[concat(variables('templatePrefix'), '-', variables('LoadBalancers')[copyIndex()].Name, '-loadbalancer')]",
@@ -56,7 +59,14 @@
         "loadBalancingRules": "[variables('LoadBalancers')[copyIndex()].loadBalancingRules]",
         "probes": "[variables('LoadBalancers')[copyIndex()].probes]"
       }
-    }    
+    }
+       
   ],
-  "outputs": {}
+  "outputs": {
+    "dependsOn" : 
+    {
+      "type" : "string",
+      "value" : "[variables('dependsOn')]"
+    }   
+  }
 }
