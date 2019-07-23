@@ -535,8 +535,8 @@
             }
           },
           "Config": {
-            "ShareFolder" : "\\\\VD201\\Share",
-            "SCOMInstallSource" : "\\\\VD201\\Share\\SCOM",
+            "ShareServer" : "KD201",
+            "SCOMInstallSource" : "\\\\KD201\\Share\\SCOM",
             "SCOMInstallDestination" : "C:\\INSTALL\\SCOM2016",
             "SCOMSourcePath" : "\\SC 2016 RTM SCOM\\",
             "SQLSysClrTypesSource" : "\\SQLSysClrTypes.msi",
@@ -545,13 +545,13 @@
             "ReportViewerProductID" : "3ECE8FC7-7020-4756-A71C-C345D4725B77",
             "SCOMProducKey" : "",
             "ManagementGroupName" : "SCOM",
-            "SQL2016ManagedPack" : "\\\\VD201\\Share\\SCOM\\SQLServer2016MP.msi",
+            "SQL2016ManagedPack" : "\\\\KD201\\Share\\SCOM\\SQLServer2016MP.msi",
             "SQL2016ManagedPackProductID" : "2CCCD49C-7B9A-4703-A8AE-F28CDE94C126",
             "InstanceName" : "MSSQLSERVER",
             "SqlServerAG" : "SCOMAG",
-            "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
-            "ModulesPath" : "\\VD201\\Share\\SCOM\\Modules",
-            "ManagementPacksPath" : "\\\\VD201\\Share\\SCOM\\ManagementPack"
+            "SQLAGBackup": "\\\\KD201\\SQLAGBackup",
+            "ModulesPath" : "\\KD201\\Share\\SCOM\\Modules",
+            "ManagementPacksPath" : "\\\\KD201\\Share\\SCOM\\ManagementPack"
           }
         },
         "imageReference" : "Windows2016",
@@ -937,7 +937,7 @@
             "InstanceName": "MSSQLSERVER",
             "AvailabilityGroupName": "TestAG",
             "TestDBName": "TestDB",
-            "ShareFolder": "\\\\KD201\\Share",
+            "ShareServer": "KD201",
             "SQLAGBackup": "\\\\KD201\\SQLAGBackup",
             "SQLInstallSource": "\\\\KD201\\Share\\SharedSQL\\SQL2016",
             "SQLInstallDestination": "C:\\INSTALL\\SQL2016",
