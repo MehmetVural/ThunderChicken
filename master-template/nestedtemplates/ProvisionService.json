@@ -937,13 +937,13 @@
             "InstanceName": "MSSQLSERVER",
             "AvailabilityGroupName": "TestAG",
             "TestDBName": "TestDB",
-            "ShareFolder": "\\\\VD201\\Share",
-            "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
-            "SQLInstallSource": "\\\\VD201\\Share\\SharedSQL\\SQL2016",
+            "ShareFolder": "\\\\KD201\\Share",
+            "SQLAGBackup": "\\\\KD201\\SQLAGBackup",
+            "SQLInstallSource": "\\\\KD201\\Share\\SharedSQL\\SQL2016",
             "SQLInstallDestination": "C:\\INSTALL\\SQL2016",
-            "SQLManagementStudio2017Path": "\\\\VD201\\Share\\SharedSQL\\SSMS.17.9.1\\SSMS-Setup-ENU.exe",
+            "SQLManagementStudio2017Path": "\\\\KD201\\Share\\SharedSQL\\SSMS.17.9.1\\SSMS-Setup-ENU.exe",
             "SQLManagementStudio2017ProductId": "91a1b895-c621-4038-b34a-01e7affbcb6b",
-            "SQLManagementStudio2016Path": "\\\\vd201\\Share\\SharedSQL\\SSMS.16.5.3\\SSMS-Setup-ENU.exe",
+            "SQLManagementStudio2016Path": "\\\\KD201\\Share\\SharedSQL\\SSMS.16.5.3\\SSMS-Setup-ENU.exe",
             "SQLManagementStudio2016ProductId": "2d1a30f7-a163-4aa7-a10e-e936aeba38fe"
           }
         }

@@ -116,7 +116,7 @@
     },   
     "BlankService": {
       "type": "string",
-      "defaultValue": "SharedSQLFull",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS",
@@ -177,7 +177,7 @@
 
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Small",
+      "defaultValue": "Large",
       "allowedValues": [
         "Small",
         "Medium",
@@ -191,7 +191,7 @@
     },       
     "DiskSizes": {
       "type": "string",
-      "defaultValue": "Small-4GB",
+      "defaultValue": "Medium-20GB",
       "allowedValues": [
         "Small-4GB",
         "Medium-20GB",
@@ -204,7 +204,7 @@
     },       
     "OSDiskSize": {
       "type": "string",
-      "defaultValue": "Small-30GB",
+      "defaultValue": "Regular-127GB",
       "allowedValues": [
         "Small-30GB",
         "Regular-127GB"        
