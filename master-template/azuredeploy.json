@@ -101,7 +101,7 @@
         "description": "Domain Controller Functioning Level"
       }
     },     
-    "BlankService": {
+    "Template": {
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
@@ -247,7 +247,7 @@
     "domainNetbiosNameDMZ": "DomainDmz",
     "domainAdminUsername" : "domainadmin",  
     "templatePrefix" : "master",
-    "template" : "[parameters('BlankService')]",
+    "template" : "[parameters('Template')]",
     "servicestoBuild" : "[ if( equals(variables('template'), 'SCOMFull'), createArray('SharedSQLFull', 'SCOMFull'), createArray(variables('template'))          )]" ,    
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
