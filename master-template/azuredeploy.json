@@ -105,7 +105,7 @@
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
-        "None",
+        "None", 
         "AD-DS",
         "DNS",
         "NPS",
