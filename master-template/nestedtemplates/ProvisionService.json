@@ -2482,7 +2482,7 @@
                 "ServiceName": "[variables('ServiceName')]",
                 "ServerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
                 "ServerIP": "[string(variables('templates')[variables('template')].servers[copyIndex()].ip)]",
-                "ServerSite": "[variables('subnets')[ variables('templates')[variables('template')].servers[copyIndex()].subnet ].Name]",
+                "ServerSite": "[string(variables('templates')[variables('template')].servers[copyIndex()].subnet)]",
 
                 "joinDomain" : "[variables('templates')[variables('template')].servers[copyIndex()].joinDomain]",
                 

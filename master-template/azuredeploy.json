@@ -116,7 +116,7 @@
     },   
     "BlankService": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SharedSQLFull",
       "allowedValues": [
         "None",
         "AD-DS",
