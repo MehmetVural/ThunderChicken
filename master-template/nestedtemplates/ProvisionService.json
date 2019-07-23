@@ -126,7 +126,9 @@
         "DNS",
         "NPS",
         "SCOM",
+        "SCOMFull",
         "SharedSQL",
+        "SharedSQLFull",
         "FileServer",
         "DHCP",       
         "SharePoint",
@@ -174,9 +176,11 @@
 
   },
   "variables": {
-    "template": "[parameters('template')]",    
+    "template":"[replace(parameters('template'),'Full', '')]",
+    "ServiceName" : "[parameters('template')]", 
     "location": "[resourceGroup().location]",
     "publicLBName" : "[if(parameters('enabledPublic'), 'Public', '') ]",
+
     "templates": {
       "None": {
         "prefix": "blank",
@@ -459,8 +463,97 @@
         ]
       },
       "SCOM": {
-        "prefix": "scom",
-        "ConfigData": {},
+        "prefix": "scom",        
+        "ConfigData": {
+          "V": {
+            "Nodes": [
+              {
+                "Name": "VS201",
+                "Role": "Primary"
+              },
+              {
+                "Name": "VS202",
+                "Role": "Secondary"
+              }
+            ],
+            "NonNodeData": {
+              "SqlServerPrimary" : "VS221",
+              "SqlServerSecondary" : "VS222",
+              "SqlServerDNSAlias" : "VSql.domain.com",
+              "SqlServerInstance" : "VSql.domain.com\\MSSQLSERVER",          
+              "DwSqlServerInstance" :  "VSql.domain.com\\MSSQLSERVER",
+              "SRSInstance" :  "VSql.domain.com\\MSSQLSERVER",
+              "ManagementGroupName" : "VSCOM",
+              "DnsPrefix": "VScom",
+              "DnsServer": "[variables('dc1NicIPAddress')]"
+            }
+          },
+          "K": {
+            "Nodes": [
+              {
+                "Name": "KS201",
+                "Role": "Primary"
+              },
+              {
+                "Name": "KS202",
+                "Role": "Secondary"
+              }
+            ],
+            "NonNodeData": {
+              "SqlServerPrimary" : "KS221",
+              "SqlServerSecondary" : "KS222",
+              "SqlServerDNSAlias" : "KSql.domain.com",
+              "SqlServerInstance" : "KSql.domain.com\\MSSQLSERVER",          
+              "DwSqlServerInstance" : "KSql.domain.com\\MSSQLSERVER",
+              "SRSInstance" : "KSql.domain.com\\MSSQLSERVER",
+              "ManagementGroupName" : "KSCOM",
+              "DnsPrefix": "KScom",
+              "DnsServer": "[variables('dc2NicIPAddress')]"
+            }
+          },
+          "C": {
+            "Nodes": [
+              {
+                "Name": "CS201",
+                "Role": "Primary"
+              },
+              {
+                "Name": "CS202",
+                "Role": "Secondary"
+              }
+            ],
+            "NonNodeData": {
+              "SqlServerPrimary" : "CS221",
+              "SqlServerSecondary" : "CS222",
+              "SqlServerDNSAlias" : "CSql.domain.com",
+              "SqlServerInstance" : "CSql.domain.com\\MSSQLSERVER",
+              "DwSqlServerInstance" : "CSql.domain.com\\MSSQLSERVER",
+              "SRSInstance" : "CSql.domain.com\\MSSQLSERVER",          
+              "ManagementGroupName" : "CSCOM",
+              "DnsPrefix": "CScom",
+              "DnsServer": "[variables('dc3NicIPAddress')]"
+            }
+          },
+          "Config": {
+            "ShareFolder" : "\\\\VD201\\Share",
+            "SCOMInstallSource" : "\\\\VD201\\Share\\SCOM",
+            "SCOMInstallDestination" : "C:\\INSTALL\\SCOM2016",
+            "SCOMSourcePath" : "\\SC 2016 RTM SCOM\\",
+            "SQLSysClrTypesSource" : "\\SQLSysClrTypes.msi",
+            "SysClrTypesProductID" : "68BA34E8-9B9D-4A74-83F0-7D366B532D75",
+            "ReportViewerSource" : "\\ReportViewer.msi",
+            "ReportViewerProductID" : "3ECE8FC7-7020-4756-A71C-C345D4725B77",
+            "SCOMProducKey" : "",
+            "ManagementGroupName" : "SCOM",
+            "SQL2016ManagedPack" : "\\\\VD201\\Share\\SCOM\\SQLServer2016MP.msi",
+            "SQL2016ManagedPackProductID" : "2CCCD49C-7B9A-4703-A8AE-F28CDE94C126",
+            "InstanceName" : "MSSQLSERVER",
+            "SqlServerAG" : "SCOMAG",
+            "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
+            "ModulesPath" : "\\VD201\\Share\\SCOM\\Modules",
+            "ManagementPacksPath" : "\\\\VD201\\Share\\SCOM\\ManagementPack"
+          }
+        },
         "imageReference" : "Windows2016",
         "servers": [
           {
@@ -556,8 +649,7 @@
         ]
       },
       "SharedSQL": {
-        "prefix": "sql",
-        "ConfigData": {},
+        "prefix": "sql",               
         "imageReference" : "Windows2016",
         "servers": [
           {
@@ -785,7 +877,76 @@
             ],
             "dscModule": null
           }
-        ]
+        ],
+        "ConfigData": {
+          "V": {
+            "Nodes": [
+              {
+                "Name": "VS221",
+                "Role": "Primary"
+              },
+              {
+                "Name": "VS222",
+                "Role": "Secondary"
+              }
+            ],
+            "NonNodeData": {
+              "ClusterName": "VCluster",
+              "SqlDnsPrefix": "VSql",
+              "DnsServer": "[variables('dc1NicIPAddress')]",
+              "ClusterIPAddress": "10.0.0.150/24"
+            }
+          },
+          "K": {
+            "Nodes": [
+              {
+                "Name": "KS221",
+                "Role": "Primary"
+              },
+              {
+                "Name": "KS222",
+                "Role": "Secondary"
+              }
+            ],
+            "NonNodeData": {
+              "ClusterName": "KCluster",
+              "SqlDnsPrefix": "KSql",
+              "DnsServer": "[variables('dc2NicIPAddress')]",
+              "ClusterIPAddress": "10.0.1.150/24"
+            }
+          },
+          "C": {
+            "Nodes": [
+              {
+                "Name": "CS221",
+                "Role": "Primary"
+              },
+              {
+                "Name": "CS222",
+                "Role": "Secondary"
+              }
+            ],
+            "NonNodeData": {
+              "ClusterName": "CCluster",
+              "SqlDnsPrefix": "CSql",
+              "DnsServer": "[variables('dc3NicIPAddress')]",
+              "ClusterIPAddress": "10.0.2.150/24"
+            }
+          },
+          "Config": {
+            "InstanceName": "MSSQLSERVER",
+            "AvailabilityGroupName": "TestAG",
+            "TestDBName": "TestDB",
+            "ShareFolder": "\\\\VD201\\Share",
+            "SQLAGBackup": "\\\\VD201\\SQLAGBackup",
+            "SQLInstallSource": "\\\\VD201\\Share\\SharedSQL\\SQL2016",
+            "SQLInstallDestination": "C:\\INSTALL\\SQL2016",
+            "SQLManagementStudio2017Path": "\\\\VD201\\Share\\SharedSQL\\SSMS.17.9.1\\SSMS-Setup-ENU.exe",
+            "SQLManagementStudio2017ProductId": "91a1b895-c621-4038-b34a-01e7affbcb6b",
+            "SQLManagementStudio2016Path": "\\\\vd201\\Share\\SharedSQL\\SSMS.16.5.3\\SSMS-Setup-ENU.exe",
+            "SQLManagementStudio2016ProductId": "2d1a30f7-a163-4aa7-a10e-e936aeba38fe"
+          }
+        }
       },
       "FileServer": {
         "prefix": "fs",
@@ -2317,9 +2478,14 @@
                 "DisksizeGB": "[int(variables('DisksizeGB')[parameters('DiskSizes')])]",
                 "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
-                "ServiceName": "[variables('template')]",
+                
+                "ServiceName": "[variables('ServiceName')]",
                 "ServerName": "[variables('templates')[variables('template')].servers[copyIndex()].hostname]",
+                "ServerIP": "[string(variables('templates')[variables('template')].servers[copyIndex()].ip)]",
+                "ServerSite": "[variables('subnets')[ variables('templates')[variables('template')].servers[copyIndex()].subnet ].Name]",
+
                 "joinDomain" : "[variables('templates')[variables('template')].servers[copyIndex()].joinDomain]",
+                
                 "ConfigData": "[string(variables('templates')[variables('template')].ConfigData)]",
 
                 "dataDisks": "[string(variables('templates')[variables('template')].servers[copyIndex()].datadisks)]",
@@ -2332,6 +2498,10 @@
             "protectedSettings": {
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
+                "InstallCredential": {
+                  "UserName": "[concat(variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                },
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domainNetbiosName, '\\', parameters('domainAdminUsername'))]",
                   "Password": "[parameters('adminPassword')]"

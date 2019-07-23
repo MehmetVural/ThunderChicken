@@ -35,7 +35,7 @@
     }, 
     "deployJumpbox": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -64,7 +64,7 @@
 
     "deployDomain": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -116,14 +116,15 @@
     },   
     "BlankService": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SharedSQLFull",
       "allowedValues": [
         "None",
         "AD-DS",
         "DNS",
         "NPS",
-        "SCOM",
+        "SCOM",        
         "SharedSQL",
+        "SharedSQLFull",
         "FileServer",
         "DHCP",
         "SharePoint",
@@ -163,7 +164,7 @@
     },
     "ReverseProxy": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -337,30 +338,31 @@
         "DomainName" : "Domain.com",
         "DomainNetbiosName" : "Domain",
         "ForestMode" : "[parameters('forestMode')]",
-        "PrimaryDns" : "10.0.1.5",
-        "vmSize" : "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]",
-        "dcInstallModule": "[variables('dcInstallModule')]",
-        
+        "PrimaryDns" : "10.0.1.5",       
+        "dcInstallModule": "[variables('dcInstallModule')]",        
         "Servers" : [
           {
             "HostName" : "VD201",
             "Site"    :  "[variables('VSubnetName')]",
             "Primary" : false,
             "FileShare"  : false,
+            "vmSize" : "Standard_D1_v2",
             "Ip" :  "10.0.0.5"
           },
           {
-            "HostName" : "KD201",
-            "Site"    :  "[variables('KSubnetName')]",
-            "Primary" : true,
-            "FileShare"  : false,
-            "Ip" :  "10.0.1.5"
+            "HostName"  : "KD201",
+            "Site"      :  "[variables('KSubnetName')]",
+            "Primary"   : true,
+            "FileShare" : true,
+            "vmSize"    : "Standard_D3_v2",
+            "Ip"        :  "10.0.1.5"
           },
           {
             "HostName" : "CD201",
             "Site"    :  "[variables('CSubnetName')]",
             "Primary" : false,
             "FileShare"  : false,
+            "vmSize" : "Standard_D1_v2",
             "Ip" :  "10.0.2.5"
           }
         ],
@@ -406,7 +408,7 @@
         "DomainNetbiosName" : "DomainDmz",        
         "ForestMode" : "[parameters('forestMode')]",
         "PrimaryDns" : "10.0.3.5",
-        "vmSize" : "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]",
+       
         "dcInstallModule": "[variables('dcInstallModule')]",        
         "Servers" : [
           {
@@ -414,6 +416,7 @@
             "Site"      :  "[variables('KDMZSubnetName')]",
             "Primary"   : true,
             "FileShare" : false,
+            "vmSize" : "Standard_D1_v2",
             "Ip" :  "10.0.3.5"
           },
           {
@@ -421,6 +424,7 @@
             "Site"      :  "[variables('CDMZSubnetName')]",
             "Primary"   : false,
             "FileShare" : false,
+            "vmSize" : "Standard_D1_v2",
             "Ip" :  "10.0.4.5"
           }
         ],
@@ -462,7 +466,7 @@
         "DomainNetbiosName" : "Client",        
         "ForestMode" : "[parameters('forestMode')]",
         "PrimaryDns" : "10.1.0.5",
-        "vmSize" : "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]",
+       
         "dcInstallModule": "[variables('dcInstallModule')]",
         "domainTemplateUrl": "[variables('domainTemplateUrl')]",
         "serviceTemplateUrl" : "[variables('serviceTemplateUrl')]",
@@ -472,6 +476,7 @@
             "Site"      : "[variables('KDMZSubnetName')]",
             "Primary"   : true,
             "FileShare" : false,
+            "vmSize" : "Standard_D1_v2",
             "Ip"        : "10.1.0.5"
           }
         ],
@@ -1701,10 +1706,9 @@
           "ConfigData" : { 
             "value" : "[variables('ConfigData').ClientDomain]"
           }
-
         }
       }
-    },     
+    },
     {
       "name": "ProvisioningSQLFull",
       "type": "Microsoft.Resources/deployments",
@@ -1725,7 +1729,7 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
-          },          
+          },
           "domainAdminUsername": {
             "value": "[variables('domainAdminUsername')]"
           },
@@ -1758,7 +1762,7 @@
           },
           "VMSeries": {
             "value": "[parameters('VMSeries')]"
-          }, 
+          },
           "template": {
             "value": "SharedSQL"
           },
@@ -1885,7 +1889,7 @@
       "apiVersion": "2015-01-01",
       "condition": "[equals(variables('SharedService'), 'SQLandSCOM')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOMFull')]"        
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningSCOMFull')]"
       ],
       "properties": {
         "mode": "Incremental",

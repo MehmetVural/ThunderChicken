@@ -368,6 +368,10 @@
             "protectedSettings": {
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
+                "InstallCredential": {
+                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                },
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('domainAdminUsername'))]",
                   "Password": "[parameters('adminPassword')]"

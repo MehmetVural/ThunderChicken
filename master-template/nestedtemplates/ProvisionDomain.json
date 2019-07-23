@@ -117,7 +117,7 @@
       },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('ConfigData').vmSize]"
+          "vmSize": "[variables('ConfigData').Servers[copyIndex()].vmSize]"
         },
         "osProfile": {
           "computerName": "[variables('ConfigData').Servers[copyIndex()].HostName]",
@@ -219,8 +219,8 @@
                 
                 "NodeName": "[variables('ConfigData').Servers[copyIndex()].HostName]",
                 "Primary": "[variables('ConfigData').Servers[copyIndex()].Primary]",
-                "FileShare": "[variables('ConfigData').Servers[copyIndex()].FileShare]",                
-                "site": "[toUpper(variables('ConfigData').Servers[copyIndex()].Site )]",                
+                "FileShare": "[variables('ConfigData').Servers[copyIndex()].FileShare]",
+                "site": "[toUpper(variables('ConfigData').Servers[copyIndex()].Site )]",
                 
                 "DiskSize": "[parameters('DiskSizes')]",
                 "DisksizeGB": "5",
