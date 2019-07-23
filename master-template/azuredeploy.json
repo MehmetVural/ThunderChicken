@@ -116,7 +116,7 @@
     },   
     "BlankService": {
       "type": "string",
-      "defaultValue": "SharedSQLFull",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS",
@@ -356,7 +356,7 @@
             "FileShare" : true,
             "vmSize"    : "Standard_D3_v2",
             "Ip"        :  "10.0.1.5"
-          },
+          }, 
           {
             "HostName" : "CD201",
             "Site"    :  "[variables('CSubnetName')]",
