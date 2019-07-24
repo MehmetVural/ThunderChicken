@@ -354,6 +354,7 @@
                 "DiskSize": "[parameters('DiskSizes')]",
                 "DisksizeGB": "[int(variables('vmDscSettings').DisksizeGB)]",
                 "domainName": "[variables('vmDscSettings').domainName]",
+                "domainNetbiosName": "[variables('vmDscSettings').domainNetbiosName]",
                 "dnsServer": "[variables('vmDscSettings').dns]",
                 "dataDisks": "[string(variables('vmDscSettings').datadisks)]",
                 "joinDomain" : true,
