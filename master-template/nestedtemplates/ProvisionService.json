@@ -1539,21 +1539,6 @@
                 "letter": "D"
               }
             ]
-          },          
-          {
-            "hostname": "KM203",
-            "size": "M",
-            "subnet": "K",
-            "loadBalancerBackendAddressPools": [],
-            "joinDomain" : true,
-            "ip": "10.0.1.57",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
           },
           {
             "hostname": "KM204",
@@ -1673,21 +1658,6 @@
             ],
             "joinDomain" : false,
             "ip": "10.0.4.53",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "CM203",
-            "size": "M",
-            "subnet": "C",
-            "loadBalancerBackendAddressPools": [],
-            "joinDomain" : true,
-            "ip": "10.0.2.54",
             "datadisks": [
               {
                 "name": "Local Data",
