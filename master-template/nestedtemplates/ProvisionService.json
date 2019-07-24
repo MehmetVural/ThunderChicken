@@ -2477,6 +2477,7 @@
                 "DiskSize": "[parameters('DiskSizes')]",
                 "DisksizeGB": "[int(variables('DisksizeGB')[parameters('DiskSizes')])]",
                 "domainName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domain]",
+                "domainNetbiosName": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domainNetbiosName]",
                 "dnsServer": "[variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].dns]",
                 
                 "ServiceName": "[variables('ServiceName')]",
