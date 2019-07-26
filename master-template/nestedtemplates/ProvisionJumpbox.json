@@ -193,6 +193,28 @@
       "RetryIntervalSec": 60,
       "datadisks": []
     },
+    "_packages" : ["sql-server-management-studio","rsat"],    
+    "ConfigData": {
+      "Packages"  : [ 
+        "vscode",        
+        "git",                
+        "Git-Credential-Manager-for-Windows",
+        "poshgit",
+        "pester",
+        "vscode-powershell",
+        "googlechrome"        
+        ],
+      "GitRepositories"  : [ 
+        "CI.Common"
+      ],
+      "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
+      "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]" 
+    },
+    "_imagesskus": [ 
+      "Get-AzureRmVMImageOffer -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' | Select Offer",
+      "Get-AzureRmVMImage -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' -Offer 'Windows-10' -Sku 'rs5-enterprise' | Select Version",
+      "Get-AzureRmVMImageSku -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' -Offer 'Windows-10' | Select Skus"
+    ],
     "imageReference": {
       "Windows10" : {
         "publisher": "MicrosoftWindowsDesktop",
@@ -283,7 +305,7 @@
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "storageProfile": {
-          "imageReference": "[variables('imageReference')['Windows10']]",
+          "imageReference": "[variables('imageReference')['Windows2016']]",
           "osDisk": {
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
@@ -358,11 +380,10 @@
                 "dnsServer": "[variables('vmDscSettings').dns]",
                 "dataDisks": "[string(variables('vmDscSettings').datadisks)]",
                 "joinDomain" : true,
-                "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
-                "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]", 
+                "ConfigData": "[string(variables('ConfigData'))]",                
                 "retryCount": "[int(variables('vmDscSettings').RetryCount)]",
                 "retryIntervalSec": "[int(variables('vmDscSettings').RetryIntervalSec)]",                
-                "ConfigurationMode": "ApplyOnly",
+                "ConfigurationMode": "ApplyAndAutoCorrect",
                 "ConfigurationModeFrequencyMins": 15
               }
             },

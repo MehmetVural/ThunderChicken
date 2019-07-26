@@ -327,28 +327,28 @@
         "dcInstallModule": "[variables('dcInstallModule')]",        
         "Servers" : [
           {
-            "HostName" : "VD201",
-            "Site"    :  "[variables('VSubnetName')]",
-            "Primary" : false,
-            "FileShare"  : false,
-            "vmSize" : "Standard_D1_v2",
-            "Ip" :  "10.0.0.5"
+            "HostName"  : "VD201",
+            "Site"      : "[variables('VSubnetName')]",
+            "Primary"   : false,
+            "FileShare" : false,
+            "vmSize"    : "Standard_D1_v2",
+            "Ip"        : "10.0.0.5"
           },
           {
             "HostName"  : "KD201",
-            "Site"      :  "[variables('KSubnetName')]",
+            "Site"      : "[variables('KSubnetName')]",
             "Primary"   : true,
             "FileShare" : true,
             "vmSize"    : "Standard_D3_v2",
-            "Ip"        :  "10.0.1.5"
+            "Ip"        : "10.0.1.5"
           }, 
           {
-            "HostName" : "CD201",
-            "Site"    :  "[variables('CSubnetName')]",
-            "Primary" : false,
-            "FileShare"  : false,
-            "vmSize" : "Standard_D1_v2",
-            "Ip" :  "10.0.2.5"
+            "HostName"  : "CD201",
+            "Site"      : "[variables('CSubnetName')]",
+            "Primary"   : false,
+            "FileShare" : false,
+            "vmSize"    : "Standard_D1_v2",
+            "Ip"        : "10.0.2.5"
           }
         ],
         "DomainGroups"  : [],
