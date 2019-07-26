@@ -1,0 +1,368 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The name of the administrator account of the new VMs and Domain"
+      },
+      "defaultValue": ""
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The password for the administrator account of the new VMs and Domain"
+      }
+    },
+    "ArtifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      }
+    },
+    "ArtifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "group": "Template settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    },   
+
+    "DiskSizes": {
+      "type": "string",     
+      "allowedValues": [
+        "Small-4GB",
+        "Medium-20GB",
+        "Large-50GB",        
+        "Default"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 Core, Medium:4 Core: Large: 8 Cores, Default: Attach individual disks for each drive letter and very costly"
+      }
+    },   
+     
+    "AutoShutdown": {
+      "type": "string",     
+      "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
+        "1500",
+        "1600",
+        "1700",
+        "1800",
+        "1900",
+        "2000"
+      ],
+      "metadata": {
+        "group": "Template Settings",
+        "description": "Daily Auto Shutdown time"
+      }
+    },       
+    "ConfigData": {
+      "type": "object",
+      "metadata": {
+        "group": "Domain Settings",
+        "description": ""
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "external",
+    "location": "[resourceGroup().location]",
+    "virtualNetworkName" : "[concat(variables('templatePrefix'), '-vn')]",
+    "mastervirtualNetworkName" : "master-vn",
+    "mastervirtualNetworkPrefixes": "10.0.0.0/16",
+    "externalvirtualNetworkPrefixes": "10.1.0.0/16",
+    "NSGName": "[concat(variables('templatePrefix'), '-nsg')]",
+    "domainAdminUsername": "[parameters('adminUserName')]",  
+    "template": "ExternalTest",
+    
+    "addressPrefix": "10.1.0.0/16",
+    "SubnetPrefix": "10.1.0.0/24",
+    "SubnetName": "es",
+    "DCNicIPAddress" : "10.1.0.5",
+
+    "domainName": "Domain.com",
+    "domainNetbiosName": "Domain",
+    "domainNameDMZ": "DomainDmz.com",
+    "domainNetbiosNameDMZ": "DomainDmz",   
+
+
+    "fileShareSAAccount": "[concat('share', substring(replace(subscription().subscriptionId,'-', ''), 0, 19))]",
+    "shareResourceGroupName": "TCShare",
+    "fileShare": "share",    
+    "RetryCount": 300,
+    "RetryIntervalSec": 60,
+    "storageAccountNamePrefix": "[concat(variables('templatePrefix'), uniqueString(resourceGroup().id))]",
+    
+    "ConfigData" :  "[parameters('ConfigData')]",
+
+    "datadisks": [      
+      {              
+        "name": "DirectoryLogs",
+        "diskSizeGB": 50,
+        "letter": "E"              
+      },
+      {              
+        "name": "FileShare",
+        "diskSizeGB": 100,
+        "letter": "F"              
+      }
+    ],
+
+    "subnets": [
+      {
+        "name": "[variables('SubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('SubnetPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSGName'))]"
+          }
+        }
+      }
+    ]
+     
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[concat(variables('virtualNetworkName'), '-', variables('subnets')[copyIndex()].Name, '-avset')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Service": "ExternalTest",
+        "Site": "[ variables('subnets')[copyIndex()].Name ]"
+      },
+      "copy": {
+        "name": "avsetLoop",
+        "count": "[length( variables('subnets')  )]"
+      },
+      "properties": {
+        "platformFaultDomainCount": 2,
+        "platformUpdateDomainCount": 2,       
+        "managed": true
+      }
+    },  
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('NSGName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "ExternalTest",
+        "Site": "[variables('SubnetName')]"
+      },
+      "properties": {        
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "ExternalTest",
+        "Site": ""       
+      },
+      "dependsOn": [      
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('NSGName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },        
+        "subnets": "[variables('subnets')]",
+       
+      "enableDdosProtection": false,
+      "enableVmProtection": false
+      }
+    },
+   
+    {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2019-04-01",
+      "name": "[concat(variables('virtualNetworkName'), '/master-vn-peering')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName') )]"
+      ],
+      "properties": {         
+          "remoteVirtualNetwork": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('mastervirtualNetworkName') )]"
+          },
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": false,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": false,
+          "remoteAddressSpace": {
+              "addressPrefixes": [
+                "[variables('mastervirtualNetworkPrefixes')]"
+              ]
+          }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2019-04-01",
+      "name": "[concat(variables('mastervirtualNetworkName'), '/external-vn-peering')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName') )]"
+      ],
+      "properties": {        
+          "remoteVirtualNetwork": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName') )]"
+          },
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": false,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": false,
+          "remoteAddressSpace": {
+              "addressPrefixes": [
+                "[variables('externalvirtualNetworkPrefixes')]"
+              ]
+          }
+      }
+    },
+    {
+      "name": "master-CLD201-nic",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "tags": {
+        "Service": "ExternalTest",
+        "Site":  "[variables('SubnetName')]"   
+      },
+      "comments": "DC server nic",
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),variables('SubnetName'))]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('DCNicIPAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProvisioningDomain-Client",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",      
+      "dependsOn": [
+        "[variables('virtualNetworkName')]",
+        "master-CLD201-nic"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ConfigData').domainTemplateUrl]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+        
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+                      
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('Provisioning', 'ExternalClient')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",      
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"  
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {          
+          "uri": "[variables('ConfigData').serviceTemplateUrl]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "Small"
+          },
+          "DiskSizes": {
+            "value": "Small-4GB"
+          },
+          "OSDiskSize": {
+            "value": "Small-30GB"
+          },
+          "VMSeries": {
+            "value": "Dv3-Series"
+          }, 
+          "template": {
+            "value": "[variables('template')]"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+
+
+}

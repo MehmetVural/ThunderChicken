@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ConfigData": {
+      "type": "object",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "master",
+    "ConfigData": "[parameters('ConfigData')]",
+    "enabledPublic" : "[variables('ConfigData').enabledPublic]",
+    "ApplicationGateways" : "[variables('ConfigData').ApplicationGateways]"    
+  },
+  "resources": [  
+    {
+      "name": "ProvisioningPublicIPs-AG",
+      "type": "Microsoft.Resources/deployments", 
+      "condition" : "[variables('enabledPublic')]",   
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ConfigData').publicIpTemplateUrl]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData')]"
+          }
+        }
+      }
+    }, 
+    {
+      "apiVersion": "2018-08-01",
+      "name": "[concat(variables('templatePrefix'), '-', variables('ApplicationGateways')[copyIndex()].Name, '-ag')]",
+      "type": "Microsoft.Network/applicationGateways",
+      "location": "[resourceGroup().location]",    
+      "dependsOn": [
+        "ProvisioningPublicIPs-AG"
+      ],
+      "tags": {
+        "Service": "Base",
+        "Site": "[ variables('ApplicationGateways')[copyIndex()].Site ]"
+      }, 
+      "copy": {
+        "name": "agLoop",
+        "count": "[length(variables('ApplicationGateways'))]"
+      },
+      "properties": {
+        "sku": "[variables('ApplicationGateways')[copyIndex()].sku]",
+        "gatewayIPConfigurations": "[variables('ApplicationGateways')[copyIndex()].gatewayIPConfigurations]",
+        "frontendIPConfigurations": "[variables('ApplicationGateways')[copyIndex()].frontendIPConfigurations]",
+        "frontendPorts": "[variables('ApplicationGateways')[copyIndex()].frontendPorts]",
+        "backendAddressPools": "[variables('ApplicationGateways')[copyIndex()].backendAddressPools]",
+        "backendHttpSettingsCollection": "[variables('ApplicationGateways')[copyIndex()].backendHttpSettingsCollection]",
+        "httpListeners": "[variables('ApplicationGateways')[copyIndex()].httpListeners]",
+        "requestRoutingRules": "[variables('ApplicationGateways')[copyIndex()].requestRoutingRules]"
+      }
+    }   
+  ],
+  "outputs": {}
+}

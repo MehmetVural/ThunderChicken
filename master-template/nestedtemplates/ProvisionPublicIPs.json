@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ConfigData": {
+      "type": "object",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "master",
+    "ConfigData" : "[parameters('ConfigData')]",
+    "publicIPAddresses" : "[variables('ConfigData').publicIPAddresses]"
+  },
+  "resources": [ 
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2019-02-01",
+      "name": "[concat(variables('templatePrefix'), '-' , variables('publicIPAddresses')[copyIndex()].Name)]",
+      "condition": "[greater(length(variables('publicIPAddresses')), 0)]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Service": "Base",
+        "Site": "[variables('publicIPAddresses')[copyIndex()].Site]"
+      },
+      "copy": {
+        "name": "publicIpLoop",
+        "count": "[length(variables('publicIPAddresses'))]"
+      },
+      "sku": {
+          "name": "Basic"
+      },
+      "properties": {  
+          "provisioningState": "Succeeded",
+          "publicIPAddressVersion": "[variables('publicIPAddresses')[copyIndex()].publicIPAddressVersion]",
+          "publicIPAllocationMethod": "[variables('publicIPAddresses')[copyIndex()].publicIPAllocationMethod]",
+          "idleTimeoutInMinutes":  "[variables('publicIPAddresses')[copyIndex()].idleTimeoutInMinutes]",
+          "dnsSettings": "[variables('publicIPAddresses')[copyIndex()].dnsSettings]",
+          "ipTags": []
+      }
+    }  
+    
+  ],
+  "outputs": {}
+}

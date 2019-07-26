@@ -193,14 +193,36 @@
       "RetryIntervalSec": 60,
       "datadisks": []
     },
+    "_packages" : ["sql-server-management-studio","rsat"],    
+    "ConfigData": {
+      "Packages"  : [ 
+        "vscode",        
+        "git",                
+        "Git-Credential-Manager-for-Windows",
+        "poshgit",
+        "pester",
+        "vscode-powershell",
+        "googlechrome"        
+        ],
+      "GitRepositories"  : [ 
+        "CI.Common"
+      ],
+      "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
+      "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]" 
+    },
+    "_imagesskus": [ 
+      "Get-AzureRmVMImageOffer -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' | Select Offer",
+      "Get-AzureRmVMImage -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' -Offer 'Windows-10' -Sku 'rs5-enterprise' | Select Version",
+      "Get-AzureRmVMImageSku -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' -Offer 'Windows-10' | Select Skus"
+    ],
     "imageReference": {
-      "Windows10Desktop" : {
+      "Windows10" : {
         "publisher": "MicrosoftWindowsDesktop",
         "offer": "Windows-10",
         "sku": "rs5-pro",
         "version": "latest"
       },    
-      "Windows2016Server": {
+      "Windows2016": {
         "publisher": "MicrosoftWindowsServer",
         "offer": "WindowsServer",
         "sku": "2016-Datacenter-smalldisk",
@@ -283,12 +305,7 @@
           "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
         },
         "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "2016-Datacenter-smalldisk",
-            "version": "latest"
-          },
+          "imageReference": "[variables('imageReference')['Windows2016']]",
           "osDisk": {
             "name": "[concat(variables('jumpBoxVmName'),'_OSDisk')]",
             "caching": "ReadWrite",
@@ -359,19 +376,24 @@
                 "DiskSize": "[parameters('DiskSizes')]",
                 "DisksizeGB": "[int(variables('vmDscSettings').DisksizeGB)]",
                 "domainName": "[variables('vmDscSettings').domainName]",
+                "domainNetbiosName": "[variables('vmDscSettings').domainNetbiosName]",
                 "dnsServer": "[variables('vmDscSettings').dns]",
                 "dataDisks": "[string(variables('vmDscSettings').datadisks)]",
-                "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
-                "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]", 
+                "joinDomain" : true,
+                "ConfigData": "[string(variables('ConfigData'))]",                
                 "retryCount": "[int(variables('vmDscSettings').RetryCount)]",
                 "retryIntervalSec": "[int(variables('vmDscSettings').RetryIntervalSec)]",                
-                "ConfigurationMode": "ApplyOnly",
+                "ConfigurationMode": "ApplyAndAutoCorrect",
                 "ConfigurationModeFrequencyMins": 15
               }
             },
             "protectedSettings": {
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
+                "InstallCredential": {
+                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "Password": "[parameters('adminPassword')]"
+                },
                 "DomainAdminCredential": {
                   "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('domainAdminUsername'))]",
                   "Password": "[parameters('adminPassword')]"

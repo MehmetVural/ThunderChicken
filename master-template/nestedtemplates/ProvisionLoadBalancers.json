@@ -1,0 +1,72 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ConfigData": {
+      "type": "object",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    }
+  },
+  "variables": {
+    "templatePrefix": "master",  
+    "ConfigData" : "[parameters('ConfigData')]",    
+    "enabledPublic" : "[variables('ConfigData').enabledPublic]",
+    "LoadBalancers" : "[if(variables('enabledPublic'), union(variables('ConfigData').LoadBalancersInternal, variables('ConfigData').LoadBalancersPublic) , union(variables('ConfigData').LoadBalancersInternal, variables('ConfigData').LoadBalancersDMZ)          ) ]",
+    "_dependsOn" : "[if(  variables('enabledPublic'), createArray('ProvisioningPublicIPs-LB'), json('null')   ) ]" 
+  },
+  "resources": [ 
+    {
+      "name": "ProvisioningPublicIPs-LB",
+      "type": "Microsoft.Resources/deployments",    
+      "condition" : "[variables('enabledPublic')]",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ConfigData').publicIpTemplateUrl]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData')]"
+          }
+        }
+      }
+    },    
+    {
+      "apiVersion": "2015-05-01-preview",
+      "name": "[concat(variables('templatePrefix'), '-', variables('LoadBalancers')[copyIndex()].Name, '-loadbalancer')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "dependsOn": [
+        "ProvisioningPublicIPs-LB"
+      ],
+      "location": "[resourceGroup().location]",      
+      "tags": {
+        "Service": "Base",
+        "Site": "[variables('LoadBalancers')[copyIndex()].Site ]"
+      }, 
+      "copy": {
+        "name": "lbLoop",
+        "count": "[length(variables('LoadBalancers'))]"
+      },
+      "properties": {
+        "frontendIPConfigurations": "[variables('LoadBalancers')[copyIndex()].frontendIPConfigurations]",
+        "backendAddressPools": "[variables('LoadBalancers')[copyIndex()].backendAddressPools]",
+        "inboundNatRules": [],
+        "loadBalancingRules": "[variables('LoadBalancers')[copyIndex()].loadBalancingRules]",
+        "probes": "[variables('LoadBalancers')[copyIndex()].probes]"
+      }
+    }
+       
+  ],
+  "outputs": {
+    "dependsOn" : 
+    {
+      "type" : "string",
+      "value" : "[variables('dependsOn')]"
+    }   
+  }
+}
