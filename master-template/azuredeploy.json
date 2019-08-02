@@ -64,7 +64,7 @@
 
     "deployDomain": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -74,12 +74,12 @@
         "description": "Indicates wheter or not include Domain Controller in this deployment"
       }
     },
-    "deployCertificateAuthority" : {
-      "type": "string",
-      "defaultValue": "Yes",
+    "includeCertificateAuthority" : {
+      "type": "bool",
+      "defaultValue": true,
       "allowedValues": [
-        "Yes",
-        "No"
+        true,
+        false
       ],
       "metadata": {
         "group": "Domain Settings",
@@ -139,7 +139,7 @@
       }
     },
     "InternalTestEnvironment": {
-      "type": "bool",
+      "type": "string",
       "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
@@ -261,7 +261,7 @@
     "templatePrefix" : "master",
     "template" : "[parameters('Template')]",
     "templates" : "[if(equals(variables('template'), 'None'), createArray('None') ,if( equals(variables('template'), 'SCOMFull'), createArray('SharedSQLFull', 'SCOMFull'), createArray(variables('template'))          ) ) ]" ,
-    "deployCA": "[ if( equals(parameters('deployCertificateAuthority'), 'Yes'), createArray('CertificateAuthority'), createArray(''))]",
+    "deployCA": "[ if( parameters('includeCertificateAuthority'), createArray('CertificateAuthority'), createArray('None'))]",
     "servicestoBuild" :"[union(variables('templates'), variables('deployCA'),  if(   equals(   variables('InternalTestEnvironment'), 'Yes'), createArray('InternalTest') ,  createArray('None')   ) )]",
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
