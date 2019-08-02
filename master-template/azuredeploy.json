@@ -64,7 +64,7 @@
 
     "deployDomain": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -140,7 +140,7 @@
     },
     "InternalTestEnvironment": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"   
