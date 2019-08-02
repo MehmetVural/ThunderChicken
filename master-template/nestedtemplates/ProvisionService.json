@@ -137,7 +137,8 @@
         "UEM",        
         "Skype",
         "InternalTest",
-        "ExternalTest"
+        "ExternalTest",
+        "CertificateAuthority"
       ],
       "metadata": {
         "group": "Lab Enviornment Template",
@@ -2084,7 +2085,11 @@
       },
       "InternalTest": {
         "prefix": "internal",
-        "ConfigData": {},
+        "ConfigData": {
+          "ClientInstallPath"  : "\\\\KD201\\Share\\Client",
+          "DestinationPath"    : "C:\\INSTALL\\Client",
+          "_InstallOffice"      : true          
+        },
         "imageReference" : "Windows10",
         "servers": [
           {
@@ -2146,6 +2151,30 @@
             "loadBalancerBackendAddressPools": [],
             "joinDomain" : true,        
             "ip": "10.1.0.6",
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          }
+        ]
+      },
+      "CertificateAuthority": {
+        "prefix": "ca",
+        "ConfigData": {
+          "WindowsFeatures"  : ["ADCS-Cert-Authority", "ADCS-Enroll-Web-Pol", "ADCS-Enroll-Web-Svc", "ADCS-Web-Enrollment", "RSAT-ADCS", "RSAT-ADCS-MGMT", "Web-Server", "Web-Mgmt-Console", "RSAT-ADDS", "RSAT-AD-PowerShell","RSAT-DNS-Server"]
+        },
+        "imageReference" : "Windows2016",
+        "servers": [
+          {
+            "hostname": "CA101",
+            "size": "S",
+            "subnet": "K",
+            "loadBalancerBackendAddressPools": [],
+            "joinDomain" : true,        
+            "ip": "10.0.1.81",
             "datadisks": [
               {
                 "name": "Local Data",

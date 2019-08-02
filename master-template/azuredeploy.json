@@ -74,6 +74,18 @@
         "description": "Indicates wheter or not include Domain Controller in this deployment"
       }
     },
+    "deployCertificateAuthority" : {
+      "type": "string",
+      "defaultValue": "Yes",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Domain Settings",
+        "description": "Indicates wheter or not include certificate authority in Domain"
+      }
+    },
     "deployDomainDMZ": {
       "type": "string",
       "defaultValue": "No",
@@ -105,21 +117,21 @@
       "type": "string",
       "defaultValue": "None",
       "allowedValues": [
-        "None", 
+        "None",
         "AD-DS",
         "DNS",
         "NPS",
         "SCOM",
-        "SCOMFull",        
         "SharedSQL",
-        "SharedSQLFull",
         "FileServer",
         "DHCP",
         "SharePoint",
         "OOS",
         "Exchange",
         "UEM",
-        "Skype"
+        "Skype",
+        "SharedSQLFull",
+        "SCOMFull"        
       ],
       "metadata": {
         "group": "Service Settings",
@@ -127,8 +139,8 @@
       }
     },
     "InternalTestEnvironment": {
-      "type": "string",
-      "defaultValue": "No",
+      "type": "bool",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"   
@@ -248,7 +260,9 @@
     "domainAdminUsername" : "domainadmin",  
     "templatePrefix" : "master",
     "template" : "[parameters('Template')]",
-    "servicestoBuild" : "[ if( equals(variables('template'), 'SCOMFull'), createArray('SharedSQLFull', 'SCOMFull'), createArray(variables('template'))          )]" ,    
+    "templates" : "[if(equals(variables('template'), 'None'), createArray('None') ,if( equals(variables('template'), 'SCOMFull'), createArray('SharedSQLFull', 'SCOMFull'), createArray(variables('template'))          ) ) ]" ,
+    "deployCA": "[ if( equals(parameters('deployCertificateAuthority'), 'Yes'), createArray('CertificateAuthority'), createArray(''))]",
+    "servicestoBuild" :"[union(variables('templates'), variables('deployCA'),  if(   equals(   variables('InternalTestEnvironment'), 'Yes'), createArray('InternalTest') ,  createArray('None')   ) )]",
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
     "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
@@ -339,7 +353,7 @@
             "Site"      : "[variables('KSubnetName')]",
             "Primary"   : true,
             "FileShare" : true,
-            "vmSize"    : "Standard_D3_v2",
+            "vmSize"    : "Standard_D1_v2",
             "Ip"        : "10.0.1.5"
           }, 
           {
@@ -1528,7 +1542,7 @@
       "name": "[concat('Provisioning',  variables('servicestoBuild')[copyIndex()]    )]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "condition": "[not(equals(variables('template'), 'None'))]",
+      "condition": "[not( equals( variables('servicestoBuild')[copyIndex()], 'None')   )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]",
         "[if( or(equals( variables('servicestoBuild')[copyIndex()] , 'Exchange'), equals( variables('servicestoBuild')[copyIndex()] , 'Skype'))   , 'ProvisionLoadBalancers' ,  'ProvisioningBase')]"
@@ -1594,69 +1608,6 @@
           }
         }
       }
-    },    
-    {
-      "name": "ProvisioningInternalTest",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "condition": "[equals(variables('InternalTestEnvironment'), 'Yes')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('serviceTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "domainAdminUsername": {
-            "value": "[variables('domainAdminUsername')]"
-          },
-          "domainname": {
-            "value": "[variables('domainname')]"
-          },
-          "domainNetbiosName": {
-            "value": "[variables('domainNetbiosName')]"
-          },
-          "domainNameDMZ": {
-            "value": "[variables('domainNameDMZ')]"
-          },
-          "domainNetbiosNameDMZ": {
-            "value": "[variables('domainNetbiosNameDMZ')]"
-          },
-          "ArtifactsLocation": {
-            "value": "[parameters('ArtifactsLocation')]"
-          },
-          "ArtifactsLocationSasToken": {
-            "value": "[parameters('ArtifactsLocationSasToken')]"
-          },
-          "VirtualMachineSizes": {
-            "value": "[parameters('VirtualMachineSizes')]"
-          },
-          "DiskSizes": {
-            "value": "[parameters('DiskSizes')]"
-          },
-          "OSDiskSize": {
-            "value": "[parameters('OSDiskSize')]"
-          },
-          "VMSeries": {
-            "value": "[parameters('VMSeries')]"
-          }, 
-          "template": {
-            "value": "InternalTest"
-          },
-          "AutoShutdown": {
-            "value": "[parameters('AutoShutdown')]"
-          }
-        }
-      }
     },
     {
       "name": "ProvisioningExternalTest",
@@ -1699,5 +1650,10 @@
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "servicesUnion": {
+      "type": "array",
+      "value": "[variables('servicestoBuild')]"
+    }    
+  }
 }

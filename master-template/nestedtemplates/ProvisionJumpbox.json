@@ -195,6 +195,9 @@
     },
     "_packages" : ["sql-server-management-studio","rsat"],    
     "ConfigData": {
+      "ClientInstallPath"  : "\\\\KD201\\Share\\Client",
+      "DestinationPath"    : "C:\\INSTALL\\Client",
+      "InstallOffice"      : true,    
       "Packages"  : [ 
         "vscode",        
         "git",                
