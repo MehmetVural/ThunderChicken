@@ -75,11 +75,11 @@
       }
     },
     "includeCertificateAuthority" : {
-      "type": "bool",
-      "defaultValue": true,
+      "type": "string",
+      "defaultValue": "Yes",
       "allowedValues": [
-        true,
-        false
+        "Yes",
+        "No"
       ],
       "metadata": {
         "group": "Domain Settings",
@@ -250,6 +250,7 @@
   "variables": {    
     "location": "[resourceGroup().location]",    
     "deployJumpBoxTemplate":"[parameters('deployJumpbox')]",
+    "includeCertificateAuthority" : "[parameters('includeCertificateAuthority')]",
     "InternalTestEnvironment" : "[parameters('InternalTestEnvironment')]",
     "ExternalTestEnvironment" : "[parameters('ExternalTestEnvironment')]",  
     "ReverseProxy" : "[parameters('ReverseProxy')]",  
@@ -261,7 +262,7 @@
     "templatePrefix" : "master",
     "template" : "[parameters('Template')]",
     "templates" : "[if(equals(variables('template'), 'None'), createArray('None') ,if( equals(variables('template'), 'SCOMFull'), createArray('SharedSQLFull', 'SCOMFull'), createArray(variables('template'))          ) ) ]" ,
-    "deployCA": "[ if( parameters('includeCertificateAuthority'), createArray('CertificateAuthority'), createArray('None'))]",
+    "deployCA": "[ if( equals(variables('includeCertificateAuthority'), 'Yes'), createArray('CertificateAuthority'), createArray('None'))]",
     "servicestoBuild" :"[union(variables('templates'), variables('deployCA'),  if(   equals(   variables('InternalTestEnvironment'), 'Yes'), createArray('InternalTest') ,  createArray('None')   ) )]",
     "forestMode": "[parameters('forestMode')]",    
     "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
