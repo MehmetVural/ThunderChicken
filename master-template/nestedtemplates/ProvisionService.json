@@ -1761,47 +1761,7 @@
         "prefix": "uem",
         "ConfigData": {},
         "imageReference" : "Windows2016",
-        "servers": [
-          {
-            "hostname": "KM206",
-            "size": "M",
-            "subnet": "KD",
-            "loadBalancerBackendAddressPools": [],
-            "joinDomain" : true,
-            "ip": "10.0.3.58",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              },
-              {
-                "name": "UEMData",
-                "diskSizeGB": 50,
-                "letter": "E"
-              }
-            ]
-          },
-          {
-            "hostname": "KM207",
-            "size": "M",
-            "subnet": "KD",
-            "loadBalancerBackendAddressPools": [],
-            "joinDomain" : true,
-            "ip": "10.0.3.59",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              },
-              {
-                "name": "UEMData",
-                "diskSizeGB": 100,
-                "letter": "E"
-              }
-            ]
-          },
+        "servers": [ 
           {
             "hostname": "KM208",
             "size": "L",
@@ -1821,54 +1781,14 @@
                 "letter": "E"
               }
             ]
-          },
-          {
-            "hostname": "CM206",
-            "size": "L",
-            "subnet": "CD",
-            "loadBalancerBackendAddressPools": [],
-            "joinDomain" : true,
-            "ip": "10.0.4.61",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              },
-              {
-                "name": "UEMData",
-                "diskSizeGB": 50,
-                "letter": "E"
-              }
-            ]
-          },
-          {
-            "hostname": "CM207",
-            "size": "M",
-            "subnet": "CD",
-            "loadBalancerBackendAddressPools": [],
-            "joinDomain" : true,
-            "ip": "10.0.4.62",
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              },
-              {
-                "name": "UEMData",
-                "diskSizeGB": 100,
-                "letter": "E"
-              }
-            ]
-          },
+          },         
           {
             "hostname": "CM208",
             "size": "M",
             "subnet": "C",
             "loadBalancerBackendAddressPools": [],
             "joinDomain" : true,
-            "ip": "10.0.2.63",
+            "ip": "10.0.2.60",
             "datadisks": [
               {
                 "name": "Local Data",
@@ -2164,7 +2084,7 @@
       "CertificateAuthority": {
         "prefix": "ca",
         "ConfigData": {
-          "WindowsFeatures"  : ["ADCS-Cert-Authority", "ADCS-Enroll-Web-Pol", "ADCS-Enroll-Web-Svc", "ADCS-Web-Enrollment", "RSAT-ADCS", "RSAT-ADCS-MGMT", "Web-Server", "Web-Mgmt-Console", "RSAT-ADDS", "RSAT-AD-PowerShell","RSAT-DNS-Server"]
+          "WindowsFeatures"  : ["ADCS-Cert-Authority", "ADCS-Enroll-Web-Pol", "ADCS-Enroll-Web-Svc", "ADCS-Web-Enrollment", "RSAT-ADCS", "cd ..", "Web-Server", "Web-Mgmt-Console", "RSAT-ADDS", "RSAT-AD-PowerShell","RSAT-DNS-Server"]
         },
         "imageReference" : "Windows2016",
         "servers": [
