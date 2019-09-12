@@ -205,8 +205,7 @@
         "poshgit",
         "pester",
         "vscode-powershell",
-        "googlechrome",
-        "office365business"       
+        "googlechrome"             
         ],
       "GitRepositories"  : [ 
         "CI.Common"
