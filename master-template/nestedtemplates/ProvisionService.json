@@ -2084,7 +2084,7 @@
       "CertificateAuthority": {
         "prefix": "ca",
         "ConfigData": {
-          "WindowsFeatures"  : ["ADCS-Cert-Authority", "ADCS-Enroll-Web-Pol", "ADCS-Enroll-Web-Svc", "ADCS-Web-Enrollment", "RSAT-ADCS", "cd ..", "Web-Server", "Web-Mgmt-Console", "RSAT-ADDS", "RSAT-AD-PowerShell","RSAT-DNS-Server"]
+          "WindowsFeatures"  : ["ADCS-Cert-Authority", "ADCS-Enroll-Web-Pol", "ADCS-Enroll-Web-Svc", "ADCS-Web-Enrollment", "RSAT-ADCS", "RSAT-ADCS-MGMT", "Web-Server", "Web-Mgmt-Console", "RSAT-ADDS", "RSAT-AD-PowerShell","RSAT-DNS-Server"]
         },
         "imageReference" : "Windows2016",
         "servers": [
