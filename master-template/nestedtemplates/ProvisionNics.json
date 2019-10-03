@@ -1,0 +1,169 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ConfigData": {
+      "type": "array",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    },
+    "hostname": {
+      "type": "string",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    },
+    "site": {
+      "type": "string",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    },
+    "template": {
+      "type": "string",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    },
+    "templatePrefix": {
+      "type": "string",
+      "metadata": {
+        "group": "Settings",
+        "description": ""
+      }
+    }
+
+  },
+  "variables": {
+    "templatePrefix": "[parameters('templatePrefix')]",    
+    "mastertemplatePrefix": "master", 
+    "externaltemplatePrefix": "external",    
+    "availabilitySetsNameInternal" : "[concat(variables('mastertemplatePrefix'), '-avset-internal')]",
+    "availabilitySetsNameExternal" : "[concat(variables('mastertemplatePrefix'), '-avset-external')]",
+    "domainName": "Domain.com",
+    "domainNetbiosName": "Domain",
+    "domainNameDMZ": "DomainDMZ.com",    
+    "domainNetbiosNameDMZ": "DomainDMZ",
+    "domainNameClient": "Client.com",
+    "domainNetbiosNameClient": "Client",
+    "RetryCount": 600,
+    "RetryIntervalSec": 60,
+    "storageAccountNamePrefix": "[concat(variables('mastertemplatePrefix'), uniqueString(resourceGroup().id))]",
+    "virtualNetworkName": "[concat(variables('mastertemplatePrefix'), '-vn')]",
+    "externalVirtualNetworkName": "[concat(variables('externaltemplatePrefix'), '-vn')]",
+    "VSubnetName": "vs",
+    "KSubnetName": "ks",
+    "CSubnetName": "cs",
+    "KDMZSubnetName": "kdmz",
+    "CDMZSubnetName": "cdmz",
+    "ESubnetName": "es",
+    "dc1NicIPAddress": "10.0.0.5",
+    "dc2NicIPAddress": "10.0.1.5",
+    "dc3NicIPAddress": "10.0.2.5",
+    "dmzdc1NicIPAddress": "10.0.3.5",
+    "dmzdc2NicIPAddress": "10.0.4.5",
+    "edcNicIPAddress": "10.1.0.5",
+    "subnets": {
+      "V": {
+        "name": "[variables('VSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "domainNetbiosName": "[variables('domainNetbiosName')]",
+        "dns": "[variables('dc1NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
+        
+      },
+      "K": {
+        "name": "[variables('KSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "domainNetbiosName": "[variables('domainNetbiosName')]",
+        "dns": "[variables('dc2NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
+      },
+      "C": {
+        "name": "[variables('CSubnetName')]",
+        "domain": "[variables('domainName')]",
+        "domainNetbiosName": "[variables('domainNetbiosName')]",
+        "dns": "[variables('dc3NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
+      },
+      "KD": {
+        "name": "[variables('KDMZSubnetName')]",
+        "domain": "[variables('domainNameDMZ')]",
+        "domainNetbiosName": "[variables('domainNetbiosNameDMZ')]",
+        "dns": "[variables('dmzdc1NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"        
+      },
+      "CD": {
+        "name": "[variables('CDMZSubnetName')]",
+        "domain": "[variables('domainNameDMZ')]",
+        "domainNetbiosName": "[variables('domainNetbiosNameDMZ')]",
+        "dns": "[variables('dmzdc2NicIPAddress')]",
+        "virtualNetworkName" : "[variables('virtualNetworkName')]"
+      },
+      "E": {
+        "name": "[variables('ESubnetName')]",
+        "domain": "[variables('domainNameClient')]",
+        "domainNetbiosName": "[variables('domainNetbiosNameClient')]",
+        "dns": "[variables('edcNicIPAddress')]",
+        "virtualNetworkName" : "[variables('externalVirtualNetworkName')]"
+      }
+    },
+
+    "ConfigData" : "[parameters('ConfigData')]", 
+    "Nics": "[variables('ConfigData')]",
+    "hostname":  "[parameters('hostname')]",
+    "Site" : "[parameters('site')]",
+    "template" : "[parameters('template')]"
+  },
+  "resources": [
+   
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('templatePrefix'), '-', variables('hostname') ,'-nic', copyIndex() )]",
+      "location": "[resourceGroup().location]",
+      "condition": "[greater(length(variables('Nics')), 0)]",     
+      "tags": {
+        "Service": "[variables('template')]",
+        "Site": "[variables('Site')]"
+      },
+      "copy": {
+        "name": "nicLoop",
+        "count": "[length(variables('Nics'))]"
+      },
+      "properties": {
+        "copy": [
+          {
+            "name": "ipConfigurations",
+            "count": "[length(variables('Nics')[copyIndex()].ips)]",
+            "input": {
+              "name": "[concat( variables('templatePrefix'), '-', variables('hostname'), '-', 'ipconfig', add(copyIndex('ipConfigurations'), 1)  )]",
+              "properties": {
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('subnets')[variables('Nics')[copyIndex()].ips[copyIndex('ipConfigurations')].subnet].virtualNetworkName,  variables('subnets')[variables('Nics')[copyIndex()].ips[copyIndex('ipConfigurations')].subnet].Name)]"
+                },
+                "privateIPAllocationMethod": "Static",
+                "privateIPAddress": "[variables('Nics')[copyIndex()].ips[copyIndex('ipConfigurations')].ip]",
+                "primary": "[if(   equals(copyIndex('ipConfigurations'), 0), 'true', 'false'  )]",
+                "privateIPAddressVersion": "IPv4",                
+                "loadBalancerBackendAddressPools": "[variables('Nics')[copyIndex()].ips[copyIndex('ipConfigurations')].loadBalancerBackendAddressPools]" 
+              }
+            }
+          }
+        ]       
+      }
+    }
+
+  ],
+  "outputs": {
+    "ip" : {      
+      "type" : "array",
+      "value": "[variables('ConfigData')]"
+    }
+  }
+}
