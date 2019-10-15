@@ -827,6 +827,32 @@
             ]
           },
           {
+            "hostname": "CS208",
+            "size": "M",
+            "subnet": "CD",            
+            "joinDomain" : false,
+            "ip": "10.0.2.14",
+            "nics": [
+              {
+                "ips": [
+                  {
+                    "ip": "10.0.2.14",
+                    "subnet": "CD",
+                    "loadBalancerBackendAddressPools": []
+                  }
+                ],
+                "primary":true
+              }       
+            ],
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
             "hostname": "KS201",
             "size": "L",
             "subnet": "K",            
@@ -864,6 +890,32 @@
                   {
                     "ip": "10.0.1.15",
                     "subnet": "K",
+                    "loadBalancerBackendAddressPools": []
+                  }
+                ],
+                "primary":true
+              }       
+            ],
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },          
+          {
+            "hostname": "KS208",
+            "size": "M",
+            "subnet": "KD",            
+            "joinDomain" : false,
+            "ip": "10.0.1.16",
+            "nics": [
+              {
+                "ips": [
+                  {
+                    "ip": "10.0.1.16",
+                    "subnet": "KD",
                     "loadBalancerBackendAddressPools": []
                   }
                 ],
