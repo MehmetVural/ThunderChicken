@@ -831,12 +831,12 @@
             "size": "M",
             "subnet": "CD",            
             "joinDomain" : false,
-            "ip": "10.0.2.14",
+            "ip": "10.0.4.14",
             "nics": [
               {
                 "ips": [
                   {
-                    "ip": "10.0.2.14",
+                    "ip": "10.0.4.14",
                     "subnet": "CD",
                     "loadBalancerBackendAddressPools": []
                   }
@@ -909,12 +909,12 @@
             "size": "M",
             "subnet": "KD",            
             "joinDomain" : false,
-            "ip": "10.0.1.16",
+            "ip": "10.0.3.16",
             "nics": [
               {
                 "ips": [
                   {
-                    "ip": "10.0.1.16",
+                    "ip": "10.0.3.16",
                     "subnet": "KD",
                     "loadBalancerBackendAddressPools": []
                   }
