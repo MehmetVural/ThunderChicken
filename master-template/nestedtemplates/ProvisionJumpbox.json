@@ -305,7 +305,7 @@
           }
         },
         "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].S]"
+          "vmSize": "[variables('virtualMachineSizeArraySeries')[parameters('VMSeries')].M]"
         },
         "storageProfile": {
           "imageReference": "[variables('imageReference')['Windows2016']]",
@@ -393,8 +393,12 @@
             "protectedSettings": {
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
+                "LocalAdminCredential": {
+                  "UserName": "[concat( parameters('adminUserName') )]",
+                  "Password": "[parameters('adminPassword')]"
+                },
                 "InstallCredential": {
-                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "UserName": "[concat(variables('vmDscSettings').domainNetbiosName, '\\user_a')]",
                   "Password": "[parameters('adminPassword')]"
                 },
                 "DomainAdminCredential": {

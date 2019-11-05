@@ -98,7 +98,12 @@
         "diskSizeGB": 100,
         "letter": "F"              
       }
-    ]
+    ],    
+    "DisksizeGB": {
+      "Small-4GB": 4,
+      "Medium-20GB": 20,
+      "Large-50GB": 50
+    }
     
   },
   "resources": [
@@ -142,14 +147,14 @@
             "managedDisk": {                 
               "storageAccountType": "Standard_LRS"
             }
-          },
+          },         
           "copy": [
             {
               "name": "dataDisks",
               "count": "[if(not(equals(parameters('DiskSizes'), 'Default')), 1, length(variables('datadisks')) )]",
               "input": {
                 "name": "[if(not(equals(parameters('DiskSizes'), 'Default')), concat(variables('ConfigData').Servers[copyIndex()].HostName, '_DataDisk'), concat(variables('ConfigData').Servers[copyIndex()].HostName,'_DataDisk_', variables('datadisks')[copyIndex('dataDisks')].letter, '_', replace(variables('datadisks')[copyIndex('dataDisks')].name,' ','_')) )]",
-                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), 32, int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB))]",
+                "diskSizeGB": "[if(not(equals(parameters('DiskSizes'), 'Default')), 110, int(variables('datadisks')[copyIndex('dataDisks')].diskSizeGB))]",
                 "lun": "[copyIndex('dataDisks')]",
                 "createOption": "Empty",
                 "managedDisk": {                 
@@ -157,8 +162,7 @@
                 }
               }
             }
-          ]
-          
+          ]          
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -223,7 +227,7 @@
                 "site": "[toUpper(variables('ConfigData').Servers[copyIndex()].Site )]",
                 
                 "DiskSize": "[parameters('DiskSizes')]",
-                "DisksizeGB": "5",
+                "DisksizeGB": "50",
                 "dataDisks": "[string(variables('datadisks'))]",                
                 "SourcePath" : "[concat('\\\\', variables('fileShareSAAccount'), '.file.core.windows.net', '\\', 'share')]",
 

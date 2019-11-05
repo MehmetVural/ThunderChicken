@@ -3189,8 +3189,12 @@
             "protectedSettings": {
               "configurationUrlSasToken": "[parameters('ArtifactsLocationSasToken')]",
               "configurationArguments": {
+                "LocalAdminCredential": {
+                  "UserName": "[concat( parameters('adminUserName') )]",
+                  "Password": "[parameters('adminPassword')]"
+                },
                 "InstallCredential": {
-                  "UserName": "[concat(variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domainNetbiosName, '\\', parameters('adminUserName'))]",
+                  "UserName": "[concat(variables('subnets')[variables('templates')[variables('template')].servers[copyIndex()].subnet].domainNetbiosName, '\\user_a')]",
                   "Password": "[parameters('adminPassword')]"
                 },
                 "DomainAdminCredential": {
