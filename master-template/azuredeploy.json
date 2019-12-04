@@ -35,7 +35,7 @@
     }, 
     "deployJumpbox": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -47,7 +47,7 @@
     },
     "enterpriseGithubUsername": {
       "type": "string",
-      "defaultValue": "",   
+      "defaultValue": "mvural",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "UserName for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -55,16 +55,15 @@
     },  
     "enterpriseGithubToken": {
       "type": "securestring",
-      "defaultValue": "",   
+      "defaultValue": "611ba9c5270214e6efbcf22a1476cdbb29146f23",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Token for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
       }
-    }, 
-
+    },
     "deployDomain": {
       "type": "string",
-      "defaultValue": "Yes",
+      "defaultValue": "No",
       "allowedValues": [
         "Yes",
         "No"
@@ -115,7 +114,7 @@
     },     
     "Template": {
       "type": "string",
-      "defaultValue": "None",
+      "defaultValue": "SharePoint",
       "allowedValues": [
         "None",
         "AD-DS",
@@ -177,7 +176,7 @@
 
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Small",
+      "defaultValue": "Medium",
       "allowedValues": [
         "Small",
         "Medium",
@@ -191,7 +190,7 @@
     },       
     "DiskSizes": {
       "type": "string",
-      "defaultValue": "Small-4GB",
+      "defaultValue": "Large-50GB",
       "allowedValues": [
         "Small-4GB",
         "Medium-20GB",
@@ -229,7 +228,7 @@
     },    
     "AutoShutdown": {
       "type": "string",
-      "defaultValue": "1700",
+      "defaultValue": "1800",
       "allowedValues": [
         "1200",
         "1300",
@@ -554,11 +553,105 @@
         "enabledPublic" :  "[variables('enabledPublicLB')]",
         "LoadBalancersInternal"   :  [  
           {     
+            "Name" : "V",
+            "Site" : "vs",        
+            "Type" : "Internal",
+            "SKU"  : "Basic",            
+            "frontendIPConfigurations": [
+              {
+                  "name": "FronEndSQLV",            
+                  "properties": {                  
+                      "privateIPAddress": "10.0.0.180",
+                      "privateIPAllocationMethod": "Static",
+                      "subnet": {                      
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('VSubnetName'))]"
+                      },
+                      "privateIPAddressVersion": "IPv4"
+                  }
+              }         
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolSQLV",            
+                "properties": {
+                }
+              }
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [
+                {
+                  "name": "loadBalancingRulesSQLListener",              
+                  "properties": {                  
+                      "frontendIPConfiguration": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'V', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLV')]"
+                      },
+                      "frontendPort": 1433,
+                      "backendPort": 1433,
+                      "enableFloatingIP": true,
+                      "idleTimeoutInMinutes": 4,
+                      "protocol": "Tcp",
+                      "enableTcpReset": false,
+                      "loadDistribution": "Default",
+                      "backendAddressPool": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'V', '-loadbalancer')), '/backendAddressPools/backendpoolSQLV')]"
+                      },
+                      "probe": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'V', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                      }
+                  }
+                }
+            ],
+            "probes": [
+                {
+                  "name": "SQLAlwaysOnEndPointProbe",
+                  "properties": {              
+                      "protocol": "Tcp",
+                      "port": 59999,
+                      "intervalInSeconds": 5,
+                      "numberOfProbes": 2
+                  }                
+                }
+            ]
+          }, 
+          {     
             "Name" : "K",
             "Site" : "ks",        
             "Type" : "Internal",
             "SKU"  : "Basic",            
             "frontendIPConfigurations": [
+              {
+                "name": "FronEndSharePointK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.160",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndSQLSharePointK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.166",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },  
+              {
+                "name": "FronEndSQLK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.181",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },             
               {
                   "name": "FronEndExchangeMailBoxK",            
                   "properties": {                  
@@ -584,6 +677,21 @@
             ],
             "backendAddressPools": [
               {
+                "name": "backendpoolSharePointK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolSQLSharePointK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolSQLK",            
+                "properties": {
+                }
+              }, 
+              {
                 "name": "backendpoolMailBoxK",            
                 "properties": {
                 }
@@ -596,6 +704,69 @@
             ],
             "inboundNatRules": [],
             "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesSharePoint80",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointK')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSQLSharePointListener",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLSharePointK')]"
+                    },
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSQLSharePointK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                    }
+                }
+              },              
+              {
+                "name": "loadBalancingRulesSQLListener",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLK')]"
+                    },
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSQLK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                    }
+                  }
+                },
                 {
                   "name": "loadBalancingRulesMailBoxK80",              
                   "properties": {                  
@@ -639,15 +810,24 @@
                   }
                 }
             ],
-            "probes": [
-                {
-                  "name": "HealthProbe80",              
-                  "properties": {              
-                      "protocol": "Tcp",
-                      "port": 80,
-                      "intervalInSeconds": 5,
-                      "numberOfProbes": 2
-                  }
+            "probes": [             
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              },              
+              {
+                "name": "SQLAlwaysOnEndPointProbe",
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 59999,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
               }
             ]
           },        
@@ -657,6 +837,17 @@
             "Type" : "Internal",          
             "SKU"  : "Basic",
             "frontendIPConfigurations": [
+              {
+                "name": "FronEndSQLC",
+                "properties": {                  
+                    "privateIPAddress": "10.0.2.182",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
               {
                 "name": "FronEndExchangeMailBoxC",            
                 "properties": {
@@ -681,7 +872,12 @@
                 }
               }          
             ],
-            "backendAddressPools": [         
+            "backendAddressPools": [
+              {
+                "name": "backendpoolSQLC",            
+                "properties": {
+                }
+              },      
               {
                 "name": "backendpoolMailBoxC",
                 "properties": {                
@@ -696,6 +892,27 @@
             ],
             "inboundNatRules": [],
             "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesSQLListener",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLC')]"
+                    },
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolSQLC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                    }
+                }
+              },
               {
                 "name": "loadBalancingRulesMailBoxC80",              
                 "properties": {                  
@@ -739,7 +956,7 @@
                 }
               }          
             ],
-            "probes": [
+            "probes": [             
               {
                 "name": "HealthProbe80",              
                 "properties": {              
@@ -748,7 +965,16 @@
                     "intervalInSeconds": 5,
                     "numberOfProbes": 2
                 }
-              }          
+              },
+              {
+                "name": "SQLAlwaysOnEndPointProbe",
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 59999,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }        
             ]
           }
         ],
@@ -1306,13 +1532,10 @@
             ]
           }    
         ]
-      }
-     
-    }
-
+      }     
+    }    
   },
-  "resources": [
-    
+  "resources": [    
     {
       "name": "ProvisioningBase",
       "type": "Microsoft.Resources/deployments",
@@ -1356,9 +1579,9 @@
     },
     {
       "name": "ProvisionLoadBalancers",
-      "type": "Microsoft.Resources/deployments",
-      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",
+      "type": "Microsoft.Resources/deployments",      
       "apiVersion": "2015-01-01",
+      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'), equals(variables('template'), 'SharedSQL'),  equals(variables('template'), 'SharePoint')     )]",
       "dependsOn" : [
         "ProvisioningBase"      
       ],
@@ -1546,7 +1769,7 @@
       "condition": "[not( equals( variables('servicestoBuild')[copyIndex()], 'None')   )]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]",
-        "[if( or(equals( variables('servicestoBuild')[copyIndex()] , 'Exchange'), equals( variables('servicestoBuild')[copyIndex()] , 'Skype'))   , 'ProvisionLoadBalancers' ,  'ProvisioningBase')]"
+        "[if( or(equals( variables('servicestoBuild')[copyIndex()] , 'Exchange'), equals( variables('servicestoBuild')[copyIndex()] , 'Skype'), equals( variables('servicestoBuild')[copyIndex()] , 'SharePoint'))   , 'ProvisionLoadBalancers' ,  'ProvisioningBase')]"
       ],
       "copy": {
         "name": "serviceLoop",

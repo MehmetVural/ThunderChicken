@@ -204,8 +204,7 @@ Configuration PrepareVms
                 DependsOn            = $FarmTask             
             }
             $FarmTask = "[Group]AddUserAToLocalAdminGroup"
-            #>
-        
+            #>        
         }
 
         ## JumpBox Settings
@@ -230,15 +229,14 @@ Configuration PrepareVms
             }
     
             $FarmTask = "[Script]SetWSMANJumpbox"  
-
              
-            # install RSAT tools  for JumpBox            
+            # Install RSAT tools  for JumpBox            
             @(
-                "RSAT"
-                # "RSAT-ADDS-Tools" ,
-                # "RSAT-AD-PowerShell",
-                # "RSAT-DNS-Server",
-                # "RSAT-DHCP"                                    
+               "RSAT"
+               "RSAT-ADDS-Tools" ,
+               "RSAT-AD-PowerShell",
+               "RSAT-DNS-Server",
+               "RSAT-DHCP"                                    
             ) | ForEach-Object -Process {
                 WindowsFeature "Feature-$_"
                 {
@@ -832,7 +830,7 @@ Configuration PrepareVms
         }
         elseif ($ServiceName -eq "SharedSQL") 
         {
-             ##  START SHARED SQL INSTALLATIONS
+            ##  START SHARED SQL INSTALLATIONS
             
             #$ConfigData | ConvertTo-Json |  Out-File -FilePath C:\ConfigData.txt
             #$ConfigData | Out-File -FilePath C:\json.txt
@@ -1863,6 +1861,122 @@ Configuration PrepareVms
             DependsOn = "[xSCOMManagementServerSetup]OMMS"            
             }  
             #>        
+        }
+        elseif ($ServiceName -eq "SharePoint") 
+        {
+            ##  BUILD SHAREPOINT SQL CLUSTER
+            
+            #$ConfigData | ConvertTo-Json |  Out-File -FilePath C:\ConfigData.txt
+            #$ConfigData | Out-File -FilePath C:\json.txt
+
+            $SqlAdministratorCredential = $InstallCredential
+            $SqlServiceCredential       = $InstallCredential   
+            $SqlAgentServiceCredential  = $InstallCredential
+            
+            #$ServerSite | Out-File -FilePath C:\ServerSite.txt
+
+            $Nodes         = $ConfigData.Nodes  # $ConfigData[$ServerSite] not site specific Availibility group any more, one giant AG replicas
+            $NonNodeData   = $ConfigData.NonNodeData
+            $Settings      = $ConfigData.DatabaseSettings
+
+            #$Nodes | ConvertTo-Json | Out-File -FilePath C:\Nodes.txt
+
+            $Node = $Nodes.Where{$_.Name -eq $ServerName} 
+            
+            #$Node | ConvertTo-Json | Out-File -FilePath C:\Node.txt
+
+            $ClusterIPAddress = $NonNodeData.ClusterIPAddress
+            $ClusterName      = $NonNodeData.ClusterName
+        
+            $ClusterNodes = @();
+
+            $Nodes.foreach({
+                $ClusterNodes += $_.Name
+            });
+
+            # xCredSSP CredSSPServer
+            # {
+            #     Ensure = 'Present'
+            #     Role = 'Server'
+            # }
+
+            # xCredSSP CredSSPClient
+            # {
+            #     Ensure = 'Present'
+            #     Role = 'Client'
+            #     DelegateComputers = "*.$($DomainName)"
+            # }
+                            
+            @(
+                "Failover-clustering",            
+                "RSAT-Clustering-PowerShell",
+                "RSAT-Clustering-CmdInterface",
+                "RSAT-Clustering-Mgmt",
+                "RSAT-AD-PowerShell",
+                "RSAT-DNS-Server"
+            ) | ForEach-Object -Process {
+                WindowsFeature "Feature-$_"
+                {
+                    Ensure      = "Present"
+                    Name        = $_
+                    DependsOn   = $FarmTask 
+                }
+                $FarmTask = "[WindowsFeature]Feature-$_"
+            }          
+
+            if ( $Node.Role -eq 'FirstServer' )      
+            {                 
+                WaitForAll ClusterFeature
+                {
+                    ResourceName            = '[WindowsFeature]Feature-RSAT-Clustering-CmdInterface'
+                    NodeName                = $Nodes.Name
+                    RetryCount              = $RetryCount
+                    RetryIntervalSec        = $RetryIntervalSec
+                    PsDscRunAsCredential    = $InstallCredential
+                    DependsOn               = $FarmTask 
+                }
+                $FarmTask = "[WaitForAll]ClusterFeature"
+                
+                Script CreateCluster
+                {
+                    SetScript = {
+                            $ClusterService = Get-Service "ClusSvc"
+                        
+                        If($ClusterService) 
+                            {
+                                New-Cluster $using:ClusterName -Node $using:ClusterNodes -StaticAddress $using:ClusterIPAddress -NoStorage -AdministrativeAccessPoint Dns
+                            }
+                            #Get-Cluster -Name 'mc21'  | Add-ClusterNode -Name "VS222"
+                            #Get-Cluster -Name MyCl1 | Add-ClusterNode -Name node3
+
+                    }
+                    TestScript = {  
+                                    $ClusterService = Get-Service "ClusSvc"
+
+                                    If($ClusterService) 
+                                    {
+                                        if($ClusterService.StartType -ne "Disabled")
+                                        {
+                                            if(Get-Cluster) {
+                                            return $true
+                                            }
+                                            else{return $true}
+                                        }
+                                        else
+                                        {
+                                            return $false
+                                        }                                 
+                                    }
+                                    else {return $true}
+                    
+                    }
+
+                    GetScript = { $null }                    
+                    PsDscRunAsCredential  =  $InstallCredential     
+                    DependsOn   = $FarmTask 
+                }
+                $FarmTask = "[Script]CreateCluster"
+            }
         }
      
     }

@@ -948,7 +948,11 @@
                   {
                     "ip": "10.0.0.16",
                     "subnet": "V",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-V', '-loadbalancer') , 'backendpoolSQLV')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -999,7 +1003,11 @@
                   {
                     "ip": "10.0.0.17",
                     "subnet": "V",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-V', '-loadbalancer') , 'backendpoolSQLV')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1050,7 +1058,11 @@
                   {
                     "ip": "10.0.2.18",
                     "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer') , 'backendpoolSQLC')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1097,7 +1109,11 @@
                   {
                     "ip": "10.0.2.19",
                     "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer') , 'backendpoolSQLC')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1144,7 +1160,11 @@
                   {
                     "ip": "10.0.1.20",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSQLK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1191,7 +1211,11 @@
                   {
                     "ip": "10.0.1.21",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSQLK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1232,7 +1256,7 @@
           "Nodes": [
             {
               "Name": "VS221",
-              "Role": "FirstServer",
+              "Role": "Secondary",
               "SqlDnsPrefix": "VSql",
               "DnsServer": "[variables('dc1NicIPAddress')]"
             },
@@ -1244,7 +1268,7 @@
             },
             {
               "Name": "KS221",
-              "Role": "Secondary",
+              "Role": "FirstServer",
               "SqlDnsPrefix": "KSql",
               "DnsServer": "[variables('dc2NicIPAddress')]"
             },
@@ -1646,139 +1670,9 @@
         ]
       },
       "SharePoint": {
-        "prefix": "sp",
-        "ConfigData": {},
+        "prefix": "sp",        
         "imageReference" : "Windows2016",
-        "servers": [
-          {
-            "hostname": "CP201",
-            "size": "L",
-            "subnet": "C",            
-            "joinDomain" : true,
-            "ip": "10.0.2.35",
-            "nics": [
-              {
-                "ips": [
-                  {
-                    "ip": "10.0.2.35",
-                    "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
-                  }
-                ],
-                "primary":true
-              }       
-            ],
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "CP202",
-            "size": "L",
-            "subnet": "C",            
-            "joinDomain" : true,
-            "ip": "10.0.2.36",
-            "nics": [
-              {
-                "ips": [
-                  {
-                    "ip": "10.0.2.36",
-                    "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
-                  }
-                ],
-                "primary":true
-              }       
-            ],
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
-          {
-            "hostname": "CP203",
-            "size": "L",
-            "subnet": "C",            
-            "joinDomain" : true,
-            "ip": "10.0.2.37",
-            "nics": [
-              {
-                "ips": [
-                  {
-                    "ip": "10.0.2.37",
-                    "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
-                  }
-                ],
-                "primary":true
-              }       
-            ],
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              },
-              {
-                "name": "SQLData",
-                "diskSizeGB": 1023,
-                "letter": "E"
-              },
-              {
-                "name": "SQLLog",
-                "diskSizeGB": 400,
-                "letter": "F"
-              },
-              {
-                "name": "SQLTempDB",
-                "diskSizeGB": 50,
-                "letter": "G"
-              },
-              {
-                "name": "SQLBackup",
-                "diskSizeGB": 1023,
-                "letter": "H"
-              },
-              {
-                "name": "SP_Indexes",
-                "diskSizeGB": 50,
-                "letter": "I"
-              }
-            ]
-          },
-          {
-            "hostname": "CP206",
-            "size": "L",
-            "subnet": "C",            
-            "joinDomain" : true,
-            "ip": "10.0.2.40",
-            "nics": [
-              {
-                "ips": [
-                  {
-                    "ip": "10.0.2.40",
-                    "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
-                  }
-                ],
-                "primary":true
-              }       
-            ],
-            "datadisks": [
-              {
-                "name": "Local Data",
-                "diskSizeGB": 50,
-                "letter": "D"
-              }
-            ]
-          },
+        "servers": [                
           {
             "hostname": "KP201",
             "size": "L",
@@ -1791,7 +1685,11 @@
                   {
                     "ip": "10.0.1.41",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSharePointK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1843,7 +1741,11 @@
                   {
                     "ip": "10.0.1.43",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSQLSharePointK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1958,8 +1860,148 @@
                 "letter": "I"
               }
             ]
+          },
+          {
+            "hostname": "KP211",
+            "size": "L",
+            "subnet": "K",            
+            "joinDomain" : true,
+            "ip": "10.0.1.35",
+            "nics": [
+              {
+                "ips": [
+                  {
+                    "ip": "10.0.1.35",
+                    "subnet": "K",
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSharePointK')]"
+                      }
+                    ]
+                  }
+                ],
+                "primary":true
+              }       
+            ],
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
+            "hostname": "KP212",
+            "size": "L",
+            "subnet": "K",           
+            "joinDomain" : true,
+            "ip": "10.0.1.36",
+            "nics": [
+              {
+                "ips": [
+                  {
+                    "ip": "10.0.1.36",
+                    "subnet": "K",
+                    "loadBalancerBackendAddressPools": []
+                  }
+                ],
+                "primary":true
+              }       
+            ],
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              }
+            ]
+          },
+          {
+            "hostname": "KP213",
+            "size": "L",
+            "subnet": "K",           
+            "joinDomain" : true,
+            "ip": "10.0.1.37",
+            "nics": [
+              {
+                "ips": [
+                  {
+                    "ip": "10.0.1.37",
+                    "subnet": "K",
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSQLSharePointK')]"
+                      }
+                    ]
+                  }
+                ],
+                "primary":true
+              }       
+            ],
+            "datadisks": [
+              {
+                "name": "Local Data",
+                "diskSizeGB": 50,
+                "letter": "D"
+              },
+              {
+                "name": "SQLData",
+                "diskSizeGB": 1023,
+                "letter": "E"
+              },
+              {
+                "name": "SQLLog",
+                "diskSizeGB": 400,
+                "letter": "F"
+              },
+              {
+                "name": "SQLTempDB",
+                "diskSizeGB": 50,
+                "letter": "G"
+              },
+              {
+                "name": "SQLBackup",
+                "diskSizeGB": 1023,
+                "letter": "H"
+              },
+              {
+                "name": "SP_Indexes",
+                "diskSizeGB": 50,
+                "letter": "I"
+              }
+            ]
+          }    
+        ],
+        "ConfigData": {          
+          "Nodes": [
+            {
+              "Name": "KP203",
+              "Role": "FirstServer",
+              "SqlDnsPrefix": "vSPSql",
+              "DnsServer": "[variables('dc1NicIPAddress')]"
+            },
+            {
+              "Name": "KP213",
+              "Role": "Secondary",
+              "SqlDnsPrefix": "",
+              "DnsServer": "[variables('dc1NicIPAddress')]"
+            }
+          ],
+          "NonNodeData": {
+            "ClusterName": "SpSQLCluster",
+            "ClusterIPAddress": "10.0.1.155/24"
+          },          
+          "DatabaseSettings": {
+            "InstanceName": "MSSQLSERVER",
+            "AvailabilityGroupName": "TestAG",
+            "TestDBName": "TestDB",
+            "ShareServer": "KD201",
+            "SQLAGBackup": "\\\\KD201\\SQLAGBackup",
+            "SQLInstallSource": "\\\\KD201\\Share\\SharedSQL\\SQL2016",
+            "SQLInstallDestination": "C:\\INSTALL\\SQL2016"            
           }
-        ]
+        }
       },
       "OOS": {
         "prefix": "oos",
