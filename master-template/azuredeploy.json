@@ -35,7 +35,7 @@
     }, 
     "deployJumpbox": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -47,7 +47,7 @@
     },
     "enterpriseGithubUsername": {
       "type": "string",
-      "defaultValue": "mvural",   
+      "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "UserName for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -55,7 +55,7 @@
     },  
     "enterpriseGithubToken": {
       "type": "securestring",
-      "defaultValue": "611ba9c5270214e6efbcf22a1476cdbb29146f23",   
+      "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Token for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -63,7 +63,7 @@
     },
     "deployDomain": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -176,7 +176,7 @@
 
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Medium",
+      "defaultValue": "Small",
       "allowedValues": [
         "Small",
         "Medium",
@@ -190,7 +190,7 @@
     },       
     "DiskSizes": {
       "type": "string",
-      "defaultValue": "Large-50GB",
+      "defaultValue": "Small-4GB",
       "allowedValues": [
         "Small-4GB",
         "Medium-20GB",
