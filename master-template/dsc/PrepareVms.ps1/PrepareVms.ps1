@@ -148,7 +148,7 @@ Configuration PrepareVms
 
         # Install RSAT tools  to each machine           
         @(
-            "RSAT"
+            "RSAT",
             "RSAT-ADDS-Tools" ,
             "RSAT-AD-PowerShell",
             "RSAT-DNS-Server",
