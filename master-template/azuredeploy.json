@@ -35,7 +35,7 @@
     }, 
     "deployJumpbox": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -63,7 +63,7 @@
     },
     "deployDomain": {
       "type": "string",
-      "defaultValue": "No",
+      "defaultValue": "Yes",
       "allowedValues": [
         "Yes",
         "No"
@@ -114,7 +114,7 @@
     },     
     "Template": {
       "type": "string",
-      "defaultValue": "SharePoint",
+      "defaultValue": "None",
       "allowedValues": [
         "None",
         "AD-DS",
@@ -176,7 +176,7 @@
 
     "VirtualMachineSizes": {
       "type": "string",
-      "defaultValue": "Medium",
+      "defaultValue": "Small",
       "allowedValues": [
         "Small",
         "Medium",
@@ -190,7 +190,7 @@
     },       
     "DiskSizes": {
       "type": "string",
-      "defaultValue": "Large-50GB",
+      "defaultValue": "Small-4GB",
       "allowedValues": [
         "Small-4GB",
         "Medium-20GB",
