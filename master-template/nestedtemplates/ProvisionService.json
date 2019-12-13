@@ -1715,7 +1715,11 @@
                   {
                     "ip": "10.0.1.42",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSharePointCAK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1903,7 +1907,11 @@
                   {
                     "ip": "10.0.1.36",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolSharePointCAK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -1991,7 +1999,33 @@
           "NonNodeData": {
             "ClusterName": "SpSQLCluster",
             "ClusterIPAddress": "10.0.1.155/24"
-          },          
+          },
+          "DnsRecords": [            
+            {
+              "prefix": "SP2016AdminAG",
+              "IP": "10.0.1.43"              
+            },
+            {
+              "prefix": "ksp2016admin",
+              "IP": "10.0.1.162"              
+            },
+            {
+              "prefix": "rootsc",
+              "IP": "10.0.1.160"
+            },
+            {
+              "prefix": "corp",
+              "IP": "10.0.1.160"              
+            },
+            {
+              "prefix": "extra",
+              "IP": "10.0.1.160"              
+            },
+            {
+              "prefix": "infra",
+              "IP": "10.0.1.160"              
+            }
+          ],          
           "DatabaseSettings": {
             "InstanceName": "MSSQLSERVER",
             "AvailabilityGroupName": "TestAG",
@@ -2005,7 +2039,18 @@
       },
       "OOS": {
         "prefix": "oos",
-        "ConfigData": {},
+        "ConfigData": {
+          "DnsRecords": [
+            {
+              "prefix": "koos",
+              "IP": "10.0.1.164"              
+            },
+            {
+              "prefix": "coos",
+              "IP": "10.0.2.164"             
+            }
+          ]          
+        },
         "imageReference" : "Windows2016",
         "servers": [          
           {
@@ -2020,7 +2065,11 @@
                   {
                     "ip": "10.0.1.44",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolOOSK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -2046,7 +2095,11 @@
                   {
                     "ip": "10.0.1.45",
                     "subnet": "K",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-K', '-loadbalancer') , 'backendpoolOOSK')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -2072,7 +2125,11 @@
                   {
                     "ip": "10.0.2.38",
                     "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer') , 'backendpoolOOSC')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true
@@ -2098,7 +2155,11 @@
                   {
                     "ip": "10.0.2.39",
                     "subnet": "C",
-                    "loadBalancerBackendAddressPools": []
+                    "loadBalancerBackendAddressPools": [ 
+                      {
+                        "id" : "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', concat(variables('mastertemplatePrefix'), '-C', '-loadbalancer') , 'backendpoolOOSC')]"
+                      }
+                    ]
                   }
                 ],
                 "primary":true

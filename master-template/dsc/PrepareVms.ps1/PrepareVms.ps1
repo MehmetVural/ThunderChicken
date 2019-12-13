@@ -146,6 +146,22 @@ Configuration PrepareVms
             }
         }
 
+        # Install RSAT tools  to each machine           
+        @(
+            "RSAT"
+            "RSAT-ADDS-Tools" ,
+            "RSAT-AD-PowerShell",
+            "RSAT-DNS-Server",
+            "RSAT-DHCP"                                    
+        ) | ForEach-Object -Process {
+            WindowsFeature "Feature-$_"
+            {
+                Ensure = "Present"
+                Name = $_                   
+            }
+        }
+
+
         if($joinDomain){           
 
             # change DNS server address to subnet DNS address
@@ -158,6 +174,7 @@ Configuration PrepareVms
         
             $FarmTask = "[DnsServerAddress]DnsServerAddress" 
         }
+
 
         if(-Not $joinDomain)
         {          
@@ -230,20 +247,7 @@ Configuration PrepareVms
     
             $FarmTask = "[Script]SetWSMANJumpbox"  
              
-            # Install RSAT tools  for JumpBox            
-            @(
-               "RSAT"
-               "RSAT-ADDS-Tools" ,
-               "RSAT-AD-PowerShell",
-               "RSAT-DNS-Server",
-               "RSAT-DHCP"                                    
-            ) | ForEach-Object -Process {
-                WindowsFeature "Feature-$_"
-                {
-                    Ensure = "Present"
-                    Name = $_                   
-                }
-            }
+           
                      
             <#
             PackageManagementSource SourceRepository
@@ -662,7 +666,7 @@ Configuration PrepareVms
             # Install DNS windows features 
             @(
                 "DNS",
-                "RSAT-Dns-Server"       
+                "RSAT-Dns-Server"
             ) | ForEach-Object -Process {
                     WindowsFeature "Feature-$_"
                     {
@@ -1862,6 +1866,24 @@ Configuration PrepareVms
             }  
             #>        
         }
+        elseif ($ServiceName -eq "OOS"){
+
+            if($joinDomain){
+                $DnsRecords =  $ConfigData.DnsRecords            
+                foreach ($DnsRecord in $DnsRecords) {  
+                    xDnsRecord $DnsRecord.prefix
+                    {
+                        Name        = $DnsRecord.prefix
+                        Target      = $DnsRecord.IP
+                        Zone        = $DomainName
+                        Type        = "ARecord"
+                        DnsServer   = $DNSServer
+                        Ensure      = "Present"
+                        PsDscRunAsCredential = $DomainAdminCredential                  
+                    }
+                }
+            }
+        }
         elseif ($ServiceName -eq "SharePoint") 
         {
             ##  BUILD SHAREPOINT SQL CLUSTER
@@ -1977,6 +1999,23 @@ Configuration PrepareVms
                 }
                 $FarmTask = "[Script]CreateCluster"
             }
+
+            if($joinDomain){
+                $DnsRecords =  $ConfigData.DnsRecords
+                foreach ($DnsRecord in $DnsRecords) {  
+                    xDnsRecord $DnsRecord.prefix
+                    {
+                        Name        = $DnsRecord.prefix
+                        Target      = $DnsRecord.IP
+                        Zone        = $DomainName
+                        Type        = "ARecord"
+                        DnsServer   = $DNSServer
+                        Ensure      = "Present"
+                        PsDscRunAsCredential = $DomainAdminCredential                  
+                    }
+                }
+            }
+
         }
      
     }

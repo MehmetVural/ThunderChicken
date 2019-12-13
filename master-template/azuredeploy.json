@@ -631,9 +631,31 @@
                 }
               },
               {
+                "name": "FronEndSharePointCAK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.162",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
                 "name": "FronEndSQLSharePointK",            
                 "properties": {                  
                     "privateIPAddress": "10.0.1.166",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndOOSK",
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.164",
                     "privateIPAllocationMethod": "Static",
                     "subnet": {                      
                         "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
@@ -682,7 +704,17 @@
                 }
               },
               {
+                "name": "backendpoolSharePointCAK",
+                "properties": {
+                }
+              },
+              {
                 "name": "backendpoolSQLSharePointK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolOOSK",
                 "properties": {
                 }
               },
@@ -705,13 +737,13 @@
             "inboundNatRules": [],
             "loadBalancingRules": [
               {
-                "name": "loadBalancingRulesSharePoint80",              
+                "name": "loadBalancingRulesSharePoint443",              
                 "properties": {
                     "frontendIPConfiguration": {
                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointK')]"
                     },
-                    "frontendPort": 80,
-                    "backendPort": 80,
+                    "frontendPort": 443,
+                    "backendPort": 443,
                     "enableFloatingIP": false,
                     "idleTimeoutInMinutes": 4,
                     "protocol": "Tcp",
@@ -721,7 +753,28 @@
                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointK')]"
                     },
                     "probe": {
-                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSharePointCA443",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointCAK')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointCAK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
                     }
                 }
               },
@@ -745,7 +798,28 @@
                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
                     }
                 }
-              },              
+              },
+              {
+                "name": "loadBalancingRulesOOS443",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSK')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolOOSK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },   
               {
                 "name": "loadBalancingRulesSQLListener",              
                 "properties": {                  
@@ -819,6 +893,15 @@
                     "intervalInSeconds": 5,
                     "numberOfProbes": 2
                 }
+              },  
+              {
+                "name": "HealthProbe443",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 443,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
               },              
               {
                 "name": "SQLAlwaysOnEndPointProbe",
@@ -837,6 +920,17 @@
             "Type" : "Internal",          
             "SKU"  : "Basic",
             "frontendIPConfigurations": [
+              {
+                "name": "FronEndOOSC",
+                "properties": {                  
+                    "privateIPAddress": "10.0.2.164",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },  
               {
                 "name": "FronEndSQLC",
                 "properties": {                  
@@ -874,6 +968,11 @@
             ],
             "backendAddressPools": [
               {
+                "name": "backendpoolOOSC",            
+                "properties": {
+                }
+              },
+              {
                 "name": "backendpoolSQLC",            
                 "properties": {
                 }
@@ -887,11 +986,31 @@
                 "name": "backendpoolSkypeC",            
                 "properties": {                
                 }
-              }
-              
+              }              
             ],
             "inboundNatRules": [],
             "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesOOS443",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSC')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolOOSC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },
               {
                 "name": "loadBalancingRulesSQLListener",              
                 "properties": {                  
@@ -956,7 +1075,16 @@
                 }
               }          
             ],
-            "probes": [             
+            "probes": [ 
+              {
+                "name": "HealthProbe443",
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 443,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              },            
               {
                 "name": "HealthProbe80",              
                 "properties": {              
