@@ -149,10 +149,10 @@ Configuration PrepareVms
         # Install RSAT tools  to each machine           
         @(
             "RSAT",
-            "RSAT-ADDS-Tools" ,
+            "RSAT-ADDS-Tools",
             "RSAT-AD-PowerShell",
             "RSAT-DNS-Server",
-            "RSAT-DHCP"                                    
+            "RSAT-DHCP"
         ) | ForEach-Object -Process {
             WindowsFeature "Feature-$_"
             {
@@ -664,11 +664,8 @@ Configuration PrepareVms
         if($ServiceName -eq "DNS"){
             ##  START DNS Services
             # Install DNS windows features 
-            @(
-                "DNS",
-                "RSAT-Dns-Server"
-            ) | ForEach-Object -Process {
-                    WindowsFeature "Feature-$_"
+            @("DNS") | ForEach-Object -Process {
+                    WindowsFeature "DNS-Feature-$_"
                     {
                         Ensure = "Present"
                         Name = $_                   
@@ -753,7 +750,7 @@ Configuration PrepareVms
             {
                 # Install DNS windows features
                 $WindowsFeatures | ForEach-Object -Process {
-                        WindowsFeature "Feature-$_"
+                        WindowsFeature "NPS-Feature-$_"
                         {
                             Ensure = "Present"
                             Name = $_                   
@@ -775,12 +772,12 @@ Configuration PrepareVms
             
             # Install DNS windows features
             $WindowsFeatures | ForEach-Object -Process {
-                    WindowsFeature "Feature-$_"
+                    WindowsFeature "CA-Feature-$_"
                     {
                         Ensure = "Present"
                         Name = $_
                     } 
-                    $DependsOnTask =  "[WindowsFeature]Feature-$_"   
+                    $DependsOnTask =  "[WindowsFeature]CA-Feature-$_"   
             }
 
             xDnsRecord CaDnsRecord
@@ -881,17 +878,15 @@ Configuration PrepareVms
                 "Failover-clustering",            
                 "RSAT-Clustering-PowerShell",
                 "RSAT-Clustering-CmdInterface",
-                "RSAT-Clustering-Mgmt",
-                "RSAT-AD-PowerShell",
-                "RSAT-DNS-Server"
+                "RSAT-Clustering-Mgmt",              
             ) | ForEach-Object -Process {
-                WindowsFeature "Feature-$_"
+                WindowsFeature "SQL-Feature-$_"
                 {
                     Ensure      = "Present"
                     Name        = $_
                     DependsOn   = $FarmTask 
                 }
-                $FarmTask = "[WindowsFeature]Feature-$_"
+                $FarmTask = "[WindowsFeature]SQL-Feature-$_"
             }          
 
             if ( $Node.Role -eq 'FirstServer' )      
@@ -997,17 +992,15 @@ Configuration PrepareVms
                 "Failover-clustering",            
                 "RSAT-Clustering-PowerShell",
                 "RSAT-Clustering-CmdInterface",
-                "RSAT-Clustering-Mgmt",
-                "RSAT-AD-PowerShell",
-                "RSAT-DNS-Server"
+                "RSAT-Clustering-Mgmt"
             ) | ForEach-Object -Process {
-                WindowsFeature "Feature-$_"
+                WindowsFeature "SQLF-Feature-$_"
                 {
                     Ensure      = "Present"
                     Name        = $_
                     DependsOn   = $FarmTask 
                 }
-                $FarmTask = "[WindowsFeature]Feature-$_"
+                $FarmTask = "[WindowsFeature]SQLF-Feature-$_"
             }
 
             if ( $Node.Role -eq 'FirstServer' )      
@@ -1520,25 +1513,13 @@ Configuration PrepareVms
                 "Web-Mgmt-Console",
                 "Web-Metabase"
             ) | ForEach-Object -Process {
-                WindowsFeature "Feature-$_"
+                WindowsFeature "SCOMF-Feature-$_"
                 {
                     Ensure = "Present"
                     Name = $_
                 }
-                $FarmTask = "[WindowsFeature]Feature-$_"
+                $FarmTask = "[WindowsFeature]SCOMF-Feature-$_"
             }
-
-            @(            
-                "RSAT-AD-PowerShell",
-                "RSAT-DNS-Server"
-            ) | ForEach-Object -Process {
-                WindowsFeature "Feature-$_"
-                {
-                    Ensure = "Present"
-                    Name = $_
-                }
-                $FarmTask = "[WindowsFeature]Feature-$_"
-            }  
 
             WaitForAll FileShare
             {
@@ -1930,20 +1911,18 @@ Configuration PrepareVms
             # }
                             
             @(
-                "Failover-clustering",            
+                "Failover-clustering",
                 "RSAT-Clustering-PowerShell",
                 "RSAT-Clustering-CmdInterface",
-                "RSAT-Clustering-Mgmt",
-                "RSAT-AD-PowerShell",
-                "RSAT-DNS-Server"
+                "RSAT-Clustering-Mgmt"
             ) | ForEach-Object -Process {
-                WindowsFeature "Feature-$_"
+                WindowsFeature "SP-Feature-$_"
                 {
                     Ensure      = "Present"
                     Name        = $_
                     DependsOn   = $FarmTask 
                 }
-                $FarmTask = "[WindowsFeature]Feature-$_"
+                $FarmTask = "[WindowsFeature]SP-Feature-$_"
             }          
 
             if ( $Node.Role -eq 'FirstServer' )      
