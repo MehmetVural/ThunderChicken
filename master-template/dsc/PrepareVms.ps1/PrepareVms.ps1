@@ -878,7 +878,7 @@ Configuration PrepareVms
                 "Failover-clustering",            
                 "RSAT-Clustering-PowerShell",
                 "RSAT-Clustering-CmdInterface",
-                "RSAT-Clustering-Mgmt",              
+                "RSAT-Clustering-Mgmt"
             ) | ForEach-Object -Process {
                 WindowsFeature "SQL-Feature-$_"
                 {
