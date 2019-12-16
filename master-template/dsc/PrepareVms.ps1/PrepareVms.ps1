@@ -893,7 +893,7 @@ Configuration PrepareVms
             {                 
                 WaitForAll ClusterFeature
                 {
-                    ResourceName            = '[WindowsFeature]Feature-RSAT-Clustering-CmdInterface'
+                    ResourceName            = '[WindowsFeature]SQL-Feature-RSAT-Clustering-CmdInterface'
                     NodeName                = $Nodes.Name
                     RetryCount              = $RetryCount
                     RetryIntervalSec        = $RetryIntervalSec
@@ -1007,7 +1007,7 @@ Configuration PrepareVms
             {                 
                 WaitForAll ClusterFeature
                 {
-                    ResourceName            = '[WindowsFeature]Feature-RSAT-Clustering-CmdInterface'
+                    ResourceName            = '[WindowsFeature]SQLF-Feature-RSAT-Clustering-CmdInterface'
                     NodeName                = $Nodes.Name
                     RetryCount              = $RetryCount
                     RetryIntervalSec        = $RetryIntervalSec
@@ -1929,7 +1929,7 @@ Configuration PrepareVms
             {                 
                 WaitForAll ClusterFeature
                 {
-                    ResourceName            = '[WindowsFeature]Feature-RSAT-Clustering-CmdInterface'
+                    ResourceName            = '[WindowsFeature]SP-Feature-RSAT-Clustering-CmdInterface'
                     NodeName                = $Nodes.Name
                     RetryCount              = $RetryCount
                     RetryIntervalSec        = $RetryIntervalSec
