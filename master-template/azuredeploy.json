@@ -758,6 +758,27 @@
                 }
               },
               {
+                "name": "loadBalancingRulesSharePoint80",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointK')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+              {
                 "name": "loadBalancingRulesSharePointCA443",              
                 "properties": {
                     "frontendIPConfiguration": {
@@ -819,7 +840,28 @@
                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
                     }
                 }
-              },   
+              },
+              {
+                "name": "loadBalancingRulesOOS80",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSK')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolOOSK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
               {
                 "name": "loadBalancingRulesSQLListener",              
                 "properties": {                  
@@ -930,7 +972,7 @@
                     },
                     "privateIPAddressVersion": "IPv4"
                 }
-              },  
+              },
               {
                 "name": "FronEndSQLC",
                 "properties": {                  
@@ -1011,6 +1053,28 @@
                     }
                 }
               },
+              {
+                "name": "loadBalancingRulesOOS80",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSC')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolOOSC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+
               {
                 "name": "loadBalancingRulesSQLListener",              
                 "properties": {                  
