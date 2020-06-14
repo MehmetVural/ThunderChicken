@@ -215,7 +215,7 @@
         "googlechrome"
         ],
       "GitRepositories"  : [ 
-        "CI.Common"
+        "Common"
       ],
       "GithubUsername":  "[parameters('GithubUsername')]",
       "GithubToken":  "[parameters('GithubToken')]",

@@ -63,7 +63,7 @@
     },
     "githubUrl": {
       "type": "string",
-      "defaultValue": "",   
+      "defaultValue": "github.com/MehmetVural",   
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Base Url for Github connection, Leave empty if Jumpbox is not part of this deployment"
