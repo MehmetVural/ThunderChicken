@@ -82,7 +82,7 @@ Configuration PrepareVms
     Node localhost
     {
 
-          
+
         ## Region Parameters
         # Convert Json string to Hashtable        
         # $ConfigData | Out-File -FilePath C:\json.txt
@@ -566,11 +566,13 @@ Configuration PrepareVms
 
         ## JumpBox Github Settings
         ## Clone Git Repositories
-        if($env:ComputerName -eq "JumpBox" -And ($ConfigData.enterpriseGithubUsername) -And ($ConfigData.enterpriseGithubToken)) {
+        if($env:ComputerName -eq "JumpBox" -And ($ConfigData.githubUsername) -And ($ConfigData.githubToken)) {
             
             $Repositories = $ConfigData.GitRepositories
-            $enterpriseGithubUsername   = $ConfigData.enterpriseGithubUsername
-            $enterpriseGithubToken      = $ConfigData.enterpriseGithubToken
+            $githubUsername   = $ConfigData.githubUsername
+            $githubToken      = $ConfigData.githubToken
+            $githubUrl           = $ConfigData.githubUrl
+            
 
             Script CloneRepositories
             {
@@ -585,8 +587,9 @@ Configuration PrepareVms
 
                         $using:Repositories | ForEach-Object -Process { 
                             $url = "https://"
-                            $url += "$($using:enterpriseGithubUsername):$($using:enterpriseGithubToken)"
-                            $url += '@github.dxc.com/AdvSol/'
+                            $url += "$($using:githubUsername):$($using:githubToken)"
+                            $url += "@($using:githubUrl)" 
+                            #github.dxc.com/AdvSol/' https://github.com/MehmetVural/
                             $url += $_
                             $url += '.git'
                             
@@ -596,20 +599,20 @@ Configuration PrepareVms
                             }
                         }
 
-                        if(Test-Path -path "C:\github\CI.Common")
+                        if(Test-Path -path "C:\github\Common")
                         {
                             # Imports Common CI Utilities
-                            # Write-Host "Importing CI.Common Module" -ForegroundColor DarkCyan
-                            if((Get-Module -Name 'CI.Common')){ Remove-Module -Name 'CI.Common' }
-                            Import-Module -Name 'C:\github\CI.Common\CI.Common.psd1' -DisableNameChecking
-                            Get-CIRepositories  -RepositoryRoot "C:\github" -GithubUsername "$($using:enterpriseGithubUsername)" -GithubToken "$($using:enterpriseGithubToken)"
+                            # Write-Host "Importing Common Module" -ForegroundColor DarkCyan
+                            if((Get-Module -Name 'Common')){ Remove-Module -Name 'Common' }
+                            Import-Module -Name 'C:\github\Common\Common.psd1' -DisableNameChecking
+                            Get-CIRepositories  -RepositoryRoot "C:\github" -GithubUsername "$($using:githubUsername)" -GithubToken "$($using:githubToken)" -GithubUrl "$($using:githubUrl)"
                                 
                             # Imports Common CI Utilities
-                            # Write-Host "Importing CI.Common Module" -ForegroundColor DarkCyan
-                            if((Get-Module -Name 'CI.Common')){ Remove-Module -Name 'CI.Common' }
-                            Import-Module -Name 'C:\github\CI.Common\CI.Common.psd1' -DisableNameChecking
+                            # Write-Host "Importing Common Module" -ForegroundColor DarkCyan
+                            if((Get-Module -Name 'Common')){ Remove-Module -Name 'Common' }
+                            Import-Module -Name 'C:\github\Common\Common.psd1' -DisableNameChecking
                             # Install additional packages
-                            #& "C:\github\CI.Common\AzurePostConfigurations.ps1"
+                            #& "C:\github\Common\AzurePostConfigurations.ps1"
                             Set-PostConfigurations                            
                         }
                     }

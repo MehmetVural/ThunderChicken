@@ -73,23 +73,30 @@
       "defaultValue": ""
     },
     
-    "enterpriseGithubUsername": {
+    "githubUsername": {
       "type": "string",
       "defaultValue": "",   
       "metadata": {
         "group": "JumbBox Github settings",
-        "description": "UserName for Enterprise Github connection"
+        "description": "UserName for Github connection"
       }
     },  
-    "enterpriseGithubToken": {
+    "githubToken": {
       "type": "string",
       "defaultValue": "",   
       "metadata": {
         "group": "JumbBox Github settings",
-        "description": "Token for Enterprise Github connection"
+        "description": "Token for Github connection"
       }
-    }, 
-
+    },
+    "githubUrl": {
+      "type": "string",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "JumbBox Github settings",
+        "description": "Base Url for Github connection"
+      }
+    },
     "DiskSizes": {
       "type": "string",     
       "allowedValues": [
@@ -210,8 +217,9 @@
       "GitRepositories"  : [ 
         "CI.Common"
       ],
-      "enterpriseGithubUsername":  "[parameters('enterpriseGithubUsername')]",
-      "enterpriseGithubToken":  "[parameters('enterpriseGithubToken')]" 
+      "GithubUsername":  "[parameters('GithubUsername')]",
+      "GithubToken":  "[parameters('GithubToken')]",
+      "GithubUrl":  "[parameters('GithubUrl')]"  
     },
     "_imagesskus": [ 
       "Get-AzureRmVMImageOffer -Location 'East US' -PublisherName 'MicrosoftWindowsDesktop' | Select Offer",

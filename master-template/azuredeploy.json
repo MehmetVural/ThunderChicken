@@ -45,20 +45,28 @@
         "description": "Indicates wheter or not include Jumpbox in this deployment"
       }
     },
-    "enterpriseGithubUsername": {
+    "githubUsername": {
       "type": "string",
       "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
-        "description": "UserName for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
+        "description": "UserName for Github connection, Leave empty if Jumpbox is not part of this deployment"
       }
     },  
-    "enterpriseGithubToken": {
+    "githubToken": {
       "type": "securestring",
       "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
-        "description": "Token for Enterprise Github connection, Leave empty if Jumpbox is not part of this deployment"
+        "description": "Token for Github connection, Leave empty if Jumpbox is not part of this deployment"
+      }
+    },
+    "githubUrl": {
+      "type": "securestring",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "Jumpbox Settings",
+        "description": "Base Url for Github connection, Leave empty if Jumpbox is not part of this deployment"
       }
     },
     "deployDomain": {
@@ -1853,11 +1861,14 @@
           "ArtifactsLocationSasToken": {
             "value": "[parameters('ArtifactsLocationSasToken')]"
           },
-          "enterpriseGithubUsername": {
-            "value": "[parameters('enterpriseGithubUsername')]"            
+          "GithubUsername": {
+            "value": "[parameters('GithubUsername')]"            
           },  
-          "enterpriseGithubToken": {
-            "value": "[parameters('enterpriseGithubToken')]"           
+          "GithubToken": {
+            "value": "[parameters('GithubToken')]"           
+          },
+          "GithubUrl": {
+            "value": "[parameters('GithubUrl')]"           
           },
           "DiskSizes": {
             "value": "[parameters('DiskSizes')]"
