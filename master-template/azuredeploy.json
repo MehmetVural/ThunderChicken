@@ -62,7 +62,7 @@
       }
     },
     "githubUrl": {
-      "type": "securestring",
+      "type": "string",
       "defaultValue": "",   
       "metadata": {
         "group": "Jumpbox Settings",
