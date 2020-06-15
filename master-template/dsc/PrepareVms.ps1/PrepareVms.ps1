@@ -78,7 +78,7 @@ Configuration PrepareVms
     # get network adapter interface name 
     $Interface=Get-NetAdapter|Where Name -Like "Ethernet*"|Select-Object -First 1
     $InterfaceAlias=$($Interface.Name)
-    
+                        
     Node localhost
     {
 
@@ -291,12 +291,14 @@ Configuration PrepareVms
             $packages = $ConfigData.packages           
             
             $packageProviderName = "ChocolateyGet"
+
             Script DevSetup
             {
                 SetScript = {
                     try {
                         
                         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
                         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -ErrorAction SilentlyContinue
                         Install-PackageProvider -Name $using:packageProviderName -ErrorAction SilentlyContinue              
                         Install-PackageProvider "NuGet"  -Force -MinimumVersion 2.8 | Out-Null
@@ -307,7 +309,7 @@ Configuration PrepareVms
                         $using:packages | ForEach-Object -Process {
                                 If(-Not (Get-Package -Name $_ -ProviderName $using:packageProviderName -ErrorAction SilentlyContinue)) 
                                 {
-                                Install-Package -Name $_ -ProviderName $using:packageProviderName -Confirm:$false -Force
+                                    Install-Package -Name $_ -ProviderName $using:packageProviderName -Confirm:$false -Force
                                 }
                         }
                     }
@@ -316,9 +318,14 @@ Configuration PrepareVms
                     }
                 }
 
-                TestScript = {                     
+                TestScript = {
+                    
                         $var = $true
+                        
                         try {
+                            
+                            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
                             Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -ErrorAction SilentlyContinue
                             Install-PackageProvider -Name $using:packageProviderName -ErrorAction SilentlyContinue              
                             Install-PackageProvider "NuGet"  -Force -MinimumVersion 2.8 | Out-Null
@@ -333,8 +340,8 @@ Configuration PrepareVms
                                 }
                             }
                         }
-                        catch {
-                            
+                        catch { 
+
                         }
 
                         return $var         
