@@ -295,6 +295,8 @@ Configuration PrepareVms
             {
                 SetScript = {
                     try {
+                        
+                        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -ErrorAction SilentlyContinue
                         Install-PackageProvider -Name $using:packageProviderName -ErrorAction SilentlyContinue              
                         Install-PackageProvider "NuGet"  -Force -MinimumVersion 2.8 | Out-Null
@@ -304,9 +306,9 @@ Configuration PrepareVms
                             
                         $using:packages | ForEach-Object -Process {
                                 If(-Not (Get-Package -Name $_ -ProviderName $using:packageProviderName -ErrorAction SilentlyContinue)) 
-                                {                        
+                                {
                                 Install-Package -Name $_ -ProviderName $using:packageProviderName -Confirm:$false -Force
-                                }                                       
+                                }
                         }
                     }
                     catch {
@@ -587,11 +589,11 @@ Configuration PrepareVms
 
                         $using:Repositories | ForEach-Object -Process { 
                             $url = "https://"
-                            $url += "$($using:githubUsername):$($using:githubToken)"
-                            $url += "@($using:githubUrl)" 
-                            #github.dxc.com/AdvSol/' https://github.com/MehmetVural/
-                            $url += $_
+                            $url += "$($using:githubUsername):$($using:githubToken)@"
+                            $url += "$($using:githubUrl)" 
+                            $url += "/$_"
                             $url += '.git'
+                            #github.dxc.com/AdvSol/' https://github.com/MehmetVural/
                             
                             if(-Not (Test-Path -path "c:\github\$_"))
                             {
@@ -605,7 +607,7 @@ Configuration PrepareVms
                             # Write-Host "Importing Common Module" -ForegroundColor DarkCyan
                             if((Get-Module -Name 'Common')){ Remove-Module -Name 'Common' }
                             Import-Module -Name 'C:\github\Common\Common.psd1' -DisableNameChecking
-                            Get-CIRepositories  -RepositoryRoot "C:\github" -GithubUsername "$($using:githubUsername)" -GithubToken "$($using:githubToken)" -GithubUrl "$($using:githubUrl)"
+                            Get-Repositories  -RepositoryRoot "C:\github" -GithubUsername "$($using:githubUsername)" -GithubToken "$($using:githubToken)" -GithubUrl "$($using:githubUrl)"
                                 
                             # Imports Common CI Utilities
                             # Write-Host "Importing Common Module" -ForegroundColor DarkCyan
