@@ -2078,9 +2078,6 @@
     }
   ],
   "outputs": {
-    "servicesUnion": {
-      "type": "array",
-      "value": "[variables('servicestoBuild')]"
-    }    
+   
   }
 }
