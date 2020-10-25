@@ -3311,10 +3311,5 @@
       ] 
     }
   ],
-  "outputs": {
-    "template": {
-      "type": "array",
-      "value": "[variables('Nics')]"
-    }
-  }
+  "outputs": {}
 }

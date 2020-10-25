@@ -160,10 +160,5 @@
     }
 
   ],
-  "outputs": {
-    "ip" : {      
-      "type" : "array",
-      "value": "[variables('ConfigData')]"
-    }
-  }
+  "outputs": {}
 }

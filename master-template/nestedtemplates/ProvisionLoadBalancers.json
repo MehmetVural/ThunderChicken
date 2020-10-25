@@ -62,11 +62,5 @@
     }
        
   ],
-  "outputs": {
-    "dependsOn" : 
-    {
-      "type" : "string",
-      "value" : "[variables('dependsOn')]"
-    }   
-  }
+  "outputs": {}
 }

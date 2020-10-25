@@ -420,12 +420,5 @@
       ]
     }
   ],
-  "outputs": {
-    "setupConfig" : 
-    {
-      "type" : "string",
-      "value" : "[variables('setupConfig')]"
-    }
-
-  }
+  "outputs": {}
 }
