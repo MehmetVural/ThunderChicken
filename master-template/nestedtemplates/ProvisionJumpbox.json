@@ -207,10 +207,6 @@
       "InstallOffice"      : true,    
       "Packages"  : [ 
         "vscode",
-        "git",
-        "Git-Credential-Manager-for-Windows",
-        "poshgit",
-        "pester",
         "vscode-powershell",
         "googlechrome"
         ],
