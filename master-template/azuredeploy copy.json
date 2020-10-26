@@ -1776,6 +1776,305 @@
           }
         }
       }
+    },
+    {
+      "name": "ProvisionLoadBalancers",
+      "type": "Microsoft.Resources/deployments",      
+      "apiVersion": "2015-01-01",
+      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'), equals(variables('template'), 'SharedSQL'),  equals(variables('template'), 'SharePoint')     )]",
+      "dependsOn" : [
+        "ProvisioningBase"      
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri":  "[variables('ConfigData').LoadBalancer.loadBalancersTemplateUrl]", 
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').LoadBalancer]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisionApplicationGateway",
+      "type": "Microsoft.Resources/deployments",
+      "condition" :  "[equals(variables('ReverseProxy'), 'Yes')]",
+      "apiVersion": "2015-01-01",
+      "dependsOn" : [
+        "ProvisioningBase"       
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ConfigData').ApplicationGateway.applicationGatewayTemplateUrl]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').ApplicationGateway]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningJumpBox",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition":  "[equals(variables('deployJumpBoxTemplate'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('jumpboxTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },   
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },  
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },               
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "GithubUsername": {
+            "value": "[parameters('GithubUsername')]"            
+          },  
+          "GithubToken": {
+            "value": "[parameters('GithubToken')]"           
+          },
+          "GithubUrl": {
+            "value": "[parameters('GithubUrl')]"           
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningDomain",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployDomain'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('domainTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+         
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+                      
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').PrimaryDomain]"
+          }
+        }
+      }
+    },   
+    {
+      "name": "ProvisioningDomain-DMZ",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployDomainDMZ'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('domainTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },         
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },                      
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').DMZDomain]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('Provisioning',  variables('servicestoBuild')[copyIndex()]    )]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[not( equals( variables('servicestoBuild')[copyIndex()], 'None')   )]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]",
+        "[if( or(equals( variables('servicestoBuild')[copyIndex()] , 'Exchange'), equals( variables('servicestoBuild')[copyIndex()] , 'Skype'), equals( variables('servicestoBuild')[copyIndex()] , 'SharePoint'))   , 'ProvisionLoadBalancers' ,  'ProvisioningBase')]"
+      ],
+      "copy": {
+        "name": "serviceLoop",
+        "count": "[length(variables('servicestoBuild'))]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('serviceTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
+          "template": {
+            "value": "[variables('servicestoBuild')[copyIndex()]]"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "enabledPublic": {
+            "value": "[variables('ConfigData').Loadbalancer.enabledPublic]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningExternalTest",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(variables('ExternalTestEnvironment'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('externalTestTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },         
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').ClientDomain]"
+          }
+        }
+      }
     }
   ]
 }
