@@ -16,6 +16,70 @@
         "group": "Base Settings",
         "description": "Password for 'localadmin', 'domainadmin', 'user', 'user_a', 'testuser'"
       }
+    },
+    "ArtifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/MehmetVural/Thunderchicken/master/master-template",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      }      
+    },
+    "ArtifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }      
+    }, 
+    "deployJumpbox": {
+      "type": "string",
+      "defaultValue": "Yes",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Jumpbox Settings",
+        "description": "Indicates wheter or not include Jumpbox in this deployment"
+      }
+    },
+    "githubUsername": {
+      "type": "string",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "Jumpbox Settings",
+        "description": "UserName for Github connection, Leave empty if Jumpbox is not part of this deployment"
+      }
+    },  
+    "githubToken": {
+      "type": "securestring",
+      "defaultValue": "",   
+      "metadata": {
+        "group": "Jumpbox Settings",
+        "description": "Token for Github connection, Leave empty if Jumpbox is not part of this deployment"
+      }
+    },
+    "githubUrl": {
+      "type": "string",
+      "defaultValue": "github.com/MehmetVural",   
+      "metadata": {
+        "group": "Jumpbox Settings",
+        "description": "Base Url for Github connection, Leave empty if Jumpbox is not part of this deployment"
+      }
+    },
+    "deployDomain": {
+      "type": "string",
+      "defaultValue": "Yes",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Domain Settings",
+        "description": "Indicates wheter or not include Domain Controller in this deployment"
+      }
     }
   },
   "variables": {    
