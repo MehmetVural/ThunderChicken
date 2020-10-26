@@ -15,6 +15,26 @@
       "metadata": {
         "group": "Base Settings",
         "description": "Password for 'localadmin', 'domainadmin', 'user', 'user_a', 'testuser'"
+      },
+      "deployJumpbox": {
+        "type": "string",
+        "defaultValue": "Yes",
+        "allowedValues": [
+          "Yes",
+          "No"
+        ],
+        "metadata": {
+          "group": "Jumpbox Settings",
+          "description": "Indicates wheter or not include Jumpbox in this deployment"
+        }
+      },
+      "githubUsername": {
+        "type": "string",
+        "defaultValue": "",   
+        "metadata": {
+          "group": "Jumpbox Settings",
+          "description": "UserName for Github connection, Leave empty if Jumpbox is not part of this deployment"
+        }
       }
     }
   },
