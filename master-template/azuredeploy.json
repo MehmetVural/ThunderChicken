@@ -17,7 +17,22 @@
         "description": "Password for 'localadmin', 'domainadmin', 'user', 'user_a', 'testuser'"
       }
     },
-    
+    "ArtifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/MehmetVural/Thunderchicken/master/master-template",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      }      
+    },
+    "ArtifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "group": "Base Settings",
+        "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      }      
+    }, 
     "deployJumpbox": {
       "type": "string",
       "defaultValue": "Yes",
@@ -89,14 +104,1977 @@
         "group": "Domain Settings",
         "description": "Indicates wheter or not include DMZ zone Domain  in this deployment"
       }
+    },
+    "forestMode": {
+      "type": "string",
+      "defaultValue": "Win2012R2",
+      "allowedValues": [
+        "WinThreshold",
+        "Win2012R2",
+        "Win2012",
+        "Win2008R2",
+        "Win2008"
+      ],
+      "metadata": {
+        "group": "Domain Settings",
+        "description": "Domain Controller Functioning Level"
+      }
+    },     
+    "Template": {
+      "type": "string",
+      "defaultValue": "None",
+      "allowedValues": [
+        "None",
+        "AD-DS",
+        "DNS",
+        "NPS",
+        "SCOM",
+        "SharedSQL",
+        "FileServer",
+        "DHCP",
+        "SharePoint",
+        "OOS",
+        "Exchange",
+        "UEM",
+        "Skype",
+        "SharedSQLFull",
+        "SCOMFull"        
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "Indicates which service layer vms to build and prepare"
+      }
+    },
+    "InternalTestEnvironment": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"   
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "Includes Internal Test Machines, windows desktop in each site"
+      }      
+    },
+    "ExternalTestEnvironment": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"                
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "Includes External network, domain and win 10 test machine"
+      }      
+    },
+    "ReverseProxy": {
+      "type": "string",
+      "defaultValue": "No",
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "metadata": {
+        "group": "Service Settings",
+        "description": "Includes External network, domain and win 10 test machine"
+      }      
+    },   
+
+    "VirtualMachineSizes": {
+      "type": "string",
+      "defaultValue": "Small",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "Default"
+      ],
+      "metadata": {
+        "group": "VM Settings",
+        "description": "Builds virtual machine to T-Shirt size: Small: 1 or 2 cores Core, Medium:4 Core: Large: 8 Cores, Default: T-Shirt sizes defined in each service layer templates."
+      }
+    },       
+    "DiskSizes": {
+      "type": "string",
+      "defaultValue": "Small-4GB",
+      "allowedValues": [
+        "Small-4GB",
+        "Medium-20GB",
+        "Large-50GB" 
+      ],
+      "metadata": {
+        "group": "VM Settings",
+        "description": "Configures size of each drives defined in service layers."
+      }
+    },       
+    "OSDiskSize": {
+      "type": "string",
+      "defaultValue": "Small-30GB",
+      "allowedValues": [
+        "Small-30GB",
+        "Regular-127GB"        
+      ],
+      "metadata": {
+        "group": "VM Settings",
+        "description": "Defines Windows OS disk size. Small is for development, Reguler is full capacity tests"
+      }
+    },       
+    "VMSeries": {
+      "type": "string",
+      "defaultValue": "Dv3-Series",
+      "allowedValues": [
+        "Dv3-Series",
+        "Dv2-Series",
+        "Bs-Series"
+      ],
+      "metadata": {
+        "group": "VM Settings",
+        "description": "Defines Azure VM Series - CPU and memory optimization."
+      }
+    },    
+    "AutoShutdown": {
+      "type": "string",
+      "defaultValue": "1800",
+      "allowedValues": [
+        "1200",
+        "1300",
+        "1400",
+        "1500",
+        "1600",
+        "1700",
+        "1800",
+        "1900",
+        "2000"
+      ],
+      "metadata": {
+        "group": "VM Settings",
+        "description": "Daily Auto Shutdown schedule for each vms."
+      }
     }
   },
   "variables": {    
-   
+    "location": "[resourceGroup().location]",    
+    "deployJumpBoxTemplate":"[parameters('deployJumpbox')]",
+    "includeCertificateAuthority" : "[parameters('includeCertificateAuthority')]",
+    "InternalTestEnvironment" : "[parameters('InternalTestEnvironment')]",
+    "ExternalTestEnvironment" : "[parameters('ExternalTestEnvironment')]",  
+    "ReverseProxy" : "[parameters('ReverseProxy')]",  
+    "domainName": "Domain.com",
+    "domainNetbiosName": "Domain",
+    "domainNameDMZ": "DomainDmz.com",
+    "domainNetbiosNameDMZ": "DomainDmz",
+    "domainAdminUsername" : "domainadmin",  
+    "templatePrefix" : "master",
+    "template" : "[parameters('Template')]",
+    "templates" : "[if(equals(variables('template'), 'None'), createArray('None') ,if( equals(variables('template'), 'SCOMFull'), createArray('SharedSQLFull', 'SCOMFull'), createArray(variables('template'))          ) ) ]" ,
+    "deployCA": "[ if( equals(variables('includeCertificateAuthority'), 'Yes'), createArray('CertificateAuthority'), createArray('None'))]",
+    "servicestoBuild" :"[union(variables('templates'), variables('deployCA'),  if(   equals(   variables('InternalTestEnvironment'), 'Yes'), createArray('InternalTest') ,  createArray('None')   ) )]",
+    "forestMode": "[parameters('forestMode')]",    
+    "baseTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionBase.json', parameters('ArtifactsLocationSasToken'))]",
+    "jumpboxTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionJumpbox.json', parameters('ArtifactsLocationSasToken'))]",
+    "publicIpTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionPublicIPs.json', parameters('ArtifactsLocationSasToken'))]",
+    "loadBalancersTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionLoadBalancers.json', parameters('ArtifactsLocationSasToken'))]",    
+    "applicationGatewayTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionApplicationGateWay.json', parameters('ArtifactsLocationSasToken'))]",    
+    
+    "domainTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomain.json', parameters('ArtifactsLocationSasToken'))]",    
+    "_domainDMZTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionDomainDMZ.json', parameters('ArtifactsLocationSasToken'))]",
 
+    "serviceTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionService.json', parameters('ArtifactsLocationSasToken'))]",
+    "externalTestTemplateUrl": "[concat(parameters('ArtifactsLocation'),'/nestedtemplates/','ProvisionExternalTest.json', parameters('ArtifactsLocationSasToken'))]",   
+
+    "dcInstallModule": {
+      "url": "[concat(parameters('ArtifactsLocation'),'/','dsc','/','BuildDCs.ps1.zip')]",
+      "script": "BuildDCs.ps1",
+      "function": "BuildDCs"
+    },
+
+    "_Comment" : "trying to place all config data here at front.",
+    "virtualNetworkName" : "[concat(variables('templatePrefix'),'-vn')]",
+    "VSubnetName"     : "vs",
+    "KSubnetName"     : "ks",
+    "CSubnetName"     : "cs",
+    "AGSubnetName"    : "ag",
+
+    "VSubnetPrefix"   : "10.0.0.0/24",
+    "KSubnetPrefix"   : "10.0.1.0/24",
+    "CSubnetPrefix"   : "10.0.2.0/24",
+    "KDMZSubnetName"  : "kdmz",  
+    "CDMZSubnetName"  : "cdmz",
+    "KDMZSubnetPrefix": "10.0.3.0/24",
+    "CDMZSubnetPrefix": "10.0.4.0/24",    
+    "AGSubnetPrefix": "10.0.10.0/24",
+
+    "_conditionfordeploymentDMZ": "[ or( equals(parameters('deployDomainDMZ'), 'Yes'), equals(variables('template'), 'UEM'), equals(variables('ExternalTestEnvironment'), 'Yes') )]",
+
+    "_conditionForLoadbalancing": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",
+    "_conditionForApplicationGateway": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'))]",
+
+    "virtualMachineSizeArraySeries": {
+      "Bs-Series" : { 
+        "S": "Standard_B2s",
+        "M": "Standard_B2ms",
+        "L": "Standard_B4ms",
+        "XL": "Standard_B8ms"
+      },
+      "Dv2-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v2",
+        "L": "Standard_D3_v2",
+        "XL": "Standard_D4_v2"
+      },
+      "Dv3-Series" : {
+        "S": "Standard_D1_v2",
+        "M": "Standard_D2_v3",
+        "L": "Standard_D4_v3",
+        "XL": "Standard_D8_v3"
+      }
+    },
+
+    "ApplicationGatewayNames" :[ 
+      "KDMZ-ApplicationGateway",
+      "CDMZ-ApplicationGateway"
+    ],
+    
+    "enabledPublicAG" : false,
+    "enabledPublicLB": false,
+
+    "ConfigData": {
+      "PrimaryDomain" : {
+        "DomainName" : "Domain.com",
+        "DomainNetbiosName" : "Domain",
+        "ForestMode" : "[parameters('forestMode')]",
+        "PrimaryDns" : "10.0.1.5",       
+        "dcInstallModule": "[variables('dcInstallModule')]",        
+        "Servers" : [
+          {
+            "HostName"  : "VD201",
+            "Site"      : "[variables('VSubnetName')]",
+            "Primary"   : false,
+            "FileShare" : false,
+            "vmSize"    : "Standard_D2_v3",
+            "Ip"        : "10.0.0.5"
+          },
+          {
+            "HostName"  : "KD201",
+            "Site"      : "[variables('KSubnetName')]",
+            "Primary"   : true,
+            "FileShare" : true,
+            "vmSize"    : "Standard_D2_v3",
+            "Ip"        : "10.0.1.5"
+          }, 
+          {
+            "HostName"  : "CD201",
+            "Site"      : "[variables('CSubnetName')]",
+            "Primary"   : false,
+            "FileShare" : false,
+            "vmSize"    : "Standard_D2_v3",
+            "Ip"        : "10.0.2.5"
+          }
+        ],
+        "DomainGroups"  : [],
+        "DomainUsers"  : [
+          {
+            "UserName" : "user",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          },
+          {
+            "UserName" : "user_a",
+            "DomainGroups" : ["Account Operators","DnsAdmins"],
+            "LocalGroups" : ["Administrators"]
+          },
+          {
+            "UserName" : "testuser",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          }
+        ],
+      
+        "sites": [        
+          {
+            "name": "[toUpper(variables('KSubnetName'))]",
+            "prefix": "[variables('KSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('CSubnetName')))]"
+          },
+          {
+            "name": "[toUpper(variables('VSubnetName'))]",
+            "prefix": "[variables('VSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('KSubnetName')),',',toUpper(variables('VSubnetName')))]"
+          },
+          {
+            "name": "[toUpper(variables('CSubnetName'))]",
+            "prefix": "[variables('CSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('CSubnetName')),',',toUpper(variables('VSubnetName')))]"
+          }
+        ]
+      },
+      "DMZDomain" : {
+        "DomainName" : "DomainDmz.com",
+        "DomainNetbiosName" : "DomainDmz",        
+        "ForestMode" : "[parameters('forestMode')]",
+        "PrimaryDns" : "10.0.3.5",
        
+        "dcInstallModule": "[variables('dcInstallModule')]",        
+        "Servers" : [
+          {
+            "HostName"  : "KDZ201",
+            "Site"      :  "[variables('KDMZSubnetName')]",
+            "Primary"   : true,
+            "FileShare" : false,
+            "vmSize" : "Standard_D1_v2",
+            "Ip" :  "10.0.3.5"
+          },
+          {
+            "HostName"  : "CDZ201",
+            "Site"      :  "[variables('CDMZSubnetName')]",
+            "Primary"   : false,
+            "FileShare" : false,
+            "vmSize" : "Standard_D1_v2",
+            "Ip" :  "10.0.4.5"
+          }
+        ],
+        "DomainGroups"  : [],
+        "DomainUsers"  : [
+          {
+            "UserName" : "user",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          },
+          {
+            "UserName" : "user_a",
+            "DomainGroups" : ["Account Operators"],
+            "LocalGroups" : ["Administrators"]
+          },
+          {
+            "UserName" : "testuser",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          }
+        ],
+      
+        "sites": [
+          {
+            "name": "[toUpper(variables('KDMZSubnetName'))]",
+            "prefix": "[variables('KDMZSubnetPrefix')]",
+            "sitelink": "[concat(toUpper(variables('KDMZSubnetName')),',',toUpper(variables('CDMZSubnetName')))]"
+          },
+          {
+            "name": "[toUpper(variables('CDMZSubnetName'))]",
+            "prefix": "[variables('CDMZSubnetPrefix')]",
+            "sitelink": null
+          }
+        ]
+
+      },
+      "ClientDomain" : {
+        "DomainName" : "Client.com",
+        "DomainNetbiosName" : "Client",        
+        "ForestMode" : "[parameters('forestMode')]",
+        "PrimaryDns" : "10.1.0.5",
+       
+        "dcInstallModule": "[variables('dcInstallModule')]",
+        "domainTemplateUrl": "[variables('domainTemplateUrl')]",
+        "serviceTemplateUrl" : "[variables('serviceTemplateUrl')]",
+        "Servers" : [
+          {
+            "HostName"  : "CLD201",
+            "Site"      : "[variables('KDMZSubnetName')]",
+            "Primary"   : true,
+            "FileShare" : false,
+            "vmSize" : "Standard_D1_v2",
+            "Ip"        : "10.1.0.5"
+          }
+        ],
+        "DomainGroups"  : [],
+        "DomainUsers"  : [
+          {
+            "UserName" : "user",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          },
+          {
+            "UserName" : "user_a",
+            "DomainGroups" : ["Account Operators"],
+            "LocalGroups" : ["Administrators"]
+          },
+          {
+            "UserName" : "testuser",
+            "DomainGroups" : [],
+            "LocalGroups" : []
+          }
+        ],
+      
+        "sites": []
+
+      },
+      "LoadBalancer"   : {
+        "loadBalancersTemplateUrl": "[variables('loadBalancersTemplateUrl')]",
+        "publicIpTemplateUrl" : "[variables('publicIpTemplateUrl')]",
+        "publicIPAddresses" : [
+          {
+            "Name" : "publicIpExchangeEdgeKDMZ",        
+            "Site" : "KDMZ",
+            "ipAddress": "40.80.157.185",
+            "publicIPAddressVersion": "IPv4",
+            "publicIPAllocationMethod": "Static",
+            "idleTimeoutInMinutes": 4,
+            "dnsSettings": {            
+              "domainNameLabel": "[concat('exchangeedgekdmz', uniqueString(resourceGroup().id))]"       
+            }        
+          },
+          {
+            "Name" : "publicIpSkypeEdgeKDMZ", 
+            "Site" : "KDMZ",       
+            "ipAddress": "40.80.157.186",
+            "publicIPAddressVersion": "IPv4",
+            "publicIPAllocationMethod": "Static",
+            "idleTimeoutInMinutes": 4,
+            "dnsSettings": {            
+              "domainNameLabel": "[concat('skypeedgekdmz', uniqueString(resourceGroup().id))]"       
+            }        
+          },
+          {
+            "Name" : "publicIpExchangeEdgeCDMZ",
+            "Site" : "CDMZ",        
+            "ipAddress": "40.80.157.187",
+            "publicIPAddressVersion": "IPv4",
+            "publicIPAllocationMethod": "Static",
+            "idleTimeoutInMinutes": 4,
+            "dnsSettings": {            
+              "domainNameLabel": "[concat('exchangeedgecdmz', uniqueString(resourceGroup().id))]"
+            }        
+          },
+          {
+            "Name" : "publicIpSkypeEdgeCDMZ", 
+            "Site" : "CDMZ",       
+            "ipAddress": "40.80.157.188",
+            "publicIPAddressVersion": "IPv4",
+            "publicIPAllocationMethod": "Static",
+            "idleTimeoutInMinutes": 4,
+            "dnsSettings": {            
+              "domainNameLabel": "[concat('skypeedgecdmz', uniqueString(resourceGroup().id))]"       
+            }        
+          }
+        ],
+        "enabledPublic" :  "[variables('enabledPublicLB')]",
+        "LoadBalancersInternal"   :  [  
+          {     
+            "Name" : "V",
+            "Site" : "vs",        
+            "Type" : "Internal",
+            "SKU"  : "Basic",            
+            "frontendIPConfigurations": [
+              {
+                  "name": "FronEndSQLV",            
+                  "properties": {                  
+                      "privateIPAddress": "10.0.0.180",
+                      "privateIPAllocationMethod": "Static",
+                      "subnet": {                      
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('VSubnetName'))]"
+                      },
+                      "privateIPAddressVersion": "IPv4"
+                  }
+              }         
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolSQLV",            
+                "properties": {
+                }
+              }
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [
+                {
+                  "name": "loadBalancingRulesSQLListener",              
+                  "properties": {                  
+                      "frontendIPConfiguration": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'V', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLV')]"
+                      },
+                      "frontendPort": 1433,
+                      "backendPort": 1433,
+                      "enableFloatingIP": true,
+                      "idleTimeoutInMinutes": 4,
+                      "protocol": "Tcp",
+                      "enableTcpReset": false,
+                      "loadDistribution": "Default",
+                      "backendAddressPool": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'V', '-loadbalancer')), '/backendAddressPools/backendpoolSQLV')]"
+                      },
+                      "probe": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'V', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                      }
+                  }
+                }
+            ],
+            "probes": [
+                {
+                  "name": "SQLAlwaysOnEndPointProbe",
+                  "properties": {              
+                      "protocol": "Tcp",
+                      "port": 59999,
+                      "intervalInSeconds": 5,
+                      "numberOfProbes": 2
+                  }                
+                }
+            ]
+          }, 
+          {     
+            "Name" : "K",
+            "Site" : "ks",        
+            "Type" : "Internal",
+            "SKU"  : "Basic",            
+            "frontendIPConfigurations": [
+              {
+                "name": "FronEndSharePointK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.160",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndSharePointCAK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.162",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndSQLSharePointK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.166",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndOOSK",
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.164",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },  
+              {
+                "name": "FronEndSQLK",            
+                "properties": {                  
+                    "privateIPAddress": "10.0.1.181",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },             
+              {
+                  "name": "FronEndExchangeMailBoxK",            
+                  "properties": {                  
+                      "privateIPAddress": "10.0.1.200",
+                      "privateIPAllocationMethod": "Static",
+                      "subnet": {                      
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                      },
+                      "privateIPAddressVersion": "IPv4"
+                  }
+              },
+              {
+                  "name": "FronEndSkypeK",            
+                  "properties": {                  
+                      "privateIPAddress": "10.0.1.201",
+                      "privateIPAllocationMethod": "Static",
+                      "subnet": {
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KSubnetName'))]"
+                      },
+                      "privateIPAddressVersion": "IPv4"
+                  }
+              }         
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolSharePointK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolSharePointCAK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolSQLSharePointK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolOOSK",
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolSQLK",            
+                "properties": {
+                }
+              }, 
+              {
+                "name": "backendpoolMailBoxK",            
+                "properties": {
+                }
+              },         
+              {
+                "name": "backendpoolSkypeK",            
+                "properties": {                
+                }
+              }
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesSharePoint443",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointK')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSharePoint80",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointK')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSharePointCA443",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSharePointCAK')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSharePointCAK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSQLSharePointListener",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLSharePointK')]"
+                    },
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSQLSharePointK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesOOS443",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSK')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolOOSK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesOOS80",              
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSK')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolOOSK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSQLListener",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLK')]"
+                    },
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSQLK')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                    }
+                  }
+                },
+                {
+                  "name": "loadBalancingRulesMailBoxK80",              
+                  "properties": {                  
+                      "frontendIPConfiguration": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndExchangeMailBoxK')]"
+                      },
+                      "frontendPort": 80,
+                      "backendPort": 80,
+                      "enableFloatingIP": false,
+                      "idleTimeoutInMinutes": 4,
+                      "protocol": "Tcp",
+                      "enableTcpReset": false,
+                      "loadDistribution": "Default",
+                      "backendAddressPool": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolMailBoxK')]"
+                      },
+                      "probe": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                      }
+                  }
+                },
+                {
+                  "name": "loadBalancingRulesSkypeK80",              
+                  "properties": {                  
+                      "frontendIPConfiguration": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/frontendIPConfigurations/FronEndSkypeK')]"
+                      },
+                      "frontendPort": 80,
+                      "backendPort": 80,
+                      "enableFloatingIP": false,
+                      "idleTimeoutInMinutes": 4,
+                      "protocol": "Tcp",
+                      "enableTcpReset": false,
+                      "loadDistribution": "Default",
+                      "backendAddressPool": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/backendAddressPools/backendpoolSkypeK')]"
+                      },
+                      "probe": {
+                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'K', '-loadbalancer')), '/probes/HealthProbe80')]"
+                      }
+                  }
+                }
+            ],
+            "probes": [             
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              },  
+              {
+                "name": "HealthProbe443",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 443,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              },              
+              {
+                "name": "SQLAlwaysOnEndPointProbe",
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 59999,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }
+            ]
+          },        
+          {     
+            "Name" : "C",
+            "Site" : "cs",
+            "Type" : "Internal",          
+            "SKU"  : "Basic",
+            "frontendIPConfigurations": [
+              {
+                "name": "FronEndOOSC",
+                "properties": {                  
+                    "privateIPAddress": "10.0.2.164",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndSQLC",
+                "properties": {                  
+                    "privateIPAddress": "10.0.2.182",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {                      
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndExchangeMailBoxC",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAddress": "10.0.2.200",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndSkypeC",            
+                "properties": {                
+                    "privateIPAddress": "10.0.2.201",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              }          
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolOOSC",            
+                "properties": {
+                }
+              },
+              {
+                "name": "backendpoolSQLC",            
+                "properties": {
+                }
+              },      
+              {
+                "name": "backendpoolMailBoxC",
+                "properties": {                
+                }
+              },
+              {
+                "name": "backendpoolSkypeC",            
+                "properties": {                
+                }
+              }              
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesOOS443",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSC')]"
+                    },
+                    "frontendPort": 443,
+                    "backendPort": 443,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolOOSC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/HealthProbe443')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesOOS80",
+                "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndOOSC')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolOOSC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+
+              {
+                "name": "loadBalancingRulesSQLListener",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndSQLC')]"
+                    },
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolSQLC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/SQLAlwaysOnEndPointProbe')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesMailBoxC80",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndExchangeMailBoxC')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolMailBoxC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSkypeC80",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/frontendIPConfigurations/FronEndSkypeC')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/backendAddressPools/backendpoolSkypeC')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'C', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              }          
+            ],
+            "probes": [ 
+              {
+                "name": "HealthProbe443",
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 443,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              },            
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              },
+              {
+                "name": "SQLAlwaysOnEndPointProbe",
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 59999,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }        
+            ]
+          }
+        ],
+        "LoadBalancersDMZ"   :  [  
+          {
+            "Name" : "KDMZ",     
+            "Site" : "kdmz",
+            "Type" : "Internal",          
+            "SKU"  : "Basic",
+            "frontendIPConfigurations": [
+              
+              {
+                "name": "FronEndExchangeEdgeKDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAddress": "10.0.3.200",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KDMZSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+                
+            },
+            {
+              "name": "FronEndSkypeEdgeKDMZ",            
+              "properties": {
+                  "provisioningState": "Succeeded",
+                  "privateIPAddress": "10.0.3.201",
+                  "privateIPAllocationMethod": "Static",
+                  "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('KDMZSubnetName'))]"
+                  },
+                  "privateIPAddressVersion": "IPv4"
+              }
+            }       
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolExchEdgeKDMZ",
+                "properties": {                
+                }
+              }, 
+              {
+                "name": "backendpoolSkypeEdgeKDMZ",
+                "properties": {                
+                }
+              }            
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesExchEdgeKDMZ80",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'KDMZ', '-loadbalancer')), '/frontendIPConfigurations/FronEndExchangeEdgeKDMZ')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'KDMZ', '-loadbalancer')), '/backendAddressPools/backendpoolExchEdgeKDMZ')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'KDMZ', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },
+              {
+                "name": "loadBalancingRulesSkypeEdgeKDMZ80",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'KDMZ', '-loadbalancer')), '/frontendIPConfigurations/FronEndSkypeEdgeKDMZ')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'KDMZ', '-loadbalancer')), '/backendAddressPools/backendpoolSkypeEdgeKDMZ')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'KDMZ', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              }          
+            ],
+            "probes": [
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }          
+            ]
+          },
+          {     
+            "Name" : "CDMZ",
+            "Site" : "cdmz",
+            "Type" : "Internal",          
+            "SKU"  : "Basic",
+            "frontendIPConfigurations": [
+              {
+                "name": "FronEndExchangeEdgeCDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAddress": "10.0.4.200",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CDMZSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              },
+              {
+                "name": "FronEndSkypeEdgeCDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAddress": "10.0.4.201",
+                    "privateIPAllocationMethod": "Static",
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('CDMZSubnetName'))]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+              }       
+            
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolExchEdgeCDMZ",
+                "properties": {                
+                }
+              },        
+              {
+                "name": "backendpoolSkypeEdgeCDMZ",
+                "properties": {                
+                }
+              }
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [
+              {
+                "name": "loadBalancingRulesExchEdgeCDMZ80",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'CDMZ', '-loadbalancer')), '/frontendIPConfigurations/FronEndExchangeEdgeCDMZ')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'CDMZ', '-loadbalancer')), '/backendAddressPools/backendpoolExchEdgeCDMZ')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'CDMZ', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              },           
+              {
+                "name": "loadBalancingRulesSkypeEdgeCDMZ80",              
+                "properties": {                  
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'CDMZ', '-loadbalancer')), '/frontendIPConfigurations/FronEndSkypeEdgeCDMZ')]"
+                    },
+                    "frontendPort": 80,
+                    "backendPort": 80,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'CDMZ', '-loadbalancer')), '/backendAddressPools/backendpoolSkypeEdgeCDMZ')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(variables('templatePrefix'), '-', 'CDMZ', '-loadbalancer')), '/probes/HealthProbe80')]"
+                    }
+                }
+              }
+            ],
+            "probes": [
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }          
+            ]
+          }
+        ],
+        "LoadBalancersPublic"   :  [  
+          {     
+            "Name" : "KDMZPublic",
+            "Site" : "kdmz",
+            "Type" : "Public",          
+            "SKU"  : "Basic",
+            "frontendIPConfigurations": [
+              {
+                "name": "FronEndExchangeEdgeKDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('templatePrefix'), '-' , 'publicIpExchangeEdgeKDMZ')     )]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+            },
+            {
+                "name": "FronEndSkypeEdgeKDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('templatePrefix'), '-' , 'publicIpSkypeEdgeKDMZ')     )]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+            }
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolExchEdgeKDMZ",
+                "properties": {                
+                }
+              },
+              {
+                "name": "backendpoolSkypeEdgeKDMZ",
+                "properties": {                
+                }
+              }
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [],
+            "probes": [
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }          
+            ]
+          },          
+          {     
+            "Name" : "CDMZPublic",
+            "Site" : "cdmz",
+            "Type" : "Public",          
+            "SKU"  : "Basic",
+            "frontendIPConfigurations": [
+              {
+                "name": "FronEndExchangeEdgeCDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('templatePrefix'), '-' , 'publicIpExchangeEdgeCDMZ')     )]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+            },
+            {
+                "name": "FronEndSkypeEdgeCDMZ",            
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('templatePrefix'), '-' , 'publicIpSkypeEdgeCDMZ')     )]"
+                    },
+                    "privateIPAddressVersion": "IPv4"
+                }
+            }
+            ],
+            "backendAddressPools": [
+              {
+                "name": "backendpoolExchEdgeCDMZ",
+                "properties": {                
+                }
+              },
+              {
+                "name": "backendpoolSkypeEdgeCDMZ",
+                "properties": {                
+                }
+              }
+            ],
+            "inboundNatRules": [],
+            "loadBalancingRules": [],
+            "probes": [
+              {
+                "name": "HealthProbe80",              
+                "properties": {              
+                    "protocol": "Tcp",
+                    "port": 80,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+              }          
+            ]
+          }          
+        ]
+      },
+      "ApplicationGateway" :  {
+        "applicationGatewayTemplateUrl":   "[variables('applicationGatewayTemplateUrl')]",
+        "publicIpTemplateUrl" : "[variables('publicIpTemplateUrl')]",
+        "publicIPAddresses" : [
+          {
+            "Name" : "publicIp-RP-KDMZ",
+            "Site" : "KDMZ",            
+            "publicIPAddressVersion": "IPv4",
+            "publicIPAllocationMethod": "Dynamic",
+            "idleTimeoutInMinutes": 4,
+            "dnsSettings": {            
+              "domainNameLabel": "[concat('rpkdmzfrontend', uniqueString(resourceGroup().id))]"       
+            }        
+          },
+          {
+            "Name" : "publicIp-RP-CDMZ", 
+            "Site" : "KDMZ",            
+            "publicIPAddressVersion": "IPv4",
+            "publicIPAllocationMethod": "Dynamic",
+            "idleTimeoutInMinutes": 4,
+            "dnsSettings": {            
+              "domainNameLabel": "[concat('rpcdmzfrontend', uniqueString(resourceGroup().id))]"       
+            }        
+          }
+        ],
+        "enabledPublic" : "[variables('enabledPublicAG')]",
+        "ApplicationGateways": [
+          { 
+            "Name" : "[variables('ApplicationGatewayNames')[0]]",
+            "Site" : "kdmz",        
+            "sku"  : {          
+                "name": "Standard_Small",
+                "tier": "Standard",
+                "capacity": 4         
+            },
+            "gatewayIPConfigurations": [
+              {
+                "name": "appGatewayIpConfig",
+                "properties": {
+                  "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName'))]"
+                  }
+                }
+              }
+            ],
+            "frontendIPConfigurations": [
+              {
+                "name": "frontendIPConfig",               
+                "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                "properties": {                    
+                   "privateIPAddress": "10.0.10.50",
+                   "privateIPAllocationMethod": "Static",
+                    "subnet": "[ if( variables('enabledPublicAG') , json('null'), json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName')) ,'\"}' ) )   )     ]",                    
+                    "publicIPAddress": "[ if( variables('enabledPublicAG') , json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/publicIPAddresses',  concat( variables('templatePrefix'),'-publicIp-RP-KDMZ')   ) ,'\"}' ) ),  json('null') )     ]"
+                }
+              }
+             
+            ],
+            "frontendPorts": [
+              {
+                "name": "appGatewayFrontendPort",
+                "properties": {
+                  "Port": "80"
+                }
+              }
+            ],
+            "backendAddressPools": [
+              {
+                "name": "appGatewayBackendPool-ExchangeMB-KDMZ",
+                "properties": {
+                  "BackendAddresses": [
+                    {
+                      "IpAddress": "10.0.1.200"
+                    }                    
+                  ]
+                }
+              },
+              {
+                "name": "appGatewayBackendPool-SkypeFE-KDMZ",
+                "properties": {
+                  "BackendAddresses": [                   
+                    {
+                      "IpAddress": "10.0.1.201"
+                    }               
+                  ]
+                }
+              }
+            ],
+            "backendHttpSettingsCollection": [
+              {
+                "name": "appGatewayBackendHttpSettings",
+                "properties": {
+                  "Port": "80",
+                  "Protocol": "Http",
+                  "CookieBasedAffinity": "Disabled"
+                }
+              }
+            ],
+            "httpListeners": [
+              {
+                "name": "appGatewayHttpListener",
+                "properties": {
+                  "FrontendIpConfiguration": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-',variables('ApplicationGatewayNames')[0], '-ag')), '/frontendIPConfigurations/frontendIPConfig')]"
+                  },
+                  "FrontendPort": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[0], '-ag')), '/frontendPorts/appGatewayFrontendPort')]"
+                  },
+                  "Protocol": "Http",
+                  "SslCertificate": null
+                }
+              }
+            ],
+            "requestRoutingRules": [
+              {
+                "Name": "requestRoutingRules",
+                "properties": {
+                  "RuleType": "Basic",
+                  "httpListener": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[0], '-ag')), '/httpListeners/appGatewayHttpListener')]"
+                  },
+                  "backendAddressPool": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[0], '-ag')), '/backendAddressPools/appGatewayBackendPool-ExchangeMB-KDMZ')]"
+                  },
+                  "backendHttpSettings": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[0], '-ag')), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"
+                  }
+                }
+              }
+            ]
+          },
+          { 
+            "Name" : "[variables('ApplicationGatewayNames')[1]]",
+            "Site" : "cdmz",        
+            "sku"  : {          
+                "name": "Standard_Small",
+                "tier": "Standard",
+                "capacity": 2         
+            },
+            "gatewayIPConfigurations": [
+              {
+                "name": "appGatewayIpConfig",
+                "properties": {
+                  "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName'))]"
+                  }
+                }
+              }
+            ],
+            "frontendIPConfigurations": [
+              {
+                "name": "frontendIPConfig",               
+                "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                "properties": {                    
+                    "privateIPAddress": "10.0.10.60",
+                    "privateIPAllocationMethod": "Static",                    
+                    "subnet": "[ if( variables('enabledPublicAG') , json('null'), json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'),  variables('AGSubnetName')) ,'\"}' ) )   )     ]",
+                    "publicIPAddress": "[ if( variables('enabledPublicAG') , json( concat( '{ \"id\": \"', resourceId('Microsoft.Network/publicIPAddresses',  concat( variables('templatePrefix'),'-publicIp-RP-CDMZ') ) ,'\"}' ) ),  json('null') )     ]"
+                }
+              }        
+                      
+            ],
+            "frontendPorts": [
+              {
+                "name": "appGatewayFrontendPort",
+                "properties": {
+                  "Port": "80"
+                }
+              }
+            ],
+            "backendAddressPools": [
+              {
+                "name": "appGatewayBackendPool-ExchangeMB-CDMZ",
+                "properties": {
+                  "BackendAddresses": [
+                    {
+                      "IpAddress": "10.0.2.200"
+                    }                    
+                  ]
+                }
+              },
+              {
+                "name": "appGatewayBackendPool-SkypeFE-CDMZ",
+                "properties": {
+                  "BackendAddresses": [                   
+                    {
+                      "IpAddress": "10.0.2.201"
+                    }               
+                  ]
+                }
+              }
+            ],
+            "backendHttpSettingsCollection": [
+              {
+                "name": "appGatewayBackendHttpSettings",
+                "properties": {
+                  "Port": "80",
+                  "Protocol": "Http",
+                  "CookieBasedAffinity": "Disabled"
+                }
+              }
+            ],
+            "httpListeners": [
+              {
+                "name": "appGatewayHttpListener",
+                "properties": {
+                  "FrontendIpConfiguration": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-',variables('ApplicationGatewayNames')[1], '-ag')), '/frontendIPConfigurations/frontendIPConfig')]"
+                  },
+                  "FrontendPort": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[1], '-ag')), '/frontendPorts/appGatewayFrontendPort')]"
+                  },
+                  "Protocol": "Http",
+                  "SslCertificate": null
+                }
+              }
+            ],
+            "requestRoutingRules": [
+              {
+                "Name": "requestRoutingRules",
+                "properties": {
+                  "RuleType": "Basic",
+                  "httpListener": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[1], '-ag')), '/httpListeners/appGatewayHttpListener')]"
+                  },
+                  "backendAddressPool": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[1], '-ag')), '/backendAddressPools/appGatewayBackendPool-ExchangeMB-CDMZ')]"
+                  },
+                  "backendHttpSettings": {                
+                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', concat(variables('templatePrefix'), '-', variables('ApplicationGatewayNames')[1], '-ag')), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"
+                  }
+                }
+              }
+            ]
+          }    
+        ]
+      }     
+    }    
   },
   "resources": [    
-    
+    {
+      "name": "ProvisioningBase",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('baseTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          }, 
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },        
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisionLoadBalancers",
+      "type": "Microsoft.Resources/deployments",      
+      "apiVersion": "2015-01-01",
+      "condition": "[ or(equals(variables('template'), 'Exchange'), equals(variables('template'), 'Skype'), equals(variables('template'), 'SharedSQL'),  equals(variables('template'), 'SharePoint')     )]",
+      "dependsOn" : [
+        "ProvisioningBase"      
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri":  "[variables('ConfigData').LoadBalancer.loadBalancersTemplateUrl]", 
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').LoadBalancer]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisionApplicationGateway",
+      "type": "Microsoft.Resources/deployments",
+      "condition" :  "[equals(variables('ReverseProxy'), 'Yes')]",
+      "apiVersion": "2015-01-01",
+      "dependsOn" : [
+        "ProvisioningBase"       
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ConfigData').ApplicationGateway.applicationGatewayTemplateUrl]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').ApplicationGateway]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningJumpBox",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition":  "[equals(variables('deployJumpBoxTemplate'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('jumpboxTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },   
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },  
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },               
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "GithubUsername": {
+            "value": "[parameters('GithubUsername')]"            
+          },  
+          "GithubToken": {
+            "value": "[parameters('GithubToken')]"           
+          },
+          "GithubUrl": {
+            "value": "[parameters('GithubUrl')]"           
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          },          
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningDomain",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployDomain'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('domainTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+         
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+                      
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').PrimaryDomain]"
+          }
+        }
+      }
+    },   
+    {
+      "name": "ProvisioningDomain-DMZ",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(parameters('deployDomainDMZ'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('domainTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },         
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },                      
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').DMZDomain]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('Provisioning',  variables('servicestoBuild')[copyIndex()]    )]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[not( equals( variables('servicestoBuild')[copyIndex()], 'None')   )]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]",
+        "[if( or(equals( variables('servicestoBuild')[copyIndex()] , 'Exchange'), equals( variables('servicestoBuild')[copyIndex()] , 'Skype'), equals( variables('servicestoBuild')[copyIndex()] , 'SharePoint'))   , 'ProvisionLoadBalancers' ,  'ProvisioningBase')]"
+      ],
+      "copy": {
+        "name": "serviceLoop",
+        "count": "[length(variables('servicestoBuild'))]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('serviceTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainAdminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "domainname": {
+            "value": "[variables('domainname')]"
+          },
+          "domainNetbiosName": {
+            "value": "[variables('domainNetbiosName')]"
+          },
+          "domainNameDMZ": {
+            "value": "[variables('domainNameDMZ')]"
+          },
+          "domainNetbiosNameDMZ": {
+            "value": "[variables('domainNetbiosNameDMZ')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },
+          "VirtualMachineSizes": {
+            "value": "[parameters('VirtualMachineSizes')]"
+          },
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+          "OSDiskSize": {
+            "value": "[parameters('OSDiskSize')]"
+          },
+          "VMSeries": {
+            "value": "[parameters('VMSeries')]"
+          }, 
+          "template": {
+            "value": "[variables('servicestoBuild')[copyIndex()]]"
+          },
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "enabledPublic": {
+            "value": "[variables('ConfigData').Loadbalancer.enabledPublic]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProvisioningExternalTest",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "condition": "[equals(variables('ExternalTestEnvironment'), 'Yes')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'ProvisioningBase')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('externalTestTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('domainAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "ArtifactsLocation": {
+            "value": "[parameters('ArtifactsLocation')]"
+          },
+          "ArtifactsLocationSasToken": {
+            "value": "[parameters('ArtifactsLocationSasToken')]"
+          },         
+          "DiskSizes": {
+            "value": "[parameters('DiskSizes')]"
+          },
+
+          "AutoShutdown": {
+            "value": "[parameters('AutoShutdown')]"
+          },
+          "ConfigData" : { 
+            "value" : "[variables('ConfigData').ClientDomain]"
+          }
+        }
+      }
+    }
   ]
 }
