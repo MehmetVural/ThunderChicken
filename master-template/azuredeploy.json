@@ -9,11 +9,6 @@
         "description": "The name of the administrator account for each machine. 'domainadmin' and 'user', 'user_a', 'testuser'  also will be created at each domain defined below"
       },
       "defaultValue": "localadmin"
-    },
-    "storagePrefix": {
-      "type": "string",
-      "minLength": 3,
-      "maxLength": 11
     }
   },
   "variables": {},
