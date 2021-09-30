@@ -2,14 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-   
     "ArtifactsLocation": {
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/MehmetVural/Thunderchicken/dev/master-template",
       "metadata": {
         "group": "Base Settings",
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      }      
+      }
     },
     "ArtifactsLocationSasToken": {
       "type": "securestring",
@@ -17,20 +16,19 @@
       "metadata": {
         "group": "Base Settings",
         "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      }      
-    }, 
-    
+      }
+    },
     "githubUsername": {
       "type": "string",
-      "defaultValue": "",   
+      "defaultValue": "",
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "UserName for Github connection, Leave empty if Jumpbox is not part of this deployment"
       }
-    },  
+    },
     "githubToken": {
       "type": "securestring",
-      "defaultValue": "",   
+      "defaultValue": "",
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Token for Github connection, Leave empty if Jumpbox is not part of this deployment"
@@ -38,18 +36,19 @@
     },
     "githubUrl": {
       "type": "string",
-      "defaultValue": "github.com/MehmetVural",   
+      "defaultValue": "github.com/MehmetVural",
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "Base Url for Github connection, Leave empty if Jumpbox is not part of this deployment"
       }
     }
-   
   },
-  "variables": {    
-        
-  },
-  "resources": [    
-   
-  ]
+  "variables": {},
+  "resources": [],
+  "outputs": {
+    "outPutValue": {
+      "type": "string",
+      "value": "Test"
+    }
+  }
 }
