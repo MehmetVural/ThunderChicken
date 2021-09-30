@@ -218,9 +218,7 @@
               "configuration": "[variables('ConfigData'). dcInstallModule]",
               
               "configurationArguments": {                
-                "ConfigData"    : "[string(variables('ConfigData'))]",
-
-                
+                "ConfigData"    : "[string(variables('ConfigData'))]",                
                 "NodeName": "[variables('ConfigData').Servers[copyIndex()].HostName]",
                 "Primary": "[variables('ConfigData').Servers[copyIndex()].Primary]",
                 "FileShare": "[variables('ConfigData').Servers[copyIndex()].FileShare]",

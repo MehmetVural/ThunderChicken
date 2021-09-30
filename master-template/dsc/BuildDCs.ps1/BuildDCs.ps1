@@ -229,6 +229,7 @@
            InterfaceAlias = $InterfaceAlias
            AddressFamily  = 'IPv4'
         }
+        
         # Region Prepare Domain
         if($Primary) { 
         # create domain first controller

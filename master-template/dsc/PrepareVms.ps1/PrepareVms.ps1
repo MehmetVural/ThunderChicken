@@ -81,8 +81,6 @@ Configuration PrepareVms
                         
     Node localhost
     {
-
-
         ## Region Parameters
         # Convert Json string to Hashtable        
         # $ConfigData | Out-File -FilePath C:\json.txt
