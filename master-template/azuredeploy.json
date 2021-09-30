@@ -67,11 +67,6 @@
         "targetWorkerSizeId": 0
       }
     }
-  ],
-  "outputs": {
-    "storageEndpoint": {
-      "type": "object",
-      "value": "[reference(variables('uniqueStorageName')).primaryEndpoints]"
-    }
-  }
+  ]
+ 
 }
