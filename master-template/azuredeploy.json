@@ -348,7 +348,7 @@
             "HostName"  : "KD201",
             "Site"      : "[variables('KSubnetName')]",
             "Primary"   : true,
-            "FileShare" : false,
+            "FileShare" : true,
             "vmSize"    : "Standard_D2_v3",
             "Ip"        : "10.0.1.5"
           }, 

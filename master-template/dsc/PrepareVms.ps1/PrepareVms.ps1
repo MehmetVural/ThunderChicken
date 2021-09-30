@@ -105,7 +105,6 @@ Configuration PrepareVms
             RefreshMode = $RefreshMode
             RefreshFrequencyMins = $RefreshFrequencyMins            
         }
-        
        
         xCredSSP CredSSPServer
         {
