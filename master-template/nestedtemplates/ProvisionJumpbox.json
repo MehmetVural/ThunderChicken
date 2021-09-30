@@ -207,8 +207,7 @@
       "InstallOffice"      : true,    
       "Packages"  : [ 
         "vscode",
-        "vscode-powershell",
-        "googlechrome"
+        "vscode-powershell"
         ],
       "GitRepositories"  : [ 
         "Common"
