@@ -23,7 +23,7 @@
       "metadata": {
         "group": "Base Settings",
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      }      
+      }
     },
     "ArtifactsLocationSasToken": {
       "type": "securestring",
@@ -31,8 +31,8 @@
       "metadata": {
         "group": "Base Settings",
         "description": "The sasToken required to access ArtifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      }      
-    }, 
+      }
+    },
     "deployJumpbox": {
       "type": "string",
       "defaultValue": "Yes",
@@ -47,222 +47,14 @@
     },
     "githubUsername": {
       "type": "string",
-      "defaultValue": "",   
+      "defaultValue": "",
       "metadata": {
         "group": "Jumpbox Settings",
         "description": "UserName for Github connection, Leave empty if Jumpbox is not part of this deployment"
       }
-    },  
-    "githubToken": {
-      "type": "securestring",
-      "defaultValue": "",   
-      "metadata": {
-        "group": "Jumpbox Settings",
-        "description": "Token for Github connection, Leave empty if Jumpbox is not part of this deployment"
-      }
-    },
-    "githubUrl": {
-      "type": "string",
-      "defaultValue": "github.com/MehmetVural",   
-      "metadata": {
-        "group": "Jumpbox Settings",
-        "description": "Base Url for Github connection, Leave empty if Jumpbox is not part of this deployment"
-      }
-    },
-    "deployDomain": {
-      "type": "string",
-      "defaultValue": "Yes",
-      "allowedValues": [
-        "Yes",
-        "No"
-      ],
-      "metadata": {
-        "group": "Domain Settings",
-        "description": "Indicates wheter or not include Domain Controller in this deployment"
-      }
-    },
-    "includeCertificateAuthority" : {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"
-      ],
-      "metadata": {
-        "group": "Domain Settings",
-        "description": "Indicates wheter or not include certificate authority in Domain"
-      }
-    },
-    "deployDomainDMZ": {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"
-      ],
-      "metadata": {
-        "group": "Domain Settings",
-        "description": "Indicates wheter or not include DMZ zone Domain  in this deployment"
-      }
-    },
-    "forestMode": {
-      "type": "string",
-      "defaultValue": "Win2012R2",
-      "allowedValues": [
-        "WinThreshold",
-        "Win2012R2",
-        "Win2012",
-        "Win2008R2",
-        "Win2008"
-      ],
-      "metadata": {
-        "group": "Domain Settings",
-        "description": "Domain Controller Functioning Level"
-      }
-    },     
-    "Template": {
-      "type": "string",
-      "defaultValue": "None",
-      "allowedValues": [
-        "None",
-        "AD-DS",
-        "DNS",
-        "NPS",
-        "SCOM",
-        "SharedSQL",
-        "FileServer",
-        "DHCP",
-        "SharePoint",
-        "OOS",
-        "Exchange",
-        "UEM",
-        "Skype",
-        "SharedSQLFull",
-        "SCOMFull"        
-      ],
-      "metadata": {
-        "group": "Service Settings",
-        "description": "Indicates which service layer vms to build and prepare"
-      }
-    },
-    "InternalTestEnvironment": {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"   
-      ],
-      "metadata": {
-        "group": "Service Settings",
-        "description": "Includes Internal Test Machines, windows desktop in each site"
-      }      
-    },
-    "ExternalTestEnvironment": {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"                
-      ],
-      "metadata": {
-        "group": "Service Settings",
-        "description": "Includes External network, domain and win 10 test machine"
-      }      
-    },
-    "ReverseProxy": {
-      "type": "string",
-      "defaultValue": "No",
-      "allowedValues": [
-        "Yes",
-        "No"
-      ],
-      "metadata": {
-        "group": "Service Settings",
-        "description": "Includes External network, domain and win 10 test machine"
-      }      
-    },   
-
-    "VirtualMachineSizes": {
-      "type": "string",
-      "defaultValue": "Small",
-      "allowedValues": [
-        "Small",
-        "Medium",
-        "Large",
-        "Default"
-      ],
-      "metadata": {
-        "group": "VM Settings",
-        "description": "Builds virtual machine to T-Shirt size: Small: 1 or 2 cores Core, Medium:4 Core: Large: 8 Cores, Default: T-Shirt sizes defined in each service layer templates."
-      }
-    },       
-    "DiskSizes": {
-      "type": "string",
-      "defaultValue": "Small-4GB",
-      "allowedValues": [
-        "Small-4GB",
-        "Medium-20GB",
-        "Large-50GB" 
-      ],
-      "metadata": {
-        "group": "VM Settings",
-        "description": "Configures size of each drives defined in service layers."
-      }
-    },       
-    "OSDiskSize": {
-      "type": "string",
-      "defaultValue": "Small-30GB",
-      "allowedValues": [
-        "Small-30GB",
-        "Regular-127GB"        
-      ],
-      "metadata": {
-        "group": "VM Settings",
-        "description": "Defines Windows OS disk size. Small is for development, Reguler is full capacity tests"
-      }
-    },       
-    "VMSeries": {
-      "type": "string",
-      "defaultValue": "Dv3-Series",
-      "allowedValues": [
-        "Dv3-Series",
-        "Dv2-Series",
-        "Bs-Series"
-      ],
-      "metadata": {
-        "group": "VM Settings",
-        "description": "Defines Azure VM Series - CPU and memory optimization."
-      }
-    },    
-    "AutoShutdown": {
-      "type": "string",
-      "defaultValue": "1800",
-      "allowedValues": [
-        "1200",
-        "1300",
-        "1400",
-        "1500",
-        "1600",
-        "1700",
-        "1800",
-        "1900",
-        "2000"
-      ],
-      "metadata": {
-        "group": "VM Settings",
-        "description": "Daily Auto Shutdown schedule for each vms."
-      }
     }
   },
-  "variables": {
-  },
-  "resources": [
-   
-  ],
-  "outputs": {
-    "storageEndpoint": {
-      "type": "string",
-      "value": "Done."
-    }
-  }
+  "variables": {},
+  "resources": [],
+  "outputs": {}
 }
