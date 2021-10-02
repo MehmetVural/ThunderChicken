@@ -208,7 +208,8 @@
       "Packages"  : [ 
         "vscode",
         "vscode-powershell",
-        "git"
+        "git",
+        "googlechrome"
         ],
       "GitRepositories"  : [ 
         "SE.DevOps.DSC"
