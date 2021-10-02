@@ -605,18 +605,18 @@ Configuration PrepareVms
                             }
                         }
 
-                        if(Test-Path -path "C:\github\Common")
+                        if(Test-Path -path "C:\github\SE.DevOps.DSC\Common")
                         {
                             # Imports Common CI Utilities
                             # Write-Host "Importing Common Module" -ForegroundColor DarkCyan
                             if((Get-Module -Name 'Common')){ Remove-Module -Name 'Common' }
-                            Import-Module -Name 'C:\github\Common\Common.psd1' -DisableNameChecking
-                            Get-Repositories  -RepositoryRoot "C:\github" -GithubUsername "$($using:githubUsername)" -GithubToken "$($using:githubToken)" -GithubUrl "$($using:githubUrl)"
+                            Import-Module -Name 'C:\github\SE.DevOps.DSC\Common\Common.psd1' -DisableNameChecking
+                            #Get-Repositories  -RepositoryRoot "C:\github" -GithubUsername "$($using:githubUsername)" -GithubToken "$($using:githubToken)" -GithubUrl "$($using:githubUrl)"
                                 
                             # Imports Common CI Utilities
                             # Write-Host "Importing Common Module" -ForegroundColor DarkCyan
                             if((Get-Module -Name 'Common')){ Remove-Module -Name 'Common' }
-                            Import-Module -Name 'C:\github\Common\Common.psd1' -DisableNameChecking
+                            Import-Module -Name 'C:\github\SE.DevOps.DSC\Common\Common.psd1' -DisableNameChecking
                             # Install additional packages
                             #& "C:\github\Common\AzurePostConfigurations.ps1"
                             Set-PostConfigurations                            
@@ -643,14 +643,12 @@ Configuration PrepareVms
                 DependsOn           = $FarmTask   
                     
             }
-            $FarmTask = "[Script]CloneRepositories"   
-
-
+            $FarmTask = "[Script]CloneRepositories"
         }
-        
+
+        <#
         if(($env:ComputerName -eq "JumpBox") -or ($ServiceName -eq "InternalTest") )
-        {
-            <#
+        { 
             $ClientInstallPath  =  $ConfigData.ClientInstallPath
             $InstallOffice      =  $ConfigData.InstallOffice
             $DestinationPath    =  $ConfigData.DestinationPath 
@@ -665,9 +663,8 @@ Configuration PrepareVms
                 Credential      = $DomainAdminCredential
             }
             $FarmTask  = "[File]DirectoryCopy"
-            #> 
-          
         }
+        #>
 
         ### Service Additional Settings
         if($ServiceName -eq "DNS"){

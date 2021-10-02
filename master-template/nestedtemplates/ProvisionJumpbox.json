@@ -207,10 +207,11 @@
       "InstallOffice"      : true,    
       "Packages"  : [ 
         "vscode",
-        "vscode-powershell"
+        "vscode-powershell",
+        "git"
         ],
       "GitRepositories"  : [ 
-        "Common"
+        "SE.DevOps.DSC"
       ],
       "GithubUsername":  "[parameters('GithubUsername')]",
       "GithubToken":  "[parameters('GithubToken')]",
