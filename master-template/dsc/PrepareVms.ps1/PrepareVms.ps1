@@ -579,7 +579,6 @@ Configuration PrepareVms
             $githubToken      = $ConfigData.githubToken
             $githubUrl           = $ConfigData.githubUrl
             
-
             Script CloneRepositories
             {
                 SetScript = {
@@ -597,7 +596,7 @@ Configuration PrepareVms
                             $url += "$($using:githubUrl)" 
                             $url += "/$_"
                             $url += '.git'
-                            #github.dxc.com/AdvSol/' https://github.com/MehmetVural/
+                            #https://github.com/MehmetVural/
                             
                             if(-Not (Test-Path -path "c:\github\$_"))
                             {

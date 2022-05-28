@@ -2002,12 +2002,16 @@
           },
           "DnsRecords": [            
             {
-              "prefix": "SP2016AdminAG",
-              "IP": "10.0.1.43"              
+              "prefix": "SPAdminAG",
+              "IP": "10.0.1.43"
+            },
+            {
+              "prefix": "spadmin",
+              "IP": "10.0.1.42"
             },
             {
               "prefix": "ksp2016admin",
-              "IP": "10.0.1.162"              
+              "IP": "10.0.1.162"
             },
             {
               "prefix": "rootsc",
@@ -2015,7 +2019,7 @@
             },
             {
               "prefix": "corp",
-              "IP": "10.0.1.160"              
+              "IP": "10.0.1.160"
             },
             {
               "prefix": "extra",
